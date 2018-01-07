@@ -1,0 +1,54 @@
+# Travis CI configuration
+language: node_js
+
+git:
+  depth: 10
+
+addons:
+  firefox: 'latest'
+
+# You can choose Node.js and io.js versions to run your tests
+# by adding them to the node_js section of your .travis.yml:
+# docs: https://docs.travis-ci.com/user/languages/javascript-with-nodejs#Choosing-Node-versions-to-test-against
+node_js:
+  - '6'
+
+# You probably want to cache node modules to speed up builds
+cache:
+  yarn: true
+  directories:
+    - node_modules
+
+# Travis CI environment setup
+install:
+  - yarn install
+
+# Your before scripts
+# You can run custom commands before the installation step (before_install),
+# and before (before_script) or after (after_script) the script step.
+# docs: https://docs.travis-ci.com/user/customizing-the-build#The-Build-Lifecycle
+before_script:
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
+
+# All commands executed should be present in your package.json
+# CI_JOB is job matrix which we define below
+script: yarn run $CI_JOB
+
+env:
+  # Define our job matrix
+  matrix:
+    # Lint sass and js
+    - CI_JOB="lint"
+    # Run tests and generate coverage report
+    - CI_JOB="test:ci"
+
+# run that job only on master branch
+branches:
+  only:
+    - master
+
+# Do something when everything was successful!
+after_success:
+  # For example here we upload covergae report to codacy
+  - cat ./devel/coverage/lcov.info | node_modules/.bin/codacy-coverage --token $CODACY_PROJECT_TOKEN
