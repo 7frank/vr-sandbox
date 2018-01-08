@@ -7,8 +7,20 @@ the goal of this project is to test the capabilities of a-frame together with so
 * create some a-frame components
 * have an easy way to import a-frame components into the project from the viewer to extend scene
 * have an <strike>ace-editor</strike> overlay  
-    * but use etherpad-lite instead
+    * but use etherpad-lite in the future for the colalboartive demo aspect
+* have some diffing tool for the virtual dom and live editing
 
+    
+## potential extensions
+
+* xsd validation for html artifacts to make sure that a edited scene is updated as soon as the dom would be in a valid state    
+* see stackblitz for how a possible ide container wwould look like
+* file system with user access policy to prevent harrasement of public code
+
+## issues
+
+* cors for etherpad lite iframe
+* etherpad lite change event ...
 
 ## aframe-webpack-boilerplate
 

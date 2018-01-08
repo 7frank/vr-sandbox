@@ -50,8 +50,12 @@
     "dev": "babel-node devel --env.devel --hot --port 9000"
   },
   "dependencies": {
-    "aframe": "^0.6.1",
+    "aframe": "^0.7.1",
     "babel-polyfill": "^6.23.0",
+    "diff-dom": "^2.3.0",
+    "jquery": "^3.2.1",
+    "lodash.debounce": "^4.0.8",
+    "lodash.trim": "^4.5.1",
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {

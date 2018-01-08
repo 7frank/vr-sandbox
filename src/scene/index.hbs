@@ -1,8 +1,54 @@
-<a-scene id="aframe-project">
+<!--<a-scene id="aframe-project">
   {{> entity/default-sphere}}
   {{> entity/default-cylinder}}
   {{> entity/default-plane}}
   {{> entity/custom-box}}
   {{> sky/default-sky}}
   {{> camera/default-camera}}
+
+
+    <a-sphere position="1 1.25 -1" radius="1.25" color="#ffffff"></a-sphere>
+    </a-scene>
+-->
+
+<a-scene id="aframe-project">
+
+
+
 </a-scene>
+
+
+
+
+<style>
+    .overlay-editor {
+        position: absolute;
+        width:30%;
+        top:10%;
+        left:60%;
+        height:80%;
+        background-color:transparent;
+    }
+
+    .overlay-editor .content-area {
+
+        width:100%;
+
+
+        height:80%;
+        background-color:transparent;
+    }
+
+
+</style>
+
+<div class="overlay-editor">
+    <textarea class="content-area"></textarea>
+</div>
+
+
+<!-- currently not working because change events for etherpad can't be accessed
+<iframe class="overlay-editor"></iframe>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+-->
