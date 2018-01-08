@@ -230,6 +230,7 @@ module.exports = {
           loader: 'eslint-loader',
           options: {
             configFile: './config/eslint.json',
+              fix:true
           },
         },
         include: [src],
