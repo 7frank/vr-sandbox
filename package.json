@@ -59,7 +59,8 @@
     "jquery": "^3.2.1",
     "lodash.debounce": "^4.0.8",
     "lodash.trim": "^4.5.1",
-    "whatwg-fetch": "^2.0.3"
+    "whatwg-fetch": "^2.0.3",
+    "cannon": "latest"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

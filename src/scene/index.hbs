@@ -1,3 +1,6 @@
+
+
+
 <!--<a-scene id="aframe-project">
   {{> entity/default-sphere}}
   {{> entity/default-cylinder}}
@@ -22,6 +25,20 @@
 
 <style>
 
+
+    .goal-info-text{
+
+        position: absolute;
+        width: 30%;
+        top: 10%;
+        left: 35%;
+        background-color: #820c0c40;
+        font-size: 6em;
+        text-align: center;
+        pointer-events: none;
+        display: none;
+
+    }
 
     .splash-screen {
         background-image: url(assets/images/loading/car-race-ferrari-racing-car-pirelli-50pct-size.jpg);
@@ -53,6 +70,10 @@
 <div class="overlay-editor">
     <textarea class="content-area"></textarea>
 </div>
+
+
+<div class="goal-info-text">GOAL!!!</div>
+
 
 
 <!-- currently not working because change events for etherpad can't be accessed

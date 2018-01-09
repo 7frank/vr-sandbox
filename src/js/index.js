@@ -5,6 +5,8 @@ import 'aframe-physics-system';
 import 'aframe-mouse-cursor-component';
 import 'aframe-extras';
 
+import CANNON from 'cannon';
+
 // project entry
 import './a-systems';
 import './a-shaders';
@@ -65,23 +67,34 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-  <a-sphere dynamic-body position="0 10.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
-   <a-cylinder  position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
-   <a-box position="-2 5.5 -3" rotation="0 45 0" color="#4CC3D9" dynamic-body  width="1" height="1" depth="1"></a-box>
 
-<a-entity scale="0.5">
+
+  <a-sphere shadow="cast: true; receive: true" material="repeat:0.1 0.1"   src="/assets/images/grids/metal8.jpg"  class="ball" dynamic-body="mass:0.5 ;angularDamping:0.01;linearDamping:0.01" position="0 10.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
+   <a-cylinder shadow="cast: true; receive: true" static-body position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
+   <a-box shadow="cast: true; receive: true"  position="-2 5.5 -3" rotation="0 45 0" color="#4CC3D9" dynamic-body  width="1" height="1" depth="1"></a-box>
+
+<a-entity scale="0.8 1 0.5">
    
-<!-- <a-plane src="/assets/images/grids/metal1.jpg" position="0 0 0" rotation="-90 0 0" width="100" height="100" color="#7BC8A4" static-body ></a-plane> -->
+   
+ <a-plane class="goal" src="/assets/images/grids/metal1.jpg"  shadow="cast: true; receive: true" position="50 0 0" rotation="0 90 0" color="white"  static-body="shape:hull" material="side: double" height="8" width=20></a-plane>
 
-   <a-box position="0 0 0" material="repeat:2 2" src="/assets/images/grids/metal6.jpg"  color="#7BC8A4" static-body  width="100" height="1" depth="100"></a-box>
+<a-plane class="goal" src="/assets/images/grids/metal1.jpg"  shadow="cast: true; receive: true" position="-50 0 0" rotation="0 90 0" color="white"  static-body="shape:hull" material="side: double" height="8" width=20></a-plane>   
+   
+   
+   
+<a-plane class="floor" shadow="cast: false; receive: true" src="/assets/images/grids/Soccer-Football-Field-Lines.jpg" position="0 0 0" rotation="-90 0 0" width="100" height="100" color="#7BC8A4" static-body ></a-plane> 
+
+<!--    <a-box position="0 0 0" material="repeat:2 2" src="/assets/images/grids/metal6.jpg"  color="#7BC8A4" static-body  width="100" height="1" depth="100"></a-box> -->
 
 
 
-<a-cylinder open-ended=true src="/assets/images/grids/metal1.jpg" segments-height=1 segments-radial=18  position="50 5 0" rotation="90 0 0" color="#FFC65D"  static-body="shape:hull" material="side: double" theta-length=90 radius="5" height="110"></a-cylinder>
-<a-cylinder open-ended=true segments-height=1 segments-radial=18   position="0 5 50" rotation="90 270 0" color="red"  static-body="shape:hull" material="side: double" theta-length=90 radius="5" height="110"></a-cylinder>
+<a-cylinder class="border"  shadow="cast: false; receive: true"  open-ended=true src="/assets/images/grids/metal1.jpg" segments-height=1 segments-radial=18  position="50 5 0" rotation="90 0 0" color="#FFC65D"  static-body="shape:hull" material="side: double" theta-length=90 radius="5" height="110"></a-cylinder>
 
-<a-cylinder open-ended=true segments-height=1 segments-radial=18   position="-50 5 0" rotation="90 180 0" color="blue"  static-body="shape:hull" material="side: double" theta-length=90 radius="5" height="110"></a-cylinder>
-<a-cylinder open-ended=true segments-height=1 segments-radial=18   position="0 5 -50" rotation="90 90 0" color="green"  static-body="shape:hull" material="side: double" theta-length=90 radius="5" height="110"></a-cylinder>
+<a-cylinder class="border"  shadow="cast: false; receive: true"  open-ended=true src="/assets/images/grids/metal1.jpg" segments-height=1 segments-radial=18   position="0 5 50" rotation="90 270 0" color="grey"  static-body="shape:hull" material="side: double" theta-length=90 radius="5" height="110"></a-cylinder>
+
+<a-cylinder class="border"  shadow="cast: false; receive: true"  open-ended=true src="/assets/images/grids/metal1.jpg" segments-height=1 segments-radial=18   position="-50 5 0" rotation="90 180 0" color="blue"  static-body="shape:hull" material="side: double" theta-length=90 radius="5" height="110"></a-cylinder>
+
+<a-cylinder class="border"  shadow="cast: false; receive: true"  open-ended=true src="/assets/images/grids/metal1.jpg" segments-height=1 segments-radial=18   position="0 5 -50" rotation="90 90 0" color="green"  static-body="shape:hull" material="side: double" theta-length=90 radius="5" height="110"></a-cylinder>
 
 </a-entity>
 
@@ -89,13 +102,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
+  
+
   `;
 
   function staticUpdateScene () {
     var copy = $(
-      `<a-scene visible="false" id="aframe-project" physics="debug: true">
-         <a-camera  static-body look-controls mouse-cursor></a-camera> 
-        <!-- <a-entity camera universal-controls="fly:true" position="0 5 0" jump-ability kinematic-body></a-entity> -->
+      `<a-scene light="shadowMapType: basic" visible="false" id="aframe-project" physics="debug: false">
+        <a-camera class="player" static-body="shape:sphere;sphereRadius:1" ></a-camera> 
+        
+         <a-sound  src="src: url(assets/audio/22 Monkey Fight Menu.mp3)" autoplay="true" loop="true" position="0 2 5"></a-sound>
+         <a-sound  class="sound-cheer" src="src: url(assets/audio/Large_Stadium-stephan_schutze-2122836113.mp3)" autoplay="false" volume=0.4 ></a-sound>
+     
+        
+        
+      <!--    <a-entity camera universal-controls="fly:true" position="0 5 0" jump-ability kinematic-body></a-entity> -->
         </a-scene>`).append(trim(elem.value));
 
     copy.get(0).addEventListener('loaded', function () {
@@ -107,10 +128,46 @@ document.addEventListener('DOMContentLoaded', function () {
 
     $('a-scene').replaceWith(copy);
 
-    var playerEl = document.querySelector('a-sphere');
-    console.log('sphere' + playerEl);
-    playerEl.addEventListener('collide', function (e) {
-      console.log('Player has collided with body #' + e.detail.body.id, e.detail.target);
+    $('.player').on('collide', function (e) {
+      var targetEl = e.detail.body.el;
+
+      // FIXME
+
+      if ($(targetEl).hasClass('ball')) {
+      //  targetEl.body.applyImpulse(
+      //  e.detail.contact.ni.negate().scale(5),  //impulse
+        new CANNON.Vec3().copy(targetEl.getComputedAttribute('position'));//   world position
+        //   );
+      }
+    });
+
+    $('.ball').on('collide', function (e) {
+      var targetEl = e.detail.body.el;
+
+      if ($(targetEl).hasClass('goal')) {
+        console.log('GOAL!!!!');
+
+        $('.sound-cheer').get(0).components.sound.playSound();
+        $('.goal-info-text').fadeIn(300).fadeOut(300).fadeIn(300).fadeOut(300);
+
+        $('.ball').attr('position', '0 50 0');
+        $('.player').attr('position', '-15 1 0');
+      }
+    });
+
+    var ballEl = document.querySelector('a-sphere');
+    console.log('sphere' + ballEl);
+    ballEl.addEventListener('collide', function (e) {
+      var targetEl = e.detail.body.el;
+      console.log('ball has collided with body', targetEl.tagName, targetEl.getAttribute('class'));
+
+      if (!$(targetEl).hasClass('floor')) {
+        if (!targetEl.__origColor__) targetEl.__origColor__ = targetEl.getAttribute('color');
+
+        targetEl.setAttribute('color', 'red');
+
+        setTimeout(function () { targetEl.setAttribute('color', targetEl.__origColor__); }, 500);
+      }
 
       e.detail.target.el.setAttribute('position', {y: 20});
       e.detail.target.el.flushToDOM();
@@ -120,6 +177,13 @@ document.addEventListener('DOMContentLoaded', function () {
       //  e.detail.contact; // Stats about the collision (CANNON.ContactEquation).
       //  e.detail.contact.ni; // Normal (direction) of the collision (CANNON.Vec3).
     });
+
+    // wait for some mseconds after the last collision to revert to the original color
+  /*  playerEl.addEventListener('collide', debounce(function (e) {
+      // console.log('no more collision');
+      var targetEl = e.detail.body.el;
+      if (targetEl.__origColor__) { targetEl.setAttribute('color', targetEl.__origColor__); }
+    }, 200)); */
   }
 
   function diffUpdateScene () {
