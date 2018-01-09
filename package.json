@@ -1,8 +1,8 @@
 {
-  "name": "aframe-webpack-boilerplate",
+  "name": "simple-rocket-league",
   "version": "0.9.1",
-  "description": "A-Frame Starter Kit of WebVR with Webpack2 and SASS",
-  "author": "Marko Kungla <marko.kungla@gmail.com> (https://github.com/mkungla)",
+  "description": "A-Frame based simple clone of 'rocket league'",
+  "author": "Frank Reimann <frank.next@gmx.de> (https://github.com/frank1147)",
   "main": "src/js/index.js",
   "license": "MIT",
   "repository": {
@@ -10,17 +10,8 @@
     "url": "https://github.com/mkungla/aframe-webpack-boilerplate.git"
   },
   "keywords": [
-    "aframe",
-    "aframe-boilerplate",
-    "webpack2",
-    "webpack",
-    "es6",
-    "babel",
-    "sass",
-    "sass boilerplate",
-    "mocha",
-    "chai",
-    "istanbul"
+    "rocket league",
+    "aframe"
   ],
   "scripts": {
     "babel": "babel-node --presets es2015",

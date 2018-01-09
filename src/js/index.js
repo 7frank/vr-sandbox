@@ -58,6 +58,20 @@ function htmlToElement (html) {
   return template.content.firstChild;
 } */
 
+function playSound (assetSelector, duration = -1) {
+  $.each($(assetSelector), function () {
+    this.components.sound.playSound();
+  });
+
+  if (duration > 0) {
+    setTimeout(function () {
+      $.each($(assetSelector), function () {
+        this.components.sound.stopSound();
+      });
+    }, duration);
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   $('body').addClass('splash-screen');
 
@@ -69,7 +83,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-  <a-sphere shadow="cast: true; receive: true" material="repeat:0.1 0.1"   src="/assets/images/grids/metal8.jpg"  class="ball" dynamic-body="mass:0.5 ;angularDamping:0.01;linearDamping:0.01" position="0 10.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
+  <a-sphere class="ball" shadow="cast: true; receive: true" material="repeat:0.1 0.1"   src="/assets/images/grids/metal8.jpg"  dynamic-body="mass:0.5 ;angularDamping:0.01;linearDamping:0.01" position="0 10.25 -5" radius="1.25" color="#EF2D5E">
+    <a-sound  class="sound-ball-bounce" src="src: url(assets/audio/rubber_ball_bounce_dirt_01.mp3)" autoplay="false" volume=0.4 ></a-sound> 
+  </a-sphere>
+
+
+
    <a-cylinder shadow="cast: true; receive: true" static-body position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
    <a-box shadow="cast: true; receive: true"  position="-2 5.5 -3" rotation="0 45 0" color="#4CC3D9" dynamic-body  width="1" height="1" depth="1"></a-box>
 
@@ -88,13 +107,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-<a-cylinder class="border"  shadow="cast: false; receive: true"  open-ended=true src="/assets/images/grids/metal1.jpg" segments-height=1 segments-radial=18  position="50 5 0" rotation="90 0 0" color="#FFC65D"  static-body="shape:hull" material="side: double" theta-length=90 radius="5" height="110"></a-cylinder>
+<a-cylinder class="border"   shadow="cast: false; receive: true"  open-ended=true repeat="0.1 1" src="/assets/images/grids/metal1.jpg" segments-height=1 segments-radial=18  position="50 5 0" rotation="90 0 0" color="#FFC65D"  static-body="shape:hull" material="side: double" theta-length=90 radius="5" height="110"></a-cylinder>
 
-<a-cylinder class="border"  shadow="cast: false; receive: true"  open-ended=true src="/assets/images/grids/metal1.jpg" segments-height=1 segments-radial=18   position="0 5 50" rotation="90 270 0" color="grey"  static-body="shape:hull" material="side: double" theta-length=90 radius="5" height="110"></a-cylinder>
+<a-cylinder class="border"  shadow="cast: false; receive: true"  open-ended=true  repeat="0.1 1" src="/assets/images/grids/metal1.jpg" segments-height=1 segments-radial=18   position="0 5 50" rotation="90 270 0" color="grey"  static-body="shape:hull" material="side: double" theta-length=90 radius="5" height="110"></a-cylinder>
 
-<a-cylinder class="border"  shadow="cast: false; receive: true"  open-ended=true src="/assets/images/grids/metal1.jpg" segments-height=1 segments-radial=18   position="-50 5 0" rotation="90 180 0" color="blue"  static-body="shape:hull" material="side: double" theta-length=90 radius="5" height="110"></a-cylinder>
+<a-cylinder class="border"  shadow="cast: false; receive: true"  repeat="0.1 1" open-ended=true src="/assets/images/grids/metal1.jpg" segments-height=1 segments-radial=18   position="-50 5 0" rotation="90 180 0" color="blue"  static-body="shape:hull" material="side: double" theta-length=90 radius="5" height="110"></a-cylinder>
 
-<a-cylinder class="border"  shadow="cast: false; receive: true"  open-ended=true src="/assets/images/grids/metal1.jpg" segments-height=1 segments-radial=18   position="0 5 -50" rotation="90 90 0" color="green"  static-body="shape:hull" material="side: double" theta-length=90 radius="5" height="110"></a-cylinder>
+<a-cylinder class="border"  shadow="cast: false; receive: true"  repeat="0.1 1" open-ended=true src="/assets/images/grids/metal1.jpg" segments-height=1 segments-radial=18   position="0 5 -50" rotation="90 90 0" color="green"  static-body="shape:hull" material="side: double" theta-length=90 radius="5" height="110"></a-cylinder>
 
 </a-entity>
 
@@ -111,8 +130,9 @@ document.addEventListener('DOMContentLoaded', function () {
       `<a-scene light="shadowMapType: basic" visible="false" id="aframe-project" physics="debug: false">
         <a-camera class="player" static-body="shape:sphere;sphereRadius:1" ></a-camera> 
         
-         <a-sound  src="src: url(assets/audio/22 Monkey Fight Menu.mp3)" autoplay="true" loop="true" position="0 2 5"></a-sound>
-         <a-sound  class="sound-cheer" src="src: url(assets/audio/Large_Stadium-stephan_schutze-2122836113.mp3)" autoplay="false" volume=0.4 ></a-sound>
+         <a-sound  src="src: url(assets/audio/22 Monkey Fight Menu.mp3)" autoplay="true" loop="true"  volume=0.7 position="0 2 5"></a-sound>
+         <a-sound  class="sound-cheer" src="src: url(assets/audio/Large_Stadium-stephan_schutze-2122836113.mp3)" autoplay="false" volume=0.4 ></a-sound>   
+         <a-sound  class="sound-ball-bounce" src="src: url(assets/audio/rubber_ball_bounce_dirt_01.mp3)" autoplay="false" volume=0.4 ></a-sound>
      
         
         
@@ -147,7 +167,9 @@ document.addEventListener('DOMContentLoaded', function () {
       if ($(targetEl).hasClass('goal')) {
         console.log('GOAL!!!!');
 
-        $('.sound-cheer').get(0).components.sound.playSound();
+        // $('.sound-cheer').get(0).components.sound.playSound();
+
+        playSound('.sound-cheer', 3000);
         $('.goal-info-text').fadeIn(300).fadeOut(300).fadeIn(300).fadeOut(300);
 
         $('.ball').attr('position', '0 50 0');
@@ -159,6 +181,9 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('sphere' + ballEl);
     ballEl.addEventListener('collide', function (e) {
       var targetEl = e.detail.body.el;
+
+      playSound('.sound-ball-bounce');
+
       console.log('ball has collided with body', targetEl.tagName, targetEl.getAttribute('class'));
 
       if (!$(targetEl).hasClass('floor')) {
