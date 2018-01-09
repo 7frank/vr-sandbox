@@ -16,6 +16,23 @@ the goal of this project is to test the capabilities of a-frame together with so
 * xsd validation for html artifacts to make sure that a edited scene is updated as soon as the dom would be in a valid state    
 * see stackblitz for how a possible ide container wwould look like
 * file system with user access policy to prevent harrasement of public code
+* https://oasis.sandstorm.io/grain/2xFiyRc7z9QgLaKG73Log9 for hosting apps
+* vs code as basic editor for advanced users with elevated priviliges
+    * a-frame-testas a preview extension and standalone viewer for a list of areas (each area owned by a specific user and a list of colalborators which the author may define in a separate file) 
+    * SampleWorld 1
+        * users.config
+            * owner:nkre
+            * collaborators: xyz(0,0,100,100),acd(100,100,100,100)
+        * nkre.area.html
+        * xyz.area.html
+    * if the execution time of an area for a certain user drops on a machine, the rendering of his area is temoprarily disabled for the user to prevent frame drops and harrasment
+* https://remotestorage.io/        
+        
+
+
+
+#test scenarios
+
 
 ## issues
 

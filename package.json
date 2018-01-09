@@ -51,6 +51,7 @@
   },
   "dependencies": {
     "aframe": "^0.7.1",
+    "aframe-extras": "^3.13.1",
     "aframe-mouse-cursor-component": "^0.5.2",
     "aframe-physics-system": "^2.1.0",
     "babel-polyfill": "^6.23.0",

@@ -12,8 +12,8 @@
 -->
 
 <a-scene id="aframe-project" physics="debug: true">
-    <a-entity camera look-controls mouse-cursor>
-
+    <!-- <a-entity camera look-controls mouse-cursor> -->
+        <a-entity camera universal-controls position="0 50 0" jump-ability kinematic-body></a-entity>
 
 </a-scene>
 
@@ -21,6 +21,14 @@
 
 
 <style>
+
+
+    .splash-screen {
+        background-image: url(assets/images/loading/car-race-ferrari-racing-car-pirelli-50pct-size.jpg);
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+
     .overlay-editor {
         position: absolute;
         width:30%;
