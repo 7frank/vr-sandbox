@@ -37,8 +37,10 @@
     "vendor:perf": "webpack --config ./config/webpack-perf.js",
     "prebuild": "npm-run-all clean:dist vendor:perf",
     "build": "webpack --config ./config/webpack.config.babel.js --env.devel --progress",
-    "start": "npm-run-all build dev",
+    "start": "npm-run-all dev",
+    "start-dev": "npm-run-all build dev",
     "dev": "babel-node devel --env.devel --hot --port 9000",
+    "postinstall": "npm run build",
     "heroku-prebuild": "export NPM_CONFIG_PRODUCTION=false; export NODE_ENV=; NPM_CONFIG_PRODUCTION=false NODE_ENV=development npm install --only=dev --dev",
     "heroku-postbuild": "export NPM_CONFIG_PRODUCTION=true; export NODE_ENV=production;"
   },
