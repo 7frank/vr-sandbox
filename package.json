@@ -46,12 +46,13 @@
     "aframe-mouse-cursor-component": "^0.5.2",
     "aframe-physics-system": "^2.1.0",
     "babel-polyfill": "^6.23.0",
+    "cannon": "^0.6.2",
     "diff-dom": "^2.3.0",
     "jquery": "^3.2.1",
     "lodash.debounce": "^4.0.8",
     "lodash.trim": "^4.5.1",
     "whatwg-fetch": "^2.0.3",
-    "cannon": "latest"
+    "npm-run-all": "^4.1.2"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
@@ -107,7 +108,7 @@
     "karma-webpack": "^2.0.4",
     "mocha": "^3.4.2",
     "node-sass": "^4.5.3",
-    "npm-run-all": "^4.0.2",
+    "npm-run-all": "^4.1.2",
     "postcss-load-config": "^1.2.0",
     "postcss-loader": "^2.0.6",
     "precss": "^2.0.0",
