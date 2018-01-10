@@ -1,6 +1,8 @@
 ## project overview
+* NOTE:currently it is a mix of a quick and dirty rocket-leagueclone and rudimentary scene/html editing tool
 
 the goal of this project is to test the capabilities of a-frame together with some life-editing by using a second etherpad-lite overlay to enter or edit the content of the scene
+
 
 * test react components and elements
 * use a-frame
