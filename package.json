@@ -51,11 +51,14 @@
     "babel-polyfill": "^6.23.0",
     "cannon": "^0.6.2",
     "diff-dom": "^2.3.0",
+    "easyrtc": "^1.1.0",
     "jquery": "^3.2.1",
     "lodash.assignin": "^4.2.0",
     "lodash.debounce": "^4.0.8",
     "lodash.trim": "^4.5.1",
     "mousetrap": "^1.6.1",
+    "networked-aframe": "^0.4.0",
+    "socket.io": "latest",
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {

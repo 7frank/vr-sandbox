@@ -3,7 +3,7 @@
 import 'aframe';
 import 'aframe-physics-system';
 import 'aframe-mouse-cursor-component';
-import 'aframe-extras';
+import 'aframe-extras/dist/aframe-extras.controls';
 
 import CANNON from 'cannon';
 
@@ -18,6 +18,8 @@ import './a-car';
 import './a-project';
 
 import $ from 'jquery';
+
+import 'networked-aframe';
 
 import {Hotkeys, showHotkeyList} from './Interactions';
 
@@ -162,16 +164,16 @@ document.addEventListener('DOMContentLoaded', function () {
 -->
 
 
-<a-simple-car position="0 10.25 -15" dynamic-body="shape: box; mass: 30" scale="4 4 4"   ></a-simple-car>
+<a-simple-car networked position="0 10.25 -15" dynamic-body="shape: box; mass: 30" scale="4 4 4"   ></a-simple-car>
 
-  <a-sphere class="ball" shadow="cast: true; receive: true" material="repeat:0.1 0.1"   src="/assets/images/grids/metal8.jpg"  dynamic-body="mass:0.5 ;angularDamping:0.01;linearDamping:0.01" position="0 10.25 -5" radius="1.25" color="#EF2D5E">
+  <a-sphere networked="template:#avatar-template;showLocalTemplate:false;" class="ball" shadow="cast: true; receive: true" material="repeat:0.1 0.1"   src="/assets/images/grids/metal8.jpg"  dynamic-body="mass:0.5 ;angularDamping:0.01;linearDamping:0.01" position="0 10.25 -5" radius="1.25" color="#EF2D5E">
     <a-sound  class="sound-ball-bounce" src="src: url(assets/audio/rubber_ball_bounce_dirt_01.mp3)" autoplay="false" volume=0.4 ></a-sound> 
   </a-sphere>
 
 
 
    <a-cylinder shadow="cast: true; receive: true" static-body position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
-   <a-box shadow="cast: true; receive: true"  position="-2 5.5 -3" rotation="0 45 0" color="#4CC3D9" dynamic-body  width="1" height="1" depth="1"></a-box>
+   <a-box networked="template:#avatar-template;showLocalTemplate:false;" shadow="cast: true; receive: true"  position="-2 5.5 -3" rotation="0 45 0" color="#4CC3D9" dynamic-body  width="1" height="1" depth="1"></a-box>
 
 <a-entity scale="0.8 1 0.5">
    
@@ -220,8 +222,69 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function staticUpdateScene () {
     var copy = $(
-      `<a-scene light="shadowMapType: basic" visible="false" id="aframe-project" physics="debug: false">
-        <a-camera class="player" static-body="shape:sphere;sphereRadius:1" ></a-camera> 
+      `
+
+
+
+        <a-scene networked-scene="room: basic;debug: true;" light="shadowMapType: basic" visible="false" id="aframe-project" physics="debug: false">
+        <!--<a-camera class="player" static-body="shape:sphere;sphereRadius:1" ></a-camera>--> 
+        
+        
+<a-assets>
+
+      
+        <!-- Templates -->
+
+        <!-- Avatar -->
+        <script id="avatar-template" type="text/html">
+            <a-entity class="avatar">
+                <a-sphere class="head"
+                          color="#5985ff"
+                          scale="0.45 0.5 0.4"
+                          random-color
+                ></a-sphere>
+                <a-entity class="face"
+                          position="0 0.05 0"
+                >
+                    <a-sphere class="eye"
+                              color="#efefef"
+                              position="0.16 0.1 -0.35"
+                              scale="0.12 0.12 0.12"
+                    >
+                        <a-sphere class="pupil"
+                                  color="#000"
+                                  position="0 0 -1"
+                                  scale="0.2 0.2 0.2"
+                        ></a-sphere>
+                    </a-sphere>
+                    <a-sphere class="eye"
+                              color="#efefef"
+                              position="-0.16 0.1 -0.35"
+                              scale="0.12 0.12 0.12"
+                    >
+                        <a-sphere class="pupil"
+                                  color="#000"
+                                  position="0 0 -1"
+                                  scale="0.2 0.2 0.2"
+                        ></a-sphere>
+                    </a-sphere>
+                </a-entity>
+            </a-entity>
+        </script>
+
+        <!-- /Templates -->
+    </a-assets>
+        
+        
+           <a-entity class="player" static-body="shape:sphere;sphereRadius:1" networked="template:#avatar-template;showLocalTemplate:false;" camera spawn-in-circle="radius:3;" position="0 1.3 0" universal-controls > <!-- wasd-controls look-controls -->
+        </a-entity>
+       
+       
+       
+       
+       
+       
+       
         
          <a-sound  src="src: url(assets/audio/22 Monkey Fight Menu.mp3)" autoplay="true" loop="true"  volume=0.7 position="0 2 5"></a-sound>
          <a-sound  class="sound-cheer" src="src: url(assets/audio/Large_Stadium-stephan_schutze-2122836113.mp3)" autoplay="false" volume=0.4 ></a-sound>   
@@ -275,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // FIXME not working for .player
         // TODO also nmight not alsways be working if player is following vehicle
         // setPosition($('.player').get(0), '-5 1 0');
-        $('a-camera').attr('position', '0 1 0');
+        $('.player').attr('position', '0 1 0');
       }
     });
 
