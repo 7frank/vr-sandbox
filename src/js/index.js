@@ -182,7 +182,8 @@ document.addEventListener('DOMContentLoaded', function () {
    
    
    
-<a-plane class="floor" shadow="cast: false; receive: true" src="/assets/images/grids/Soccer-Football-Field-Lines.jpg" position="0 0 0" rotation="-90 0 0" width="150" height="150" color="#7BC8A4" static-body ></a-plane> 
+<a-plane class="floor" shadow="cast: false; receive: true"  src="/assets/images/grids/Soccer-Football-Field-Lines.jpg"  position="0 0 0" rotation="-90 0 0" width="110" height="110" color="#7BC8A4" static-body ></a-plane> 
+<a-plane class="second-floor"position="0 -1 0" src="/assets/images/grids/metal1.jpg" rotation="-90 0 0" width="250" height="250" color="#7BC8A4" static-body ></a-plane> 
 
 <!--    <a-box position="0 0 0" material="repeat:2 2" src="/assets/images/grids/metal6.jpg"  color="#7BC8A4" static-body  width="100" height="1" depth="100"></a-box> -->
 
@@ -219,7 +220,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function staticUpdateScene () {
     var copy = $(
-      `<a-scene light="shadowMapType: basic" visible="false" id="aframe-project" physics="debug: true">
+      `<a-scene light="shadowMapType: basic" visible="false" id="aframe-project" physics="debug: false">
         <a-camera class="player" static-body="shape:sphere;sphereRadius:1" ></a-camera> 
         
          <a-sound  src="src: url(assets/audio/22 Monkey Fight Menu.mp3)" autoplay="true" loop="true"  volume=0.7 position="0 2 5"></a-sound>
@@ -272,6 +273,7 @@ document.addEventListener('DOMContentLoaded', function () {
         $('.goal-info-text').fadeIn(300).fadeOut(300).fadeIn(300).fadeOut(300);
         setPosition($('.ball').get(0), '0 15 0');
         // FIXME not working for .player
+        // TODO also nmight not alsways be working if player is following vehicle
         // setPosition($('.player').get(0), '-5 1 0');
         $('a-camera').attr('position', '0 1 0');
       }

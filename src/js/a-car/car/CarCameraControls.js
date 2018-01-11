@@ -91,7 +91,7 @@ export default class CarCameraControls {
 
     direction = direction.normalize().negate().multiplyScalar(3);
     // 5 units above level ground
-    direction.y = 4;
+    direction.y = 2;
 
     // tCamera.position.copy(position);
     // we want the camera group position to be set in this case
