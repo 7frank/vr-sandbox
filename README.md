@@ -1,9 +1,23 @@
+
+
+
+
+| |
+| :---: |
+| <h1>simple-rocket-league</h1> |
+| A-Frame based rudimentary implementation of the game rocket league |
+| [![Build Status][ci-image]][ci-url] [![A-Frame Version][aframe-image]][aframe-url] [![Project License][license-image]][license-url] |
+| [![Grade Badge][codacy-grade-image]][codacy-grade-url] [![Coverage Badge][coverage-image]][coverage-url]   |
+| [![Dependencies][dep-status-image]][dep-status-url] [![Dev Dependencies][devdep-status-image]][devdep-status-url] |
+
+
 ## project overview
 * NOTE:currently it is a mix of a quick and dirty rocket-leagueclone and rudimentary scene/html editing tool
 
-the goal of this project is to test the capabilities of a-frame together with some life-editing by using a second etherpad-lite overlay to enter or edit the content of the scene
+the goal of this project is to test the capabilities of a-frame together with some live-editing by using a second etherpad-lite overlay to enter or edit the content of the scene
 
 
+* [Try out online](https://fierce-earth-97894.herokuapp.com/)
 * test react components and elements
 * use a-frame
 * create some a-frame components
@@ -41,16 +55,22 @@ the goal of this project is to test the capabilities of a-frame together with so
 * cors for etherpad lite iframe
 * etherpad lite change event ...
 
+
+* physics: the slopes at the edges of the playing field accellerate the player to the outside
+    * this might be due to some normal vecotr problem which is  shown on the console. It might be the car normals or the ones of the slopes which are generated or used when physics is wrapping the underlying cylinder 
+
+
+# todo
+* better documentation
+    * https://github.com/dwyl/repo-badges/blob/master/README.md
+
+
+# acknoledgements
 ## aframe-webpack-boilerplate
+* mkungla / aframe-webpack-boilerplate
 
-| |
-| :---: |
-| <h1>A-Frame Webpack Boilerplate</h1> |
-| A-Frame Starter Kit of WebVR with Webpack2 SASS |
-| [![A-Frame Version][aframe-image]][aframe-url] [![Build Status][ci-image]][ci-url] [![Grade Badge][codacy-grade-image]][codacy-grade-url] [![Coverage Badge][coverage-image]][coverage-url]  [![Project License][license-image]][license-url] |
-| [![Dependencies][dep-status-image]][dep-status-url] [![Dev Dependencies][devdep-status-image]][devdep-status-url] |
 
-### A-Frame Project skeleton
+# Project skeleton based on boilerplate
 
 - **config** project configuration files.
 - **devel** development
@@ -96,12 +116,14 @@ $theme: red;
 [license-url]: https://raw.githubusercontent.com/mkungla/aframe-php/master/LICENSE
 
 <!-- A-Frame -->
-[aframe-image]: https://img.shields.io/badge/a--frame-0.5.0-FC3164.svg?style=flat-square
+[aframe-image]: https://img.shields.io/badge/a--frame-0.7.1-FC3164.svg?style=flat-square
 [aframe-url]: https://aframe.io/
 
 <!-- travis-ci -->
-[ci-image]: https://travis-ci.org/mkungla/aframe-webpack-boilerplate.svg?branch=master
-[ci-url]: https://travis-ci.org/mkungla/aframe-webpack-boilerplate
+[ci-image]: https://travis-ci.org/frank1147/simple-rocket-league.svg?branch=master
+[ci-url]: https://travis-ci.org/frank1147/simple-rocket-league
+
+ [![Build Status](https://travis-ci.org/frank1147/simple-rocket-league.svg?branch=master)]()
 
 <!-- Codacy Badge Grade -->
 [codacy-grade-image]: https://api.codacy.com/project/badge/Grade/7a47a8ae8682467b9e33a3d47a6fbd54
@@ -111,10 +133,10 @@ $theme: red;
 [coverage-image]: https://api.codacy.com/project/badge/Coverage/7a47a8ae8682467b9e33a3d47a6fbd54
 [coverage-url]: https://www.codacy.com/app/marko-kungla/aframe-webpack-boilerplate?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mkungla/aframe-webpack-boilerplate&amp;utm_campaign=Badge_Coverage
 
-[dep-status-image]: https://david-dm.org/mkungla/aframe-webpack-boilerplate/status.svg
-[dep-status-url]: https://david-dm.org/mkungla/aframe-webpack-boilerplate#info=dependencies
-[devdep-status-image]: https://david-dm.org/mkungla/aframe-webpack-boilerplate/dev-status.svg
-[devdep-status-url]: https://david-dm.org/mkungla/aframe-webpack-boilerplate#info=devDependencies
+[dep-status-image]: https://david-dm.org/frank1147/simple-rocket-league/status.svg
+[dep-status-url]: https://david-dm.org/frank1147/simple-rocket-league#info=dependencies
+[devdep-status-image]: https://david-dm.org/frank1147/simple-rocket-league/dev-status.svg
+[devdep-status-url]: https://david-dm.org/frank1147/simple-rocket-league#info=devDependencies
 
 <!-- Screenshots -->
 [screeenshot-theme-red]: src/assets/images/screenshots/theme-red.png

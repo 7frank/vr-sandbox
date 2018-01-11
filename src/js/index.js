@@ -12,16 +12,20 @@ import './a-systems';
 import './a-shaders';
 import './a-components';
 import './a-primitives';
+import './a-car';
 
 // Load Application
 import './a-project';
 
 import $ from 'jquery';
 
+import {Hotkeys, showHotkeyList} from './Interactions';
+
 import debounce from 'lodash.debounce';
 import trim from 'lodash.trim';
 
 import DiffDOM from 'diff-dom';
+import CarCameraControls from './a-car/car/CarCameraControls';
 
 if (module.hot) {
   module.hot.accept();
@@ -57,6 +61,78 @@ function htmlToElement (html) {
   template.innerHTML = html;
   return template.content.firstChild;
 } */
+Hotkeys('show help', 'h', function () {
+  showHotkeyList();
+});
+// ---------------------------------------------------
+Hotkeys('accelerate  car forward', 'i', () => {
+  window.car._car.controls().moveForward = true;
+}, () => {
+  window.car._car.controls().moveForward = false;
+});
+
+Hotkeys('accelerate  car backward', 'k', () => {
+  window.car._car.controls().moveBackward = true;
+}, () => {
+  window.car._car.controls().moveBackward = false;
+});
+
+Hotkeys('steer car left', 'j', () => {
+  window.car._car.controls().moveLeft = true;
+}, () => {
+  window.car._car.controls().moveLeft = false;
+});
+
+Hotkeys('steer car right', 'l', () => {
+  window.car._car.controls().moveRight = true;
+}, () => {
+  window.car._car.controls().moveRight = false;
+});
+
+// ---------------------------------------------------
+
+Hotkeys('toggle follow car with camera', '+', function () {
+  // TODO use tquery cameracontrols'
+
+  // $('.player').get(0).object3D.position.copy($('a-simple-car').get(0).body.position);
+  var camera = $('.player').get(0).object3D.children[0];
+  var car = $('a-simple-car').get(0).components['simple-car'];
+  var carCamera = new CarCameraControls({camera: camera, car: car});
+
+  function step (timestamp) {
+    carCamera.update();
+    window.requestAnimationFrame(step);
+  }
+
+  window.requestAnimationFrame(step);
+
+  // prevent physics between player and car while "driving"
+  $('.player').get(0).removeAttribute('static-body');
+});
+
+Hotkeys('toggle overlay editor', '#', function () {
+  $('.overlay-editor').toggle();
+});
+
+Hotkeys('kick ball', 'space', function () {
+  var player = $('.player').get(0);
+  var ball = $('.ball').get(0);
+
+  /* el.body.applyImpulse(
+    // impulse  new CANNON.Vec3(0, 1, 0),
+    // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
+  );
+  */
+  var p = player.body.position;
+  var b = ball.body.position;
+
+  var direction = p.vsub(b);
+
+  if (direction.length() < 5) {
+    var velo = ball.body.velocity.addScaledVector(1, direction.negate());
+    ball.body.velocity.copy(velo);
+  }
+});
 
 function playSound (assetSelector, duration = -1) {
   $.each($(assetSelector), function () {
@@ -80,8 +156,13 @@ document.addEventListener('DOMContentLoaded', function () {
   elem.value = `
 
 
+<!-- 
+ <a-car  position="0 10.25 -5" ></a-car>
+ <a-entity simple-car position="0 1 -10"></a-entity> 
+-->
 
 
+<a-simple-car position="0 10.25 -15" dynamic-body="shape: box; mass: 30" scale="4 4 4"   ></a-simple-car>
 
   <a-sphere class="ball" shadow="cast: true; receive: true" material="repeat:0.1 0.1"   src="/assets/images/grids/metal8.jpg"  dynamic-body="mass:0.5 ;angularDamping:0.01;linearDamping:0.01" position="0 10.25 -5" radius="1.25" color="#EF2D5E">
     <a-sound  class="sound-ball-bounce" src="src: url(assets/audio/rubber_ball_bounce_dirt_01.mp3)" autoplay="false" volume=0.4 ></a-sound> 
@@ -101,19 +182,19 @@ document.addEventListener('DOMContentLoaded', function () {
    
    
    
-<a-plane class="floor" shadow="cast: false; receive: true" src="/assets/images/grids/Soccer-Football-Field-Lines.jpg" position="0 0 0" rotation="-90 0 0" width="100" height="100" color="#7BC8A4" static-body ></a-plane> 
+<a-plane class="floor" shadow="cast: false; receive: true" src="/assets/images/grids/Soccer-Football-Field-Lines.jpg" position="0 0 0" rotation="-90 0 0" width="150" height="150" color="#7BC8A4" static-body ></a-plane> 
 
 <!--    <a-box position="0 0 0" material="repeat:2 2" src="/assets/images/grids/metal6.jpg"  color="#7BC8A4" static-body  width="100" height="1" depth="100"></a-box> -->
 
 
 
-<a-cylinder class="border"   shadow="cast: false; receive: true"  open-ended=true repeat="0.1 1" src="/assets/images/grids/metal1.jpg" segments-height=1 segments-radial=18  position="50 5 0" rotation="90 0 0" color="#FFC65D"  static-body="shape:hull" material="side: double" theta-length=90 radius="5" height="110"></a-cylinder>
+<a-cylinder class="border"   shadow="cast: false; receive: true"  open-ended=true repeat="0.1 1" src="/assets/images/grids/metal1.jpg" segments-height=1 segments-radial=18  position="50 4 0" rotation="90 0 0" color="#FFC65D"  static-body="shape:hull" material="side: double" theta-length=90 radius="5" height="110"></a-cylinder>
 
-<a-cylinder class="border"  shadow="cast: false; receive: true"  open-ended=true  repeat="0.1 1" src="/assets/images/grids/metal1.jpg" segments-height=1 segments-radial=18   position="0 5 50" rotation="90 270 0" color="grey"  static-body="shape:hull" material="side: double" theta-length=90 radius="5" height="110"></a-cylinder>
+<a-cylinder class="border"  shadow="cast: false; receive: true"  open-ended=true  repeat="0.1 1" src="/assets/images/grids/metal1.jpg" segments-height=1 segments-radial=18   position="0 4 50" rotation="90 270 0" color="grey"  static-body="shape:hull" material="side: double" theta-length=90 radius="5" height="110"></a-cylinder>
 
-<a-cylinder class="border"  shadow="cast: false; receive: true"  repeat="0.1 1" open-ended=true src="/assets/images/grids/metal1.jpg" segments-height=1 segments-radial=18   position="-50 5 0" rotation="90 180 0" color="blue"  static-body="shape:hull" material="side: double" theta-length=90 radius="5" height="110"></a-cylinder>
+<a-cylinder class="border"  shadow="cast: false; receive: true"  repeat="0.1 1" open-ended=true src="/assets/images/grids/metal1.jpg" segments-height=1 segments-radial=18   position="-50 4 0" rotation="90 180 0" color="blue"  static-body="shape:hull" material="side: double" theta-length=90 radius="5" height="110"></a-cylinder>
 
-<a-cylinder class="border"  shadow="cast: false; receive: true"  repeat="0.1 1" open-ended=true src="/assets/images/grids/metal1.jpg" segments-height=1 segments-radial=18   position="0 5 -50" rotation="90 90 0" color="green"  static-body="shape:hull" material="side: double" theta-length=90 radius="5" height="110"></a-cylinder>
+<a-cylinder class="border"  shadow="cast: false; receive: true"  repeat="0.1 1" open-ended=true src="/assets/images/grids/metal1.jpg" segments-height=1 segments-radial=18   position="0 4 -50" rotation="90 90 0" color="green"  static-body="shape:hull" material="side: double" theta-length=90 radius="5" height="110"></a-cylinder>
 
 </a-entity>
 
@@ -125,16 +206,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
   `;
 
+  function setPosition (el, v) {
+    var arr = v.split(' ');
+
+    var v2 = {x: Number(arr[0]), y: Number(arr[1]), z: Number(arr[2])};
+    console.log(v);
+    if (el.body != null && el.body.position != null) {
+      el.body.position.copy(v2);
+      el.body.velocity.set(0, 0, 0);
+    } else el.setAttribute('position', v);
+  }
+
   function staticUpdateScene () {
     var copy = $(
-      `<a-scene light="shadowMapType: basic" visible="false" id="aframe-project" physics="debug: false">
+      `<a-scene light="shadowMapType: basic" visible="false" id="aframe-project" physics="debug: true">
         <a-camera class="player" static-body="shape:sphere;sphereRadius:1" ></a-camera> 
         
          <a-sound  src="src: url(assets/audio/22 Monkey Fight Menu.mp3)" autoplay="true" loop="true"  volume=0.7 position="0 2 5"></a-sound>
          <a-sound  class="sound-cheer" src="src: url(assets/audio/Large_Stadium-stephan_schutze-2122836113.mp3)" autoplay="false" volume=0.4 ></a-sound>   
          <a-sound  class="sound-ball-bounce" src="src: url(assets/audio/rubber_ball_bounce_dirt_01.mp3)" autoplay="false" volume=0.4 ></a-sound>
      
-        
+      <a-plane class="limbo" shadow="cast: false; receive: false" src="/assets/images/grids/Soccer-Football-Field-Lines.jpg" position="0 -100 0" rotation="-90 0 0" width="10000" height="10000" color="#7BC8A4" static-body ></a-plane> 
+  
         
       <!--    <a-entity camera universal-controls="fly:true" position="0 5 0" jump-ability kinematic-body></a-entity> -->
         </a-scene>`).append(trim(elem.value));
@@ -161,6 +254,12 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
 
+    // everything that falls down to limbo gets spawned at the center of the playing field
+    $('.limbo').on('collide', function (e) {
+      var targetEl = e.detail.body.el;
+      setPosition(targetEl, '0 20 0');
+    });
+
     $('.ball').on('collide', function (e) {
       var targetEl = e.detail.body.el;
 
@@ -171,9 +270,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         playSound('.sound-cheer', 3000);
         $('.goal-info-text').fadeIn(300).fadeOut(300).fadeIn(300).fadeOut(300);
-
-        $('.ball').attr('position', '0 50 0');
-        $('.player').attr('position', '-15 1 0');
+        setPosition($('.ball').get(0), '0 15 0');
+        // FIXME not working for .player
+        // setPosition($('.player').get(0), '-5 1 0');
+        $('a-camera').attr('position', '0 1 0');
       }
     });
 
@@ -244,5 +344,5 @@ document.addEventListener('DOMContentLoaded', function () {
 
   initSceneFromTextarea();
 
-  elem.addEventListener('keypress', debounce(initSceneFromTextarea, 1000));
+  elem.addEventListener('keypress', debounce(initSceneFromTextarea, 2000));
 });

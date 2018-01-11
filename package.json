@@ -52,8 +52,10 @@
     "cannon": "^0.6.2",
     "diff-dom": "^2.3.0",
     "jquery": "^3.2.1",
+    "lodash.assignin": "^4.2.0",
     "lodash.debounce": "^4.0.8",
     "lodash.trim": "^4.5.1",
+    "mousetrap": "^1.6.1",
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
