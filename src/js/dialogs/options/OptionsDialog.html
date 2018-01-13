@@ -1,0 +1,114 @@
+<script>
+
+    var expanded = false;
+
+    function showCheckboxes() {
+        var checkboxes = document.getElementById("checkboxes");
+        if (!expanded) {
+            checkboxes.style.display = "inline-block";
+            expanded = true;
+        } else {
+            checkboxes.style.display = "none";
+            expanded = false;
+        }
+    }
+
+</script>
+
+<style>
+
+    .multiselect {
+        width: 200px;
+    }
+
+    .selectBox {
+        position: relative;
+    }
+
+    .selectBox select {
+        width: 100%;
+        font-weight: bold;
+    }
+
+    .overSelect {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+    }
+
+    #checkboxes {
+        white-space: nowrap;
+
+        display: none;
+        border: 1px #dadada solid;
+    }
+
+    #checkboxes label {
+        display: block;
+    }
+
+    #checkboxes label:hover {
+        background-color: #1e90ff;
+    }
+
+
+    .strike {
+        display: block;
+        text-align: center;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .strike > span {
+        position: relative;
+        display: inline-block;
+    }
+
+    .strike > span:before,
+    .strike > span:after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        width: 9999px;
+        height: 1px;
+        background: red;
+    }
+
+    .strike > span:before {
+        right: 100%;
+        margin-right: 15px;
+    }
+
+    .strike > span:after {
+        left: 100%;
+        margin-left: 15px;
+    }
+
+
+</style>
+
+
+below controls can be activated or deactivated for the player<br>
+they will not work when inside the vehicle at the moment.<br>
+for a detailed explaination of the controls see
+https://aframe.io/docs/0.7.0/components/<br>
+and<br>
+https://github.com/donmccurdy/aframe-extras/tree/master/src/controls<br>
+Nöte: depending on the input devices you are using they might or might not work<br>
+
+
+<form>
+    <div class="multiselect">
+        <div class="selectBox" onclick="showCheckboxes()">
+            <select>
+                <option>Select one or many controls</option>
+            </select>
+            <div class="overSelect"></div>
+        </div>
+        <div id="checkboxes">
+        {{checkboxes}}
+        </div>
+    </div>
+</form>
