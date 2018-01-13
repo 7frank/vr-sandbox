@@ -54,6 +54,8 @@ the goal of this project is to test the capabilities of a-frame together with so
 
 * cors for etherpad lite iframe
 * etherpad lite change event ...
+* universal camera does jump on desktop
+* adding network to ball might have broken game logic
 
 
 * physics: the slopes at the edges of the playing field accellerate the player to the outside

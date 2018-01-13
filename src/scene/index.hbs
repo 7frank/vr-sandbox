@@ -13,6 +13,12 @@
 -->
 
 <script src="/assets/js/spawn-in-circle.component.js"></script>
+
+
+    <script src="/assets/js/spawn-in-circle.component.js"></script>
+
+
+
 </head>
 
 <script>
@@ -30,6 +36,18 @@
         ]
     };
     NAF.schemas.add(avatarSchema);
+
+
+    var ballSchema = {
+        template: '#ball-template',
+        components: [
+            'position',
+            'rotation'
+        ]
+    };
+    NAF.schemas.add(ballSchema);
+
+
 </script>
 
 <!-- endof scripts for network sample -->

@@ -1,0 +1,45 @@
+<!-- Templates -->
+
+<!-- Avatar -->
+<script id="avatar-template" type="text/html">
+    <a-entity class="avatar">
+        <a-sphere class="head"
+                  color="#5985ff"
+                  scale="0.45 0.5 0.4"
+                  random-color
+        ></a-sphere>
+        <a-entity class="face"
+                  position="0 0.05 0"
+        >
+            <a-sphere class="eye"
+                      color="#efefef"
+                      position="0.16 0.1 -0.35"
+                      scale="0.12 0.12 0.12"
+            >
+                <a-sphere class="pupil"
+                          color="#000"
+                          position="0 0 -1"
+                          scale="0.2 0.2 0.2"
+                ></a-sphere>
+            </a-sphere>
+            <a-sphere class="eye"
+                      color="#efefef"
+                      position="-0.16 0.1 -0.35"
+                      scale="0.12 0.12 0.12"
+            >
+                <a-sphere class="pupil"
+                          color="#000"
+                          position="0 0 -1"
+                          scale="0.2 0.2 0.2"
+                ></a-sphere>
+            </a-sphere>
+        </a-entity>
+    </a-entity>
+</script>
+
+
+<script id="ball-template" type="text/html">
+    <a-sphere class="ball" shadow="cast: true; receive: true" material="repeat:0.1 0.1"   src="/assets/images/grids/metal8.jpg"  dynamic-body="mass:0.5 ;angularDamping:0.01;linearDamping:0.01" position="0 10.25 -5" radius="1.25" color="#EF2D5E">
+        <a-sound  class="sound-ball-bounce" src="src: url(assets/audio/rubber_ball_bounce_dirt_01.mp3)" autoplay="false" volume=0.4 ></a-sound>
+    </a-sphere>
+</script>
