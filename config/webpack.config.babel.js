@@ -153,21 +153,34 @@ const cssRules = isHot ? [
     ]
   },
 ] : [
-  {
+  { //for css that is imported inline TODO not working atm
     test: /\.css$/,
     include: [
       src,
-      path.resolve(process.cwd(), 'node_modules')
+     // path.resolve(process.cwd(), 'node_modules')
     ],
-    use: ExtractTextPlugin.extract({
-      fallback: 'style-loader',
-      use: [
-        { loader: 'css-loader', options: { sourceMap: 'inline' } }, 
+    use:  [
+        { loader: 'css-loader', options: { sourceMap: 'inline' } },
         { loader: 'postcss-loader', options: { sourceMap: true } },
         'resolve-url-loader'
       ]
-    })
+
   },
+    { //for css that is handled via the ExtractTextPlugin
+        test: /\.css$/,
+        include: [
+          //  src,
+            path.resolve(process.cwd(), 'node_modules')
+        ],
+        use: ExtractTextPlugin.extract({
+            fallback: 'style-loader',
+            use: [
+                { loader: 'css-loader', options: { sourceMap: 'inline' } },  //'inline'
+                { loader: 'postcss-loader', options: { sourceMap: true } },
+                'resolve-url-loader'
+            ]
+        })
+    },
   {
     test: /\.scss$/,
     include: [
