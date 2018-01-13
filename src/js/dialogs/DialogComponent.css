@@ -1,0 +1,35 @@
+
+
+
+.DialogComponent
+{
+
+    display:none;
+    position:absolute;
+    left:20%;
+    top:20%;
+    bottom:20%;
+    right:20%;
+    background-color: rgba(255,255,255,0.3);
+    overflow: auto;
+    padding: 1em;
+
+
+}
+
+
+.DialogComponent .head
+{
+    background-color: rgba(155,155,155,0.3);
+    max-height:2em;
+
+}
+
+.DialogComponent .body
+{
+    background-color: rgba(155,155,155,0.3);
+
+
+
+}
+
