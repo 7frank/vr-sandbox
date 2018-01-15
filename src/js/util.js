@@ -1,4 +1,6 @@
 
+import $ from 'jquery';
+
 export function setPosition (el, v) {
   var arr = v.split(' ');
 

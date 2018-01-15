@@ -83,6 +83,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   })
   );
+
+  reloadSceneToDOM();
 });
 
 /**
@@ -94,42 +96,68 @@ document.addEventListener('DOMContentLoaded', function () {
 });
  */
 
-/*
-function htmlToElement (html) {
-  var template = document.createElement('template');
-  template.innerHTML = html;
-  return template.content.firstChild;
-} */
-
 // listening for changes of a-scene like added removed
 onTagChanged('a-scene', function (elementsInfo) {
   // console.log('a-scene changed', elementsInfo);
 
-  if (elementsInfo.added.length > 0) { onSceneAddedToDOM(elementsInfo.added[0]); }
+  function initScene (scene) {
+    scene.setAttribute('visible', false);
+
+    addLoadingListenersToScene(elementsInfo.added[0], function () {
+      scene.setAttribute('visible', true);
+    });
+
+    attachGameLogic();
+  }
+
+  // the first time called, this will attach logic for nothing as the initial scene is empty
+  if (elementsInfo.added.length > 0) {
+    initScene(elementsInfo.added[0]);
+  }
 });
 
-/*
-var manager = document.querySelector('a-assets').fileLoader.manager
-manager.onStart=function(){
-    console.log(arguments)
+function addLoadingListenersToScene (scene, loadedhandler = () => {}) {
+  var assets = scene.querySelector('a-assets');
+  console.log(assets);
+  if (assets == null) {
+    console.log('scene does not contain asssets for the loader');
+    loadedhandler();
+    return;
+  }
 
-};
-*/
+  var manager = assets.fileLoader.manager;
+  manager.onStart = function () {
+    console.log('scene assests start loading', arguments);
+  };
 
-// TODO
-document.addEventListener('DOMContentLoaded', initScene);
+  manager.onStart = function () {
+    console.log('scene assests start loading', arguments);
+  };
 
-function initScene () {
+  manager.onError = function () {
+    console.log('scene assests error loading', arguments);
+  };
+  manager.onProgress = function () {
+    console.log('scene assests progress loading', arguments);
+  };
 
+  manager.onLoad = function () {
+    console.log('scene assests loaded', arguments);
+    loadedhandler();
+  };
 }
 
-// --------------------------------------
+/*
+
+*/
 
 // --------------------------------------
 
-function onSceneAddedToDOM (scene) {
+// --------------------------------------
+
+function reloadSceneToDOM () {
   $('body').addClass('splash-screen');
-  console.log('on scene added to dom');
+
   var elem = document.querySelector('.overlay-editor .content-area');
 
   var content = require('../staticContent.hbs');
@@ -142,18 +170,16 @@ function onSceneAddedToDOM (scene) {
     var copy = $(sceneDefinition()).append(trim(elem.value));
 
     // FIXME no longer detecting loaded
-    copy.get(0).addEventListener('loaded', function () {
+    /*  copy.get(0).addEventListener('loaded', function () {
       console.log('scene was loaded');
       setTimeout(function () {
         copy.attr('visible', true);
       }, 500);
-    });
+    }); */
 
     $('a-scene').replaceWith(copy);
 
     // ----------------------------------
-
-    setTimeout(attachGameLogic, 500);
   }
 
   function diffUpdateScene () {
