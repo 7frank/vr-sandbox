@@ -33,6 +33,40 @@ import DiffDOM from 'diff-dom';
 import CarCameraControls from './a-car/car/CarCameraControls';
 import OptionsDialog from './dialogs/options/OptionDialog';
 
+import {
+  onAFrameAttributeChange, onAttributeChange, onElementChange, onTagChanged,
+  onXYZAFrameChange
+} from './network-sync';
+
+// ------------------
+
+// ----------------
+//
+// NOTE:Make sure that Bootstrap's CSS classes are included in your HTML.
+// NOTE:Make sure that Bootstrap's CSS classes are included in your HTML.
+// global.jQuery = global.$ = $;
+
+// require('bootstrap');
+// require('@gladeye/aframe-preloader-component');
+// NOTE:use below approach if component above is not sufficient
+/* var manager = document.querySelector('a-assets').fileLoader.manager
+ manager.onStart=function(){
+     console.log(arguments)
+
+ };
+*/
+/*
+onAttributeChange(undefined, 'position', function () {
+  console.log('------------------------------');
+  console.log('changed element:', arguments);
+});
+*/
+
+// track all elements with a position attribute (for now estimate that those are a-frame elements)
+onXYZAFrameChange('[position]', function (evt) {
+  // console.log('Entity has moved from', evt, evt.detail, evt.detail.oldData, 'to', evt.detail.newData, '!');
+});
+
 if (module.hot) {
   module.hot.accept();
 }
@@ -133,10 +167,10 @@ Hotkeys('kick ball', 'space', function () {
   var ball = $('.ball').get(0);
 
   /* el.body.applyImpulse(
-      // impulse  new CANNON.Vec3(0, 1, 0),
-      // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
-    );
-    */
+          // impulse  new CANNON.Vec3(0, 1, 0),
+          // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
+        );
+        */
   var p = player.body.position;
   var b = ball.body.position;
 
@@ -162,9 +196,27 @@ function playSound (assetSelector, duration = -1) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-  $('body').addClass('splash-screen');
+// listening for changes of a-scene like added removed
+onTagChanged('a-scene', function (elementsInfo) {
+  // console.log('a-scene changed', elementsInfo);
 
+  if (elementsInfo.added.length > 0) { onSceneAddedToDOM(elementsInfo.added[0]); }
+});
+
+/*
+var manager = document.querySelector('a-assets').fileLoader.manager
+manager.onStart=function(){
+    console.log(arguments)
+
+};
+*/
+
+// TODO
+// document.addEventListener('DOMContentLoaded', initScene);
+
+function onSceneAddedToDOM (scene) {
+  $('body').addClass('splash-screen');
+  console.log('on scene added to dom');
   var elem = document.querySelector('.overlay-editor .content-area');
 
   var content = require('../staticContent.hbs');
@@ -187,6 +239,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var copy = $(sceneDefinition()).append(trim(elem.value));
 
+    // FIXME no longer detecting loaded
     copy.get(0).addEventListener('loaded', function () {
       console.log('scene was loaded');
       setTimeout(function () {
@@ -196,77 +249,83 @@ document.addEventListener('DOMContentLoaded', function () {
 
     $('a-scene').replaceWith(copy);
 
-    $('.player').on('collide', function (e) {
-      var targetEl = e.detail.body.el;
+    // ----------------------------------
+    function attachGameLogic () {
+      $('.player').on('collide', function (e) {
+        var targetEl = e.detail.body.el;
 
-      // FIXME
+        // FIXME
 
-      if ($(targetEl).hasClass('ball')) {
-        //  targetEl.body.applyImpulse(
-        //  e.detail.contact.ni.negate().scale(5),  //impulse
-        new CANNON.Vec3().copy(targetEl.getComputedAttribute('position'));//   world position
-        //   );
-      }
-    });
+        if ($(targetEl).hasClass('ball')) {
+          //  targetEl.body.applyImpulse(
+          //  e.detail.contact.ni.negate().scale(5),  //impulse
+          new CANNON.Vec3().copy(targetEl.getComputedAttribute('position'));//   world position
+          //   );
+        }
+      });
 
-    // everything that falls down to limbo gets spawned at the center of the playing field
-    $('.limbo').on('collide', function (e) {
-      var targetEl = e.detail.body.el;
-      setPosition(targetEl, '0 20 0');
-    });
+      // everything that falls down to limbo gets spawned at the center of the playing field
+      $('.limbo').on('collide', function (e) {
+        var targetEl = e.detail.body.el;
+        setPosition(targetEl, '0 20 0');
+      });
 
-    $('.ball').on('collide', function (e) {
-      var targetEl = e.detail.body.el;
+      $('.ball').on('collide', function (e) {
+        var targetEl = e.detail.body.el;
 
-      if ($(targetEl).hasClass('goal')) {
-        console.log('GOAL!!!!');
+        if ($(targetEl).hasClass('goal')) {
+          console.log('GOAL!!!!');
 
-        // $('.sound-cheer').get(0).components.sound.playSound();
+          // $('.sound-cheer').get(0).components.sound.playSound();
 
-        playSound('.sound-cheer', 3000);
-        $('.goal-info-text').fadeIn(300).fadeOut(300).fadeIn(300).fadeOut(300);
-        setPosition($('.ball').get(0), '0 15 0');
-        // FIXME not working for .player
-        // TODO also nmight not alsways be working if player is following vehicle
-        // setPosition($('.player').get(0), '-5 1 0');
-        $('.player').attr('position', '0 1 0');
-      }
-    });
+          playSound('.sound-cheer', 3000);
+          $('.goal-info-text').fadeIn(300).fadeOut(300).fadeIn(300).fadeOut(300);
+          setPosition($('.ball').get(0), '0 15 0');
+          // FIXME not working for .player
+          // TODO also nmight not alsways be working if player is following vehicle
+          // setPosition($('.player').get(0), '-5 1 0');
+          $('.player').attr('position', '0 1 0');
+        }
+      });
 
-    var ballEl = document.querySelector('a-sphere');
-    console.log('sphere' + ballEl);
-    ballEl.addEventListener('collide', function (e) {
-      var targetEl = e.detail.body.el;
+      // var ballEl = document.querySelector('a-sphere');
+      // console.log('sphere' + ballEl);
+      // ballEl.addEventListener(
+      $('.ball').on('collide', function (e) {
+        var targetEl = e.detail.body.el;
 
-      playSound('.sound-ball-bounce');
+        playSound('.sound-ball-bounce');
 
-      console.log('ball has collided with body', targetEl.tagName, targetEl.getAttribute('class'));
+        console.log('ball has collided with body', targetEl.tagName, targetEl.getAttribute('class'));
 
-      if (!$(targetEl).hasClass('floor')) {
-        if (!targetEl.__origColor__) targetEl.__origColor__ = targetEl.getAttribute('color');
+        if (!$(targetEl).hasClass('floor')) {
+          if (!targetEl.__origColor__) targetEl.__origColor__ = targetEl.getAttribute('color');
 
-        targetEl.setAttribute('color', 'red');
+          targetEl.setAttribute('color', 'red');
 
-        setTimeout(function () {
-          targetEl.setAttribute('color', targetEl.__origColor__);
-        }, 500);
-      }
+          setTimeout(function () {
+            targetEl.setAttribute('color', targetEl.__origColor__);
+          }, 500);
+        }
 
-      e.detail.target.el.setAttribute('position', {y: 20});
-      e.detail.target.el.flushToDOM();
+        e.detail.target.el.setAttribute('position', {y: 20});
+        e.detail.target.el.flushToDOM();
 
-      //  e.detail.target.el; // Original entity (playerEl).
-      //  e.detail.body.el; // Other entity, which playerEl touched.
-      //  e.detail.contact; // Stats about the collision (CANNON.ContactEquation).
-      //  e.detail.contact.ni; // Normal (direction) of the collision (CANNON.Vec3).
-    });
+        //  e.detail.target.el; // Original entity (playerEl).
+        //  e.detail.body.el; // Other entity, which playerEl touched.
+        //  e.detail.contact; // Stats about the collision (CANNON.ContactEquation).
+        //  e.detail.contact.ni; // Normal (direction) of the collision (CANNON.Vec3).
+      });
 
-    // wait for some mseconds after the last collision to revert to the original color
-    /*  playerEl.addEventListener('collide', debounce(function (e) {
-            // console.log('no more collision');
-            var targetEl = e.detail.body.el;
-            if (targetEl.__origColor__) { targetEl.setAttribute('color', targetEl.__origColor__); }
-          }, 200)); */
+      // wait for some mseconds after the last collision to revert to the original color
+      /*  playerEl.addEventListener('collide', debounce(function (e) {
+                                  // console.log('no more collision');
+                                  var targetEl = e.detail.body.el;
+                                  if (targetEl.__origColor__) { targetEl.setAttribute('color', targetEl.__origColor__); }
+                                }, 200)); */
+    }
+
+    setTimeout(attachGameLogic, 500);
   }
 
   function diffUpdateScene () {
@@ -307,4 +366,4 @@ document.addEventListener('DOMContentLoaded', function () {
   initSceneFromTextarea();
 
   elem.addEventListener('keypress', debounce(initSceneFromTextarea, 2000));
-});
+}

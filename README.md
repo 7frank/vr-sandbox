@@ -11,13 +11,26 @@
 | [![Dependencies][dep-status-image]][dep-status-url] [![Dev Dependencies][devdep-status-image]][devdep-status-url] |
 
 
-## project overview
-* NOTE:currently it is a mix of a quick and dirty rocket-leagueclone and rudimentary scene/html editing tool
+# project overview
+* NOTE:currently it is a mix of a quick and dirty rocket-league clone and rudimentary scene/html editing tool
 
-the goal of this project is to test the capabilities of a-frame together with some live-editing by using a second etherpad-lite overlay to enter or edit the content of the scene
+the goal of this project is to test the capabilities of a-frame together with some live-editing by using a etherpad-lite overlay to enter or edit the content of the scene
+
+## Features
+* physics - cannon.js
+* network - npm i networked-aframe
+* visulalisation - a-frame
+
+## credits, references, acknowledgements
+* car behaviour and assets -  [jeromeetienne/tquery/car](https://github.com/jeromeetienne/tquery/tree/master/plugins/car)
+* boilerplate code -   [mkungla/aframe-webpack-boilerplate](https://github.com/mkungla/aframe-webpack-boilerplate)
+* network physics -  [lance-gg/sprocketleague](https://github.com/lance-gg/sprocketleague)
+
 
 
 * [Try out online](https://fierce-earth-97894.herokuapp.com/)
+
+## technical goals
 * test react components and elements
 * use a-frame
 * create some a-frame components
@@ -56,6 +69,8 @@ the goal of this project is to test the capabilities of a-frame together with so
 * etherpad lite change event ...
 * universal camera does jump on desktop
 * adding network to ball might have broken game logic
+* checkout https://msdn.microsoft.com/en-us/magazine/mt826359.aspx
+    * for network physics problem
 
 
 * physics: the slopes at the edges of the playing field accellerate the player to the outside
@@ -65,12 +80,6 @@ the goal of this project is to test the capabilities of a-frame together with so
 # todo
 * better documentation
     * https://github.com/dwyl/repo-badges/blob/master/README.md
-
-
-# acknoledgements
-## aframe-webpack-boilerplate
-* mkungla / aframe-webpack-boilerplate
-
 
 # Project skeleton based on boilerplate
 
