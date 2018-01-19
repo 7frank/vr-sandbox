@@ -36,6 +36,7 @@ import {
   onXYZAFrameChange
 } from './network-sync';
 import {attachGameLogic} from './ballGameLogic';
+import * as _ from 'lodash';
 
 // ------------------
 
@@ -105,9 +106,14 @@ onTagChanged('a-scene', function (elementsInfo) {
 
     addLoadingListenersToScene(elementsInfo.added[0], function () {
       scene.setAttribute('visible', true);
-    });
 
-    attachGameLogic();
+      /*   var ball = $('.ball');
+      // ball.removeAttribute("dynamic-body");
+      ball.attr('position', '0 2 ' + _.random(-5, 15));
+      console.log('initial ball position', ball.attr('position'));
+      */
+      attachGameLogic();
+    });
   }
 
   // the first time called, this will attach logic for nothing as the initial scene is empty

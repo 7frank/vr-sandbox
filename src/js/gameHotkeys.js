@@ -1,4 +1,6 @@
 
+import "@nk/core-components"
+
 import {Hotkeys, showHotkeyList} from './Interactions';
 
 import CarCameraControls from './a-car/car/CarCameraControls';

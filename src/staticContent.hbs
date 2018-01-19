@@ -7,7 +7,7 @@
 -->
 
 
-<a-simple-car networked position="0 10.25 -15" dynamic-body="shape: box; mass: 30" scale="4 4 4"   ></a-simple-car>
+<a-simple-car position="0 10.25 -15" dynamic-body="shape: box; mass: 30" scale="4 4 4"   ></a-simple-car>
 
 <!--
 <a-sphere networked="template:#avatar-template;showLocalTemplate:false;" class="ball" shadow="cast: true; receive: true" material="repeat:0.1 0.1"   src="/assets/images/grids/metal8.jpg"  dynamic-body="mass:0.5 ;angularDamping:0.01;linearDamping:0.01" position="0 10.25 -5" radius="1.25" color="#EF2D5E">
@@ -16,13 +16,13 @@
 -->
 
 
-<a-entity networked="template:#ball-template;showLocalTemplate:true;"  ></a-entity>
+<a-entity networked="template:#ball-template;showLocalTemplate:true;" spawn-in-circle="radius:3;"  ></a-entity>
 
 
 
 
 <a-cylinder shadow="cast: true; receive: true" static-body position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
-<a-box networked="template:#avatar-template;showLocalTemplate:false;" shadow="cast: true; receive: true"  position="-2 5.5 -3" rotation="0 45 0" color="#4CC3D9" dynamic-body  width="1" height="1" depth="1"></a-box>
+<a-box  shadow="cast: true; receive: true"  position="-2 5.5 -3" rotation="0 45 0" color="#4CC3D9" dynamic-body  width="1" height="1" depth="1"></a-box>
 
 <a-entity scale="0.8 1 0.5">
 
