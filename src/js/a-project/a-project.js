@@ -48,6 +48,7 @@ class APROJECT {
    * Render
    */
   render (aframeScene) {
+    console.log('render');
     let self = this;
 
     self.version = (self.Config.isDev()) ? self.version + '-devel' : self.version;

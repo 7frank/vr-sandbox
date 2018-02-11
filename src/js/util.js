@@ -1,6 +1,9 @@
 
 import $ from 'jquery';
 
+const AFRAME = window.AFRAME;
+const THREE = AFRAME.THREE;
+
 export function setPosition (el, v) {
   var arr = v.split(' ');
 
@@ -24,4 +27,35 @@ export function playSound (assetSelector, duration = -1) {
       });
     }, duration);
   }
+}
+
+// FIME direction seems to be inverted
+export function getDirectionForEntity (entity) {
+  var o3d = entity.object3D;
+  var pos = o3d.position;
+  var up = o3d.up;
+  var quaternion = o3d.quaternion;
+  var direction = new THREE.Vector3().copy(up);
+  direction.applyQuaternion(quaternion);
+  return direction;
+}
+
+export function findClosestEntity (targetSelector, selector = '.player') {
+  var player = document.querySelector(selector);
+  var targets = document.querySelectorAll(targetSelector);
+  var p = player.object3D.position;
+
+  function getDir (ball) {
+    var b = ball.object3D.position;
+    var direction = p.sub(b);
+
+    return direction;
+  }
+  targets =
+        Array.prototype.slice.call(targets, 0);
+  targets.sort(function (entityA, entityB) {
+    return getDir(entityA).length() >= getDir(entityB).length();
+  });
+
+  return targets[0];
 }

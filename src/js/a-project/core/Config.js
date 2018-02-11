@@ -39,6 +39,7 @@ class Config {
     for (let [key, value] of Object.entries(data)) {
       if (this.hasOwnProperty(key)) {
         this[key] = value;
+        this[key] = value;
       } else {
         console.warn('Invalid configuration property: ' + key);
       }

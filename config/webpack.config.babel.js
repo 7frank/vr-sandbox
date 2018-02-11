@@ -8,6 +8,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const StyleLintPlugin = require('stylelint-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const WpPluginWatchOffset = require('wp-plugin-watch-offset');
 const helper = require('../devel/utils/helpers');
 const argv = helper.parseArguments(process.argv.slice(2));
 const isDevel = process.env.NODE_ENV !== 'production' && !argv['env.production'];
@@ -208,9 +209,9 @@ module.exports = {
   resolve: {
     modules: [
       'src',
-      'node_modules',
+        path.resolve(process.cwd(), 'node_modules'),
     ],
-    extensions: ['.js', '.jsx', '.json', '.css', '.scss', '.html']
+    extensions: ['.js', '.jsx', '.json', '.css', '.scss', '.html','.ts','.tsx']
   },
   entry: helper.sanitizeObject({
     vendors: isProduction ? ['babel-polyfill', './js/vendors.js'] : [],
@@ -236,6 +237,8 @@ module.exports = {
 
   module: {
     rules: [
+        {test: /\.tsx?$/, loader: 'ts-loader'},
+        {test: /\.tsx$/, loader: 'ts-loader'},
       {
         test: /\.js[x]?$/,
         enforce: 'pre',
@@ -298,6 +301,8 @@ module.exports = {
     ].concat(cssRules)
   },
   plugins: [
+      new WpPluginWatchOffset(),
+
     new Webpack.DefinePlugin({
       'process.env.NODE_ENV': isProduction ? JSON.stringify('production') : JSON.stringify('development'),
       __DEV__: !isProduction,
@@ -351,7 +356,8 @@ module.exports = {
     }),
 
     new CopyWebpackPlugin([
-      { from: 'assets', to: 'assets' }
+      { from: 'assets', to: 'assets' },
+      { from: '../node_modules/aframe-material-snickell/assets', to: 'assets' }
     ]),
 
     new Webpack.NamedModulesPlugin(),

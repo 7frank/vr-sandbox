@@ -71,6 +71,13 @@ the goal of this project is to test the capabilities of a-frame together with so
 * adding network to ball might have broken game logic
 * checkout https://msdn.microsoft.com/en-us/magazine/mt826359.aspx
     * for network physics problem
+    
+*missing global dependencies for building when nppm install after node_modules got deleted
+    npm-run-all
+    rimraf
+    webpack
+    babel-cli (for babel node)
+    babel-polyfill error
 
 
 * physics: the slopes at the edges of the playing field accellerate the player to the outside

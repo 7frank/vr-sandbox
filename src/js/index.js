@@ -1,6 +1,8 @@
 'use strict';
 // Dependencies we load from vendor.js
+
 import 'aframe';
+
 import 'aframe-physics-system';
 import 'aframe-mouse-cursor-component';
 import 'aframe-extras/dist/aframe-extras.controls';
@@ -14,6 +16,8 @@ import './a-shaders';
 import './a-components';
 import './a-primitives';
 import './a-car';
+
+import './a-html3d/html';
 
 // Load Application
 import './a-project';
@@ -73,6 +77,7 @@ if (module.hot) {
 // Load html
 let aScene = require('../scene/index.hbs');
 document.addEventListener('DOMContentLoaded', function () {
+  console.log('DOMContentLoaded');
   $('body').append(aScene({
     defaults: {
       camera: {
@@ -84,7 +89,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   })
   );
-
   reloadSceneToDOM();
 });
 
@@ -99,6 +103,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // listening for changes of a-scene like added removed
 onTagChanged('a-scene', function (elementsInfo) {
+  console.log('onTagChanged a-scene');
   // console.log('a-scene changed', elementsInfo);
 
   function initScene (scene) {
@@ -162,6 +167,7 @@ function addLoadingListenersToScene (scene, loadedhandler = () => {}) {
 // --------------------------------------
 
 function reloadSceneToDOM () {
+  console.log('reloadSceneToDOM');
   $('body').addClass('splash-screen');
 
   var elem = document.querySelector('.overlay-editor .content-area');
@@ -184,6 +190,90 @@ function reloadSceneToDOM () {
     }); */
 
     $('a-scene').replaceWith(copy);
+
+    $('body').append(`
+    
+    
+    <style type="text/css">
+    #target {
+      width: 512px;
+      height: 256px;
+      position: absolute;
+      background: rgba(255,255,0,0.3);
+    }
+    #htmlTarget.hide {
+      z-index: -1;
+    }
+    #target h1 {
+      font-family: Arial;
+      font-size: 110px;
+      margin: 0;
+      vertical-align: top;
+      color: white;
+    }
+    #target h1 span {
+      color: tomato;
+    }
+    #emoji {
+      position: absolute;
+      font-size: 512px;
+      color: mediumTurquoise;
+      font-style: serif;
+    }
+    #pre {
+      font-family: monospace;
+      margin: 0;
+      padding: 0;
+      height: 50px;
+      font-size: 50px;
+      background: royalblue;
+      color: tomato;
+    }
+    #htmlTarget {
+      position: absolute;
+      z-index: 1;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+    #debug {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+    }
+    @media (max-width: 512px) {
+      #target {
+        width: 256px;
+        height: 126px;
+      }
+      #target h1 {
+        font-size: 55px;
+      }
+      #pre {
+        height: 50px;
+        font-size: 25px;
+      }
+      #emoji {
+        position: absolute;
+        font-size: 256px;
+        color: mediumTurquoise;
+      }
+    }
+    body[data-vr="true"] .novr{
+      display: none;
+    }
+    </style>
+    
+      <div id="htmlTarget" class="hide">
+      <div id="emoji">〠</div>
+      <div id="target">
+        <h1>HELLO<span>★</span></h1>
+        <span id="pre">A</span>
+      </div>
+    </div>
+    <div id="debug" class="novr_2"></div>
+  
+  `);
 
     // ----------------------------------
   }

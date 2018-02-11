@@ -15,7 +15,7 @@ import easyrtc from "easyrtc";
 import socketIo from "socket.io";
 
 
-
+//import  serveIndex from 'serve-index';
 
 const argv = helper.parseArguments(process.argv.slice(2));
 const isHot = argv['hot'] || false;
@@ -55,12 +55,12 @@ else {
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+
 app.use('/api', routing);
 app.use(history({
   verbose: false,
 }));
 app.use(publicPath, express.static(outputPath));
-
 
 /*********************************************/
 //a-frame-network

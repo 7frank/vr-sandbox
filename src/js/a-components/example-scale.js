@@ -1,3 +1,4 @@
+window.AFRAME = require('aframe');
 const AFRAME = window.AFRAME;
 /**
  * Example component

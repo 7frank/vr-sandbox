@@ -22,8 +22,17 @@ routing.get('/coverage/*', (req, res) => {
 });
 
 routing.get('*', (req, res) => {
-  clioutput.error('[404] Not Found ' + req.params[0]);
-  res.sendStatus(404).end()
+
+
+  //FIXME change again for production
+  //clioutput.error('[404] Not Found ' + req.params[0]);
+  //res.sendStatus(404).end()
+
+    clioutput.ok('[200] ' + req.params[0]);
+    res.sendFile(path.join(__dirname, '../../', req.params[0] ? req.params[0] : 'index.html'));
+    res.status(200);
+
+
 });
 
 export default routing;

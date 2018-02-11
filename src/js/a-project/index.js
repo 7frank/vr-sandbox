@@ -12,13 +12,14 @@ APROJECT.name = JSON.stringify(require('../../../package.json').name);
 // Export to browser
 exports = window.APROJECT = APROJECT;
 window.addEventListener('load', function () {
+  console.log('a-project load event handler');
   let aframeScene = document.querySelector('a-scene');
   APROJECT.Config.set({
     host: 'localhost',
     path: '/api/v1',
     port: '9000',
     scheme: 'http',
-    stats: true
+    stats: false
   });
 
   if (aframeScene.hasLoaded) {

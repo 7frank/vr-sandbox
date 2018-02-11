@@ -1,40 +1,78 @@
-
-
-
 <!-- note: foor now, the preloaded get attached manually via js to be able to reload full scenee which is changes in the near future (jan/18) -->
-<a-scene  networked-scene="room: basic;debug: true;" light="shadowMapType: basic"
-
-          visible="true"
-
-          id="aframe-project" physics="debug: false">
+<a-scene networked-scene="room: basic;debug: true;" light="shadowMapType: basic"
+         visible="true"
+         id="aframe-project"
+         physics="debug: false">
     <!--<a-camera class="player" static-body="shape:sphere;sphereRadius:1" ></a-camera>-->
 
 
     <a-assets>
-
-
-    {{> asssetsDefinition}}
-
+        {{> asssetsDefinition}}
         <!-- /Templates -->
     </a-assets>
 
 
-    <a-entity class="player" static-body="shape:sphere;sphereRadius:1" networked="template:#avatar-template;showLocalTemplate:false;" camera spawn-in-circle="radius:3;" position="0 1.3 0"  universal-controls > <!-- wasd-controls look-controls -->
+    <!-- a first 3d form integration test-->
+
+    {{> form1}}
+
+     <!-- wasd-controls look-controls -->
+    <a-entity class="player" static-body="shape:sphere;sphereRadius:1"
+              networked="template:#avatar-template;showLocalTemplate:false;" camera spawn-in-circle="radius:3;"
+              position="0 1.3 0" universal-controls="rotationSensitivity:0.2" laser-controls="hand: right">
+
+
+        <!-- TODO have a laser pointer for form controls via laser-controls="hand: right" or daydream-controller-->
+
+
+
+
+<!--  cursor ="fuse: true; fuseTimeout: 500" -->
+        <a-entity cursor
+                  position="0 0 -1"
+                  geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+                  material="color: black; shader: flat">
+        </a-entity>
+
     </a-entity>
 
 
 
+    <a-sound src="src: url(assets/audio/22 Monkey Fight Menu.mp3)" autoplay="true" loop="true" volume=0.7
+             position="0 2 5"></a-sound>
+    <a-sound class="sound-cheer" src="src: url(assets/audio/Large_Stadium-stephan_schutze-2122836113.mp3)"
+             autoplay="false" volume=0.4></a-sound>
+    <a-sound class="sound-ball-bounce" src="src: url(assets/audio/rubber_ball_bounce_dirt_01.mp3)" autoplay="false"
+             volume=0.4></a-sound>
+
+    <a-plane class="limbo" shadow="cast: false; receive: false"
+             src="/assets/images/grids/Soccer-Football-Field-Lines.jpg" position="0 -100 0" rotation="-90 0 0"
+             width="10000" height="10000" color="#7BC8A4" static-body></a-plane>
 
 
+    <!-- test for first of 3 stereo html approaches -->
+    <!-- <a-html-3d  position="0 2 3" stereo="eye:left"> <span>hello 3d</span>    </a-html-3d>
+ -->
 
+    <!-- TODO stereo="eye:right" FIXME dialog1 not present when entity is created so no html2canvas happening -->
+    <!--    <a-entity  geometry="primitive:plane;width:5;height:5;" rotation="0 0 0" position="0 2 4" material="shader:html;target:#testFormShader;transparent:false;ratio:width;fps:10.5;debug:#debugShader"></a-entity>
+    -->
 
+    <!-- emoji 66 letters -->
 
-    <a-sound  src="src: url(assets/audio/22 Monkey Fight Menu.mp3)" autoplay="true" loop="true"  volume=0.7 position="0 2 5"></a-sound>
-    <a-sound  class="sound-cheer" src="src: url(assets/audio/Large_Stadium-stephan_schutze-2122836113.mp3)" autoplay="false" volume=0.4 ></a-sound>
-    <a-sound  class="sound-ball-bounce" src="src: url(assets/audio/rubber_ball_bounce_dirt_01.mp3)" autoplay="false" volume=0.4 ></a-sound>
+<!--
+    <a-entity id="emojiEntity" geometry="primitive:box;width:3;height:3;depth:3;" rotation="0 0 0"
+              position="-2 3.5 -0.5"
+              material="shader:html;target:#emoji;transparent:false;ratio:height;fps:0.3;side:double;"></a-entity>
 
-    <a-plane class="limbo" shadow="cast: false; receive: false" src="/assets/images/grids/Soccer-Football-Field-Lines.jpg" position="0 -100 0" rotation="-90 0 0" width="10000" height="10000" color="#7BC8A4" static-body ></a-plane>
+    <a-entity id="lettersEntity" geometry="primitive:plane;width:5;height:5;" rotation="-90 0 0" position="-0.2 0.5 4.5"
+              material="shader:html;target:#target;transparent:false;fps:1.5;debug:#debug"></a-entity>
+-->
+
 
 
     <!--    <a-entity camera universal-controls="fly:true" position="0 5 0" jump-ability kinematic-body></a-entity> -->
 </a-scene>
+
+
+
