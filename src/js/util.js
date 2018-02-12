@@ -59,3 +59,11 @@ export function findClosestEntity (targetSelector, selector = '.player') {
 
   return targets[0];
 }
+
+export function addScript (src, load) {
+  var s = document.createElement('script');
+  s.onload = load;
+  s.setAttribute('src', src);
+  document.body.appendChild(s);
+  return s;
+}

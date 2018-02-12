@@ -19,6 +19,8 @@ import './a-car';
 
 import './a-html3d/html';
 
+import './a-editable/editable-actor';
+import './a-editable/editable-region';
 // Load Application
 import './a-project';
 
@@ -46,7 +48,6 @@ import * as _ from 'lodash';
 
 // ----------------
 //
-// NOTE:Make sure that Bootstrap's CSS classes are included in your HTML.
 // NOTE:Make sure that Bootstrap's CSS classes are included in your HTML.
 // global.jQuery = global.$ = $;
 
