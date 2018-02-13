@@ -21,6 +21,9 @@ import './a-html3d/html';
 
 import './a-editable/editable-actor';
 import './a-editable/editable-region';
+
+import './a-controls/customizable-wasd-controls';
+
 // Load Application
 import './a-project';
 

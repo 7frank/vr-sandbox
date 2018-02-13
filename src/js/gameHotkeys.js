@@ -63,6 +63,13 @@ function addHotkeys () {
     } else optionsDialog.$.toggle();
   });
 
+  // ----------------------------------------------
+  Hotkeys('player-move-forward', 'w', () => {}, () => {}, {category: 'player', description: 'Moves the player in the forward direction.'});
+  Hotkeys('player-move-backward', 's', () => {}, () => {}, {category: 'player', description: 'Moves the player in the backward direction.'}); Hotkeys('player-strafe-left', 'a', () => {}, () => {}, {category: 'player', description: 'Moves the player  sideways.'});
+  Hotkeys('player-strafe-right', 'd', () => {}, () => {}, {category: 'player', description: 'Moves the player  sideways.'});
+  Hotkeys('player-rotate-left', 'q', () => {}, () => {}, {category: 'player', description: 'Rotates the player.'});
+  Hotkeys('player-rotate-right', 'e', () => {}, () => {}, {category: 'player', description: 'Rotates the player.'});
+
   // ---------------------------------------------------
   Hotkeys('move forward', 'i', () => {
     window.car._car.controls().moveForward = true;
