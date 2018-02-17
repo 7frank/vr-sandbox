@@ -48,7 +48,8 @@ export default class CarCameraControls {
       matrix.extractRotation(obj.matrix);
 
       var direction = new THREE.Vector3(0, 0, 1);
-      matrix.multiplyVector3(direction);
+      // matrix.multiplyVector3(direction);
+      direction.applyMatrix4(matrix);
       return direction;
     }
 

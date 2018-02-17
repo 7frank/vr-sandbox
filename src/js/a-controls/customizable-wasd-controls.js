@@ -33,6 +33,7 @@ var KEYS = [
  *
  *
  * Next up:
+ * FIXME having humam input as backend does not fully work currently
  * - test customising wasd
  * - have event mappings for undo/release
  * - keymap dialog does not show up if the scene has the focus when using "HumanInput"
@@ -65,8 +66,8 @@ module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls'
     // Bind methods and add event listeners.
     this.onBlur = bind(this.onBlur, this);
     this.onFocus = bind(this.onFocus, this);
-    this.onKeyDown = bind(this.onKeyDown, this);
-    this.onKeyUp = bind(this.onKeyUp, this);
+    // this.onKeyDown = bind(this.onKeyDown, this);
+    // this.onKeyUp = bind(this.onKeyUp, this);
     this.onVisibilityChange = bind(this.onVisibilityChange, this);
     this.attachVisibilityEventListeners();
   },
@@ -80,13 +81,17 @@ module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls'
     var velocity = this.velocity;
 
     if (!velocity[data.adAxis] && !velocity[data.wsAxis] &&
-            isEmptyObject(this.keys)) { return; }
+            isEmptyObject(this.keys)) {
+      return;
+    }
 
     // Update velocity.
     delta = delta / 1000;
     this.updateVelocity(delta);
 
-    if (!velocity[data.adAxis] && !velocity[data.wsAxis]) { return; }
+    if (!velocity[data.adAxis] && !velocity[data.wsAxis]) {
+      return;
+    }
 
     // Get movement vector and translate position.
     currentPosition = el.getAttribute('position');
@@ -140,22 +145,36 @@ module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls'
     }
 
     // Clamp velocity easing.
-    if (Math.abs(velocity[adAxis]) < CLAMP_VELOCITY) { velocity[adAxis] = 0; }
-    if (Math.abs(velocity[wsAxis]) < CLAMP_VELOCITY) { velocity[wsAxis] = 0; }
+    if (Math.abs(velocity[adAxis]) < CLAMP_VELOCITY) {
+      velocity[adAxis] = 0;
+    }
+    if (Math.abs(velocity[wsAxis]) < CLAMP_VELOCITY) {
+      velocity[wsAxis] = 0;
+    }
 
-    if (!data.enabled) { return; }
+    if (!data.enabled) {
+      return;
+    }
 
     // Update velocity using keys pressed.
     acceleration = data.acceleration;
     if (data.adEnabled) {
       adSign = data.adInverted ? -1 : 1;
-      if (keys.KeyA || keys.ArrowLeft) { velocity[adAxis] -= adSign * acceleration * delta; }
-      if (keys.KeyD || keys.ArrowRight) { velocity[adAxis] += adSign * acceleration * delta; }
+      if (keys.KeyA || keys.ArrowLeft) {
+        velocity[adAxis] -= adSign * acceleration * delta;
+      }
+      if (keys.KeyD || keys.ArrowRight) {
+        velocity[adAxis] += adSign * acceleration * delta;
+      }
     }
     if (data.wsEnabled) {
       wsSign = data.wsInverted ? -1 : 1;
-      if (keys.KeyW || keys.ArrowUp) { velocity[wsAxis] -= wsSign * acceleration * delta; }
-      if (keys.KeyS || keys.ArrowDown) { velocity[wsAxis] += wsSign * acceleration * delta; }
+      if (keys.KeyW || keys.ArrowUp) {
+        velocity[wsAxis] -= wsSign * acceleration * delta;
+      }
+      if (keys.KeyS || keys.ArrowDown) {
+        velocity[wsAxis] += wsSign * acceleration * delta;
+      }
     }
   },
 
@@ -172,7 +191,9 @@ module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls'
       directionVector.multiplyScalar(delta);
 
       // Absolute.
-      if (!rotation) { return directionVector; }
+      if (!rotation) {
+        return directionVector;
+      }
 
       xRotation = this.data.fly ? rotation.x : 0;
 
@@ -197,20 +218,38 @@ module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls'
 
   attachKeyEventListeners: function () {
     //  window.addEventListener('keydown', this.onKeyDown);
-    window.addEventListener('keyup', this.onKeyUp);
+    // window.addEventListener('keyup', this.onKeyUp);
+    var that = this;
 
-    function keyHandler (code) {
+    /**
+         *
+         * @param code - the key code in the internal notation
+         * @param bVal - a value indicating wheather the first or the second handler of an
+         *                action should be handled. An action does have an optional value that is meant to work
+         *                as undo for the first handler so if a click event is sent the action will trigger
+         *                a down and up event for the action if 2 handlers where defined for it.
+         * @returns {Function}
+         */
+    function keyHandler (code, bVal) {
       return function (event) {
-        if (!shouldCaptureKeyEvent(event)) { return; }
+        if (!shouldCaptureKeyEvent(event)) {
+          return;
+        }
 
-        if (KEYS.indexOf(code) !== -1) { this.keys[code] = true; }
+        if (KEYS.indexOf(code) !== -1) {
+          if (event.detail.first) {
+            that.keys[code] = true;
+          } else {
+            delete that.keys[code];
+          }
+        }
       };
     }
 
-    this.khw = keyHandler(KEYS.KeyW);
-    this.khs = keyHandler(KEYS.KeyS);
-    this.kha = keyHandler(KEYS.KeyA);
-    this.khd = keyHandler(KEYS.KeyD);
+    this.khw = keyHandler('KeyW');
+    this.khs = keyHandler('KeyS');
+    this.kha = keyHandler('KeyA');
+    this.khd = keyHandler('KeyD');
 
     window.addEventListener('player-move-forward', this.khw);
     window.addEventListener('player-move-backward', this.khs);
@@ -220,7 +259,7 @@ module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls'
 
   removeKeyEventListeners: function () {
     //  window.removeEventListener('keydown', this.onKeyDown);
-    window.removeEventListener('keyup', this.onKeyUp);
+    // window.removeEventListener('keyup', this.onKeyUp);
 
     window.removeEventListener('player-move-forward', this.khw);
     window.removeEventListener('player-move-backward', this.khs);
@@ -242,24 +281,30 @@ module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls'
     } else {
       this.onFocus();
     }
-  },
+  }
 
-  onKeyDown: function (event) {
+  /* onKeyDown: function (event) {
     var code;
-    if (!shouldCaptureKeyEvent(event)) { return; }
+    if (!shouldCaptureKeyEvent(event)) {
+      return;
+    }
     code = event.code || KEYCODE_TO_CODE[event.keyCode];
-    if (KEYS.indexOf(code) !== -1) { this.keys[code] = true; }
+    if (KEYS.indexOf(code) !== -1) {
+      this.keys[code] = true;
+    }
   },
 
   onKeyUp: function (event) {
     var code;
     code = event.code || KEYCODE_TO_CODE[event.keyCode];
     delete this.keys[code];
-  }
+  } */
 });
 
 function isEmptyObject (keys) {
   var key;
-  for (key in keys) { return false; }
+  for (key in keys) {
+    return false;
+  }
   return true;
 }

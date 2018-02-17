@@ -74,17 +74,17 @@ AFRAME.registerComponent('simple-car', {
     // el.emit('model-loaded', {format: 'obj', model: this.model});
 
     /*      this.model = null;
-        /*  this.objLoader = new THREE.OBJLoader();
-            this.mtlLoader = new THREE.MTLLoader(this.objLoader.manager);
-            // Allow cross-origin images to be loaded.
-            this.mtlLoader.crossOrigin = ''; */
+            /*  this.objLoader = new THREE.OBJLoader();
+                this.mtlLoader = new THREE.MTLLoader(this.objLoader.manager);
+                // Allow cross-origin images to be loaded.
+                this.mtlLoader.crossOrigin = ''; */
   },
 
   update: function () {
     /*    var data = this.data;
-        if (!data.obj) { return; }
-        this.remove();
-        this.loadObj(data.obj, data.mtl);**/
+            if (!data.obj) { return; }
+            this.remove();
+            this.loadObj(data.obj, data.mtl);**/
   },
 
   remove: function () {
@@ -158,3 +158,130 @@ AFRAME.registerPrimitive('a-simple-car', utils.extendDeep({}, meshMixin, {
     mtl: 'obj-model.mtl'
   }
 }));
+
+// window.AFRAME = require('aframe');
+// const AFRAME = window.AFRAME;
+// const THREE = AFRAME.THREE;
+var utils = AFRAME.utils;
+
+var bind = utils.bind;
+
+/*
+* inits controls based on the "keyboard-actions" plugin
+*
+**/
+
+AFRAME.registerComponent('customizable-wasd-car-controls', {
+  schema: {},
+  init: function () {
+    // Bind methods and add event listeners.
+    this.onBlur = bind(this.onBlur, this);
+    this.onFocus = bind(this.onFocus, this);
+
+    this.onVisibilityChange = bind(this.onVisibilityChange, this);
+    this.attachVisibilityEventListeners();
+  },
+  // update: function () {},
+  // tick: function () {},
+  remove: function () {
+    this.removeKeyEventListeners();
+    this.removeVisibilityEventListeners();
+  },
+
+  play: function () {
+    this.attachKeyEventListeners();
+  },
+
+  pause: function () {
+    this.keys = {};
+    this.removeKeyEventListeners();
+  },
+  attachVisibilityEventListeners: function () {
+    window.addEventListener('blur', this.onBlur);
+    window.addEventListener('focus', this.onFocus);
+    document.addEventListener('visibilitychange', this.onVisibilityChange);
+  },
+
+  removeVisibilityEventListeners: function () {
+    window.removeEventListener('blur', this.onBlur);
+    window.removeEventListener('focus', this.onFocus);
+    document.removeEventListener('visibilitychange', this.onVisibilityChange);
+  },
+
+  attachKeyEventListeners: function () {
+    //  window.addEventListener('keydown', this.onKeyDown);
+    // window.addEventListener('keyup', this.onKeyUp);
+
+    let simpleCarComponentInstance = this.el.components['simple-car'];
+
+    if (!simpleCarComponentInstance) {
+      console.error("'customizable-wasd-car-controls' must be attribute of 'a-simple-car'");
+      return;
+    }
+
+    // should be an instance of './car/tquery.car' {@see Car}
+    var that = simpleCarComponentInstance._car;
+
+    if (!that) {
+      console.error("component 'simple-car' not compatible with 'a-simple-car'");
+      return;
+    }
+
+    /**
+         *
+         * @param action - the internal action that should be triggered
+         * @param bVal - a value indicating wheather the first or the second handler of an
+         *                action should be handled. An action does have an optional value that is meant to work
+         *                as undo for the first handler so if a click event is sent the action will trigger
+         *                a down and up event for the action if 2 handlers where defined for it.
+         * @returns {Function}
+         */
+    function keyHandler (action, bVal) {
+      return function (event) {
+        // TODO check the doc.activeel==doc.body part for potential conflict
+        // if (!shouldCaptureKeyEvent(event)) { return; }
+
+        var obj = that.controls();
+
+        if (event.detail.first) {
+          obj[action] = true;
+        } else {
+          obj[action] = false;
+        }
+      };
+    }
+
+    this.khw = keyHandler('moveForward');
+    this.khs = keyHandler('moveBackward');
+    this.kha = keyHandler('moveLeft');
+    this.khd = keyHandler('moveRight');
+
+    window.addEventListener('player-move-forward', this.khw);
+    window.addEventListener('player-move-backward', this.khs);
+    window.addEventListener('player-strafe-left', this.kha);
+    window.addEventListener('player-strafe-right', this.khd);
+  },
+
+  removeKeyEventListeners: function () {
+    window.removeEventListener('player-move-forward', this.khw);
+    window.removeEventListener('player-move-backward', this.khs);
+    window.removeEventListener('player-strafe-left', this.kha);
+    window.removeEventListener('player-strafe-right', this.khd);
+  },
+
+  onBlur: function () {
+    this.pause();
+  },
+
+  onFocus: function () {
+    this.play();
+  },
+
+  onVisibilityChange: function () {
+    if (document.hidden) {
+      this.onBlur();
+    } else {
+      this.onFocus();
+    }
+  }
+});

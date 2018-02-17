@@ -87,6 +87,30 @@ the goal of this project is to test the capabilities of a-frame together with so
 # todo
 * better documentation
     * https://github.com/dwyl/repo-badges/blob/master/README.md
+* have a standard set of actions for 3d integration
+    * entity-move-left/right/up/down/forward/backward
+    * more of above might be defined for with a standartised interface so that components could rely on those events being triggered instead of each component defining their own input keys statically
+
+* integrate keyboard-interactions and components 
+    * with server client based websocket events
+        * say entity is moving on serverURL
+        * would it be better to send an event or better to sync the sortObjects
+        * or of use in any way for communication
+* ```javascript
+   /**
+    * have some bind method per entity that uses the abstract entity based mapping
+    */
+       player.bind=function bind(evtName,handler)
+           {
+
+              return EntityWrapper(this,evtName,handler)
+
+           }
+* the possible actions for a player/entity should include move x-y-z +- and rotate x-y-z +- == 6 degrees of freedom
+    * although look would be simmilar to rotate in lots of cases .... lets test some possuble use cases here
+    * theere also should be some kind of normalization per device going on 
+        * but look-left via keyboard would need other implementation than look-left via headtraciking
+   
 
 # Project skeleton based on boilerplate
 

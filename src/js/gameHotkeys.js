@@ -10,7 +10,7 @@ import OptionsDialog from './dialogs/options/OptionDialog';
 
 import $ from 'jquery';
 import * as CANNON from 'cannon';
-import {addScript, findClosestEntity, getDirectionForEntity} from './util';
+import {addScript, findClosestEntity, getDirectionForEntity, playSound} from './util';
 import {getTextEditorInstance} from './a-editable/utils';
 import {startEditingTextarea} from './a-editable/editable-actor';
 
@@ -35,7 +35,7 @@ function handlerwrapper () {
     s2.title = 'Input Configuration';
     s2.className = 'card card-1'; // add some material design
     s2.setAttribute('style', 'top:50px;left:50%;position:absolute;width:600px;height:300px');
-    s2.style.display = 'none';
+    // s2.style.display = 'none';
     document.body.appendChild(s2);
   }, 1000);
 }
@@ -64,47 +64,67 @@ function addHotkeys () {
   });
 
   // ----------------------------------------------
-  Hotkeys('player-move-forward', 'w', () => {}, () => {}, {category: 'player', description: 'Moves the player in the forward direction.'});
-  Hotkeys('player-move-backward', 's', () => {}, () => {}, {category: 'player', description: 'Moves the player in the backward direction.'}); Hotkeys('player-strafe-left', 'a', () => {}, () => {}, {category: 'player', description: 'Moves the player  sideways.'});
-  Hotkeys('player-strafe-right', 'd', () => {}, () => {}, {category: 'player', description: 'Moves the player  sideways.'});
-  Hotkeys('player-rotate-left', 'q', () => {}, () => {}, {category: 'player', description: 'Rotates the player.'});
-  Hotkeys('player-rotate-right', 'e', () => {}, () => {}, {category: 'player', description: 'Rotates the player.'});
+  Hotkeys('player-move-forward', 'w', () => {
+  }, () => {
+  }, {category: 'player', description: 'Moves the player in the forward direction.'});
+  Hotkeys('player-move-backward', 's', () => {
+  }, () => {
+  }, {category: 'player', description: 'Moves the player in the backward direction.'});
+  Hotkeys('player-strafe-left', 'a', () => {
+  }, () => {
+  }, {category: 'player', description: 'Moves the player  sideways.'});
+  Hotkeys('player-strafe-right', 'd', () => {
+  }, () => {
+  }, {category: 'player', description: 'Moves the player  sideways.'});
+  Hotkeys('player-rotate-left', 'q', () => {
+  }, () => {
+  }, {category: 'player', description: 'Rotates the player.'});
+  Hotkeys('player-rotate-right', 'e', () => {
+  }, () => {
+  }, {category: 'player', description: 'Rotates the player.'});
 
   // ---------------------------------------------------
-  Hotkeys('move forward', 'i', () => {
-    window.car._car.controls().moveForward = true;
-  }, () => {
-    window.car._car.controls().moveForward = false;
-  }, {category: 'car', description: 'Accelerates the car in the forward direction.'});
+  // todo the keys for car would be the same wasd but only if player controler is set to car entity
+  // TODO how does this interfere with car contols existing and actions and customization
+  /* Hotkeys('move forward', 'i', () => {
+      window.car._car.controls().moveForward = true;
+    }, () => {
+      window.car._car.controls().moveForward = false;
+    }, {category: 'car', description: 'Accelerates the car in the forward direction.'});
 
-  Hotkeys('move backward', 'k', () => {
-    window.car._car.controls().moveBackward = true;
-  }, () => {
-    window.car._car.controls().moveBackward = false;
-  }, {category: 'car', description: 'Accelerates the car in the backward direction.'});
+    Hotkeys('move backward', 'k', () => {
+      window.car._car.controls().moveBackward = true;
+    }, () => {
+      window.car._car.controls().moveBackward = false;
+    }, {category: 'car', description: 'Accelerates the car in the backward direction.'});
 
-  Hotkeys('steer left', 'j', () => {
-    window.car._car.controls().moveLeft = true;
-  }, () => {
-    window.car._car.controls().moveLeft = false;
-  }, {category: 'car'});
+    Hotkeys('steer left', 'j', () => {
+      window.car._car.controls().moveLeft = true;
+    }, () => {
+      window.car._car.controls().moveLeft = false;
+    }, {category: 'car'});
 
-  Hotkeys('steer right', 'l', () => {
-    window.car._car.controls().moveRight = true;
-  }, () => {
-    window.car._car.controls().moveRight = false;
-  }, {category: 'car'});
+    Hotkeys('steer right', 'l', () => {
+      window.car._car.controls().moveRight = true;
+    }, () => {
+      window.car._car.controls().moveRight = false;
+    }, {category: 'car'});
+
+  */
 
   // ---------------------------------------------------
 
-  Hotkeys('toggle follow with camera', '+', function () {
+  function createAndAttachCarCameraControls (player, vehicle) {
     // TODO check how tquery camera controls better would work with other aframe controls
 
-    var camera = $('.player').get(0).object3D.children[0];
-    var car = $('a-simple-car').get(0).components['simple-car'];
+    var camera = player.object3D.children[0];
+    var car = vehicle.components['simple-car'];
     var carCamera = new CarCameraControls({camera: camera, car: car});
 
+    var cancel = false;
+
     function step (timestamp) {
+      if (cancel) return;
       carCamera.update();
       window.requestAnimationFrame(step);
     }
@@ -112,8 +132,53 @@ function addHotkeys () {
     window.requestAnimationFrame(step);
 
     // prevent physics between player and car while "driving"
-    $('.player').get(0).removeAttribute('static-body');
-  }, {category: 'car', description: 'Toggles the view between the player and the car camera.'});
+    player.removeAttribute('static-body');
+
+    return {
+      undo: function () {
+        cancel = true;
+        player.setAttribute('static-body', true);
+      }
+    };
+  }
+
+  function enterOrExitVehicle () {
+    var target = findClosestEntity('a-simple-car', '.player', 5);
+
+    if (!target) {
+      console.warn('no vehicle close enough ', 'a-simple-car');
+      playSound('.sound-ball-bounce');
+      return;
+    }
+
+    var player = $('.player').get(0);
+    if (player.hasAttribute('customizable-wasd-controls')) {
+      enterVehicle(player, target);
+    } else {
+      exitVehicle(player, target);
+    }
+  }
+
+  var carCamControls;
+  function exitVehicle (player, vehicle) {
+    console.log('exiting');
+    vehicle.removeAttribute('customizable-wasd-car-controls');
+    player.setAttribute('customizable-wasd-controls', true);
+    if (carCamControls) {
+      carCamControls.undo();
+    }
+  }
+
+  function enterVehicle (player, vehicle) {
+    vehicle.setAttribute('customizable-wasd-car-controls', true);
+    player.removeAttribute('customizable-wasd-controls');
+    carCamControls = createAndAttachCarCameraControls(player, vehicle);
+  }
+
+  Hotkeys('enter-vehicle', 'r', enterOrExitVehicle, {
+    category: 'car',
+    description: 'Lets player enter the vehicle and switches from player camera to car camera.'
+  });
 
   /**
      * @deprecated not the whole scene schould be edited but only smaller parts of it (actors and regions within the world)
@@ -127,10 +192,10 @@ function addHotkeys () {
     var ball = $('.ball').get(0);
 
     /* el.body.applyImpulse(
-                                          // impulse  new CANNON.Vec3(0, 1, 0),
-                                          // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
-                                        );
-                                        */
+                                              // impulse  new CANNON.Vec3(0, 1, 0),
+                                              // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
+                                            );
+                                            */
     var p = player.body.position;
     var b = ball.body.position;
 
@@ -147,10 +212,10 @@ function addHotkeys () {
     var ball = $('.ball').get(0);
 
     /* el.body.applyImpulse(
-                                          // impulse  new CANNON.Vec3(0, 1, 0),
-                                          // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
-                                        );
-                                        */
+                                              // impulse  new CANNON.Vec3(0, 1, 0),
+                                              // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
+                                            );
+                                            */
     var el = ball; // partially works with ball but not with player body as it seems
     el.body.applyImpulse(new CANNON.Vec3(0, 1, 0), new CANNON.Vec3(0, -1, 0)); // new CANNON.Vec3().copy(el.getComputedAttribute('position')));
   }, {category: 'game play', description: 'will elevate the player by a small margin'});

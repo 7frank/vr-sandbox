@@ -40,7 +40,7 @@ export function getDirectionForEntity (entity) {
   return direction;
 }
 
-export function findClosestEntity (targetSelector, selector = '.player') {
+export function findClosestEntity (targetSelector, selector = '.player', minDistance = Infinity) {
   var player = document.querySelector(selector);
   var targets = document.querySelectorAll(targetSelector);
   var p = player.object3D.position;
@@ -53,9 +53,19 @@ export function findClosestEntity (targetSelector, selector = '.player') {
   }
   targets =
         Array.prototype.slice.call(targets, 0);
-  targets.sort(function (entityA, entityB) {
+
+  // FIXME this might be broken .. clarify and refactor
+  function sortByDistanceBetween (entityA, entityB) {
     return getDir(entityA).length() >= getDir(entityB).length();
-  });
+  }
+
+  targets.sort(sortByDistanceBetween);
+
+  // check if min distance applies here
+
+  if (minDistance < Infinity) {
+    if (getDir(targets[0]).length() > minDistance) { return null; }
+  }
 
   return targets[0];
 }
