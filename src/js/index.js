@@ -33,8 +33,6 @@ import 'networked-aframe';
 
 import './gameHotkeys';
 
-import {setPosition} from './util';
-
 import debounce from 'lodash.debounce';
 import trim from 'lodash.trim';
 
@@ -46,6 +44,7 @@ import {
 } from './network-sync';
 import {attachGameLogic} from './ballGameLogic';
 import * as _ from 'lodash';
+import {addLoadingListenersToScene} from './loadingBarUtils';
 
 // ------------------
 
@@ -108,6 +107,7 @@ document.addEventListener('DOMContentLoaded', function () {
 // listening for changes of a-scene like added removed
 onTagChanged('a-scene', function (elementsInfo) {
   console.log('onTagChanged a-scene');
+
   // console.log('a-scene changed', elementsInfo);
 
   function initScene (scene) {
@@ -117,10 +117,10 @@ onTagChanged('a-scene', function (elementsInfo) {
       scene.setAttribute('visible', true);
 
       /*   var ball = $('.ball');
-      // ball.removeAttribute("dynamic-body");
-      ball.attr('position', '0 2 ' + _.random(-5, 15));
-      console.log('initial ball position', ball.attr('position'));
-      */
+                  // ball.removeAttribute("dynamic-body");
+                  ball.attr('position', '0 2 ' + _.random(-5, 15));
+                  console.log('initial ball position', ball.attr('position'));
+                  */
       attachGameLogic();
     });
   }
@@ -130,43 +130,6 @@ onTagChanged('a-scene', function (elementsInfo) {
     initScene(elementsInfo.added[0]);
   }
 });
-
-function addLoadingListenersToScene (scene, loadedhandler = () => {}) {
-  var assets = scene.querySelector('a-assets');
-  console.log(assets);
-  if (assets == null) {
-    console.log('scene does not contain asssets for the loader');
-    loadedhandler();
-    return;
-  }
-
-  var manager = assets.fileLoader.manager;
-  manager.onStart = function () {
-    console.log('scene assests start loading', arguments);
-  };
-
-  manager.onStart = function () {
-    console.log('scene assests start loading', arguments);
-  };
-
-  manager.onError = function () {
-    console.log('scene assests error loading', arguments);
-  };
-  manager.onProgress = function () {
-    console.log('scene assests progress loading', arguments);
-  };
-
-  manager.onLoad = function () {
-    console.log('scene assests loaded', arguments);
-    loadedhandler();
-  };
-}
-
-/*
-
-*/
-
-// --------------------------------------
 
 // --------------------------------------
 
@@ -187,11 +150,11 @@ function reloadSceneToDOM () {
 
     // FIXME no longer detecting loaded
     /*  copy.get(0).addEventListener('loaded', function () {
-      console.log('scene was loaded');
-      setTimeout(function () {
-        copy.attr('visible', true);
-      }, 500);
-    }); */
+              console.log('scene was loaded');
+              setTimeout(function () {
+                copy.attr('visible', true);
+              }, 500);
+            }); */
 
     $('a-scene').replaceWith(copy);
 

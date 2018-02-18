@@ -10,7 +10,7 @@ import OptionsDialog from './dialogs/options/OptionDialog';
 
 import $ from 'jquery';
 import * as CANNON from 'cannon';
-import {addScript, findClosestEntity, getDirectionForEntity, playSound} from './util';
+import {addScript, findClosestEntity, getDirectionForEntity, playSound, toast} from './util';
 import {getTextEditorInstance} from './a-editable/utils';
 import {startEditingTextarea} from './a-editable/editable-actor';
 
@@ -35,7 +35,7 @@ function handlerwrapper () {
     s2.title = 'Input Configuration';
     s2.className = 'card card-1'; // add some material design
     s2.setAttribute('style', 'top:50px;left:50%;position:absolute;width:600px;height:300px');
-    // s2.style.display = 'none';
+    s2.style.display = 'none';
     document.body.appendChild(s2);
   }, 1000);
 }
@@ -146,8 +146,9 @@ function addHotkeys () {
     var target = findClosestEntity('a-simple-car', '.player', 5);
 
     if (!target) {
+      toast('Get closer to a vehicle to enter it.', 'Got it.');
       console.warn('no vehicle close enough ', 'a-simple-car');
-      playSound('.sound-ball-bounce');
+      playSound('.command-error');
       return;
     }
 
@@ -161,7 +162,7 @@ function addHotkeys () {
 
   var carCamControls;
   function exitVehicle (player, vehicle) {
-    console.log('exiting');
+    toast('leaving vehicle');
     vehicle.removeAttribute('customizable-wasd-car-controls');
     player.setAttribute('customizable-wasd-controls', true);
     if (carCamControls) {
