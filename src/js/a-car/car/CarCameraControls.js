@@ -11,6 +11,7 @@ tQuery.registerStatic('createCarCameraControls', function(opts, world){
 */
 
 import Car from './tquery.car';
+import {lookAtAndOrient, lookAwayFrom} from '../../util';
 
 const AFRAME = window.AFRAME;
 const THREE = AFRAME.THREE;
@@ -78,32 +79,31 @@ export default class CarCameraControls {
     }
     this._prevPosition	= tObject3d.position.clone();
 
-    // set camera position
     var tCamera	= this._opts.camera;
-    var position	= new THREE.Vector3(0, 0.35, -0.4 + 0.3 * this._curDistance);
+    // set camera position
+
+    // ------------------------
+
+    // set camera position
+    // var position	= new THREE.Vector3(0, 0.35, -0.4 + 0.3 * this._curDistance);
+    var position	= new THREE.Vector3(0, 2.35, -2 + 1.5 * this._curDistance);
 
     var matrix	= new THREE.Matrix4().makeRotationY(this._curAngle);
-
     position.applyMatrix4(matrix).add(tObject3d.position);
 
-    // add a distance between camera and car
+    tCamera.parent.position.copy(position);
 
-    var direction = getDirection(tObject3d);
-
-    direction = direction.normalize().negate().multiplyScalar(3);
-    // 5 units above level ground
-    direction.y = 2;
-
-    // tCamera.position.copy(position);
-    // we want the camera group position to be set in this case
-    tCamera.parent.position.copy(position.add(direction));
-    window.cam = tCamera;
     // set set camera target
-    // var tCamera	= this._opts.world.tCamera();
+
+    // TODO evaluate what was / is going on with the code below here as lookat was looking in the opposite direction
+
+    /*
     var target	= new THREE.Vector3(0, 0, -2 * this._curDistance);
     var matrix	= new THREE.Matrix4().makeRotationY(this._curAngle);
     target.applyMatrix4(matrix).add(tObject3d.position);
-    // tCamera.up.set(0, 1, 0);
-    // tCamera.lookAt(target);
+    tCamera.parent.lookAt(target);
+    */
+    // meanwhile this method solves the problem partially
+    lookAwayFrom(tCamera.parent, tObject3d);
   }
 }

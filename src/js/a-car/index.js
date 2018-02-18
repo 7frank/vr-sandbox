@@ -46,17 +46,29 @@ var extendDeep = AFRAME.utils.extendDeep;
  *
  */
 
+delete AFRAME.components['simple-car'];
+
 AFRAME.registerComponent('simple-car', {
   schema: {
     mtl: {type: 'model'},
-    obj: {type: 'model'}
+    obj: {type: 'model'},
+    type: {
+      type: 'string',
+      default: 'veyron'
+    }
   },
 
   init: function () {
     var el = this.el;
     var that = window.car = this;
 
-    var car = new Car({el: this.el});
+    // veyron,gallardo
+    if (this.data.type != 'veyron' && this.data.type != 'gallardo') {
+      this.data.type = 'veyron';
+      console.warn("simple-car: currently only supports two types of car models 'veyron' and 'gallardo' ");
+    }
+
+    var car = new Car({el: this.el, type: this.data.type});
     this._car = car;
 
     this.model = car.model();
@@ -74,17 +86,17 @@ AFRAME.registerComponent('simple-car', {
     // el.emit('model-loaded', {format: 'obj', model: this.model});
 
     /*      this.model = null;
-            /*  this.objLoader = new THREE.OBJLoader();
-                this.mtlLoader = new THREE.MTLLoader(this.objLoader.manager);
-                // Allow cross-origin images to be loaded.
-                this.mtlLoader.crossOrigin = ''; */
+                /*  this.objLoader = new THREE.OBJLoader();
+                    this.mtlLoader = new THREE.MTLLoader(this.objLoader.manager);
+                    // Allow cross-origin images to be loaded.
+                    this.mtlLoader.crossOrigin = ''; */
   },
 
   update: function () {
     /*    var data = this.data;
-            if (!data.obj) { return; }
-            this.remove();
-            this.loadObj(data.obj, data.mtl);**/
+                if (!data.obj) { return; }
+                this.remove();
+                this.loadObj(data.obj, data.mtl);**/
   },
 
   remove: function () {
@@ -148,14 +160,13 @@ var utils = AFRAME.utils;
  *
  */
 
+delete AFRAME.components['a-simple-car'];
 AFRAME.registerPrimitive('a-simple-car', utils.extendDeep({}, meshMixin, {
   defaultComponents: {
     'simple-car': {}
   },
-
   mappings: {
-    src: 'obj-model.obj',
-    mtl: 'obj-model.mtl'
+    type: 'simple-car.type'
   }
 }));
 
@@ -170,6 +181,8 @@ var bind = utils.bind;
 * inits controls based on the "keyboard-actions" plugin
 *
 **/
+
+delete AFRAME.components['customizable-wasd-car-controls'];
 
 AFRAME.registerComponent('customizable-wasd-car-controls', {
   schema: {},
