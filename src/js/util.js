@@ -4,15 +4,72 @@ import * as _ from 'lodash';
 const AFRAME = window.AFRAME;
 const THREE = AFRAME.THREE;
 
-export function setPosition (el, v) {
-  var arr = v.split(' ');
+/**
+ * Stringify coordinates from an object with keys [x y z].
+ * Example: {x: 3, y: 10, z: -5} to "3 10 -5".
+ *
+ * @param {object|string} data - An object with keys [x y z].
+ * @param {number} precision - A precision to round all values to.
+ * @returns {string} An "x y z" string.
+ */
+export function stringifyWithPrecision (data, precision = 2) {
+  if (typeof data !== 'object') {
+    return data;
+  }
+  return [_.round(data.x, precision), _.round(data.y, precision), _.round(data.z, precision), _.round(data.w, precision)].join(' ').trim();
+}
 
-  var v2 = {x: Number(arr[0]), y: Number(arr[1]), z: Number(arr[2])};
-  console.log(v);
+export function getPosition (el) {
   if (el.body != null && el.body.position != null) {
-    el.body.position.copy(v2);
-    el.body.velocity.set(0, 0, 0);
+    return new THREE.Vector3().copy(el.body.position);
+  } else {
+    return new THREE.Vector3().copy(el.getAttribute('position'));
+  }
+}
+
+export function setPosition (el, v) {
+  var arr, v2;
+
+  if (typeof v == 'string') {
+    arr = v.split(' ');
+
+    v2 = {x: Number(arr[0]), y: Number(arr[1]), z: Number(arr[2])};
+  }
+  if (v instanceof THREE.Vector3) {
+    v2 = v;
+    v = v.x + ' ' + v.y + ' ' + v.z;
+  }
+
+  if (el.body != null && el.body.position != null) {
+    teleportPhysicsBody(el.body, v2);
   } else el.setAttribute('position', v);
+}
+
+export function teleportPhysicsBody (body, position) {
+  body.position.copy(position);
+  body.previousPosition.copy(position);
+  body.interpolatedPosition.copy(position);
+  body.initPosition.copy(position);
+
+  // orientation
+  body.quaternion.set(0, 0, 0, 1);
+  body.initQuaternion.set(0, 0, 0, 1);
+  body.interpolatedQuaternion.set(0, 0, 0, 1);
+
+  // Velocity
+  body.velocity.setZero();
+  body.initVelocity.setZero();
+  body.angularVelocity.setZero();
+  body.initAngularVelocity.setZero();
+
+  // Force
+  body.force.setZero();
+  body.torque.setZero();
+
+  // Sleep state reset
+  body.sleepState = 0;
+  body.timeLastSleepy = 0;
+  body._wakeUpAfterNarrowphase = false;
 }
 
 /**
@@ -48,20 +105,43 @@ export function playSound (assetSelector, duration = -1, instanceLimit = 1) {
   }
 }
 
-// FIME direction seems to be inverted
+/**
+ * returns a directional vector where the entity is facing
+ *
+ * @param entity
+ * @returns {THREE.Vector3}
+ */
 export function getDirectionForEntity (entity) {
   var o3d = entity.object3D;
-  var pos = o3d.position;
-  var up = o3d.up;
-  var quaternion = o3d.quaternion;
-  var direction = new THREE.Vector3().copy(up);
-  direction.applyQuaternion(quaternion);
+
+  var matrix = new THREE.Matrix4();
+  matrix.extractRotation(o3d.matrix);
+
+  var direction = new THREE.Vector3(0, 0, 1);
+  matrix.multiplyVector3(direction);
   return direction;
+
+  /* var pos = o3d.position;
+      var up = o3d.up;
+      var quaternion = o3d.quaternion;
+      var direction = new THREE.Vector3().copy(up);
+      direction.applyQuaternion(quaternion);
+      return direction; */
 }
 
+/**
+ *
+ * @param {(selector|HTMLElement[])} targetSelector - A selector to query for elements that might be close.
+ * @param (selector|HTMLElement) selector - The element that we want to find other close elements for.
+ * @param {number} minDistance - if the distance between selector-Element and targetSelector-Elements is bigger than minDistance the targetSelector-Element gets discarded.
+ * @returns {*}
+ */
 export function findClosestEntity (targetSelector, selector = '.player', minDistance = Infinity) {
-  var player = document.querySelector(selector);
-  var targets = document.querySelectorAll(targetSelector);
+  var player = typeof selector == 'string' ? document.querySelector(selector) : selector;
+  var targets = typeof targetSelector == 'string' ? document.querySelectorAll(targetSelector) : targetSelector;
+
+  if (!targets.length) throw new Error('probably invalid targetSelector');
+
   var p = player.object3D.position;
 
   function getDir (ball) {
@@ -169,10 +249,203 @@ export function lookAtAndOrient (objectToAdjust,
   // objectToAdjust.rotation.z = ??;
 }
 
-// actually quite trivial but oh well sometimes...
-// see http://www.mrspeaker.net/2013/03/06/opposite-of-lookat/
+/**
+ * see http://www.mrspeaker.net/2013/03/06/opposite-of-lookat/
+ * @param {THREE.Object3D} me - The element itself.
+ * @param {THREE.Object3D} target - The element to look away from.
+ */
 export function lookAwayFrom (me, target) {
   var v = new THREE.Vector3();
   v.subVectors(me.position, target.position).add(me.position);
   me.lookAt(v);
+}
+
+/**
+ * a simple fps limiter
+ *
+ * for reference see https://stackoverflow.com/a/19773537
+ */
+
+export function FPSCtrl (fps, onFrame, context) {
+  var delay = 1000 / fps, // calc. time per frame
+    time = null, // start time
+    frame = -1, // frame count
+    tref; // rAF time reference
+
+  if (context != null) {
+    onFrame = onFrame.bind(context);
+  }
+
+  function loop (timestamp) {
+    if (time === null) time = timestamp; // init start time
+    var seg = Math.floor((timestamp - time) / delay); // calc frame no.
+    if (seg > frame) { // moved to next frame?
+      frame = seg; // update
+      onFrame({ // callback function
+        time: timestamp,
+        frame: frame
+      });
+    }
+    tref = requestAnimationFrame(loop);
+  }
+
+  // play status
+  this.isPlaying = false;
+
+  // set frame-rate
+  this.frameRate = function (newfps) {
+    if (!arguments.length) return fps;
+    fps = newfps;
+    delay = 1000 / fps;
+    frame = -1;
+    time = null;
+  };
+
+  // enable starting/pausing of the object
+  this.start = function () {
+    if (!this.isPlaying) {
+      this.isPlaying = true;
+      tref = requestAnimationFrame(loop);
+    }
+    return this;
+  };
+
+  this.pause = function () {
+    if (this.isPlaying) {
+      cancelAnimationFrame(tref);
+      this.isPlaying = false;
+      time = null;
+      frame = -1;
+    }
+    return this;
+  };
+}
+
+/**
+ * container class
+ * TODO
+ */
+
+export class AiScripts {
+  constructor () {
+    this.scripts = {};
+  }
+
+  add (name, handler) {
+    this.scripts.name = {};
+  }
+
+  pause (name) {
+
+  }
+
+  play () {
+
+  }
+}
+
+/**
+ * takes a unit vector (or should at least) and transforms it into a quaternion using an up-vector
+ * @param {THREE.Vector3} mVec - The unit vector.
+ * @param {THREE.Vector3} up - An up-vector.
+ * @returns {THREE.Quaternion} the quaternion representing the rotation in 3D-space
+ * FIXME this only works for the 0,1,0 up vector
+ * @deprecated since 0.1.0
+ */
+export function vector2Quaternion (mVec, up = new THREE.Vector3(0, 1, 0)) {
+  if (mVec.length() == 0) throw new Error('vector may not have length 0');
+
+  let angle = Math.atan2(mVec.x, mVec.z); // Note: I expected atan2(z,x) but OP reported success with atan2(x,z) instead! Switch around if you see 90° off.
+  let qx = up.x;
+  let qy = up.y * Math.sin(angle / 2);
+  let qz = up.z;
+  let qw = Math.cos(angle / 2);
+  return new THREE.Quaternion().set(qx, qy, qz, qw);
+}
+
+/**
+ * returns a unsigned angle in radian between 0 and Pi
+ * @param v1
+ * @param v2
+ * @param normalVector
+ */
+export function getUnsignedAngle (vectorA, vectorB) {
+  // Store some information about them for below
+  var dot = vectorA.dot(vectorB);
+  var lengthA = vectorA.length();
+  var lengthB = vectorB.length();
+
+  // Now to find the angle "acos"
+  var theta = Math.acos(dot / (lengthA * lengthB));
+  return theta;
+}
+
+/**
+ * returns a signed angle in radian between -Pi and Pi
+ * @param v1
+ * @param v2
+ * @param normalVector
+ */
+
+export function getSignedAngle (v1, v2, normalVector) {
+  if (normalVector == null) throw new Error("signed angle needs a normal vector (use 'up'-vector of THREE.Object3D for example)");
+
+  let n = normalVector.clone().normalize();
+  v1.dot(v2);
+
+  let dot = v1.dot(v2);// x1*x2 + y1*y2      # dot product
+  let det = n.dot(v1.cross(v2)); // det(v1,v2,n)=n⋅(v1×v2)  //3d case
+  let angle = Math.atan2(det, dot); //  # atan2(y, x) or atan2(sin, cos)
+  return angle;
+}
+
+/**
+ * works if component has animation-mixer attribute attached only
+ *
+ * @param el
+ * @returns {String[]}
+ */
+export function getAnimationNames (el) {
+  var component = el.components['animation-mixer'];
+  if (!component) {
+    console.warn("can't get animation names. does not have animation-mixer");
+    return [];
+  }
+
+  // console.log(component, component.mixer);
+
+  if (!component.mixer) return [];
+  var availableActions = component.mixer._actions;
+  var actionNames = availableActions.map((action) => action._clip.name);
+  return actionNames;
+}
+
+export function playAnimation (el, animationName, tCrossfade) {
+  var component = el.components['animation-mixer'];
+  if (!component) {
+    console.warn("can't run animation does not have animation-mixer ", animationName);
+    return;
+  }
+
+  component.data.crossFadeDuration = tCrossfade;
+
+  if (!component.mixer) return []; // TODO wait for initialisation of compoennt instead of discarding
+
+  var actionNames = getAnimationNames(el);
+
+  // todo have an info if no animation was played because none matched pattern
+  //   if (actionNames.indexOf(animationName)==-1)
+
+  component.stopAction();
+  component.data.clip = animationName; // actionNames[4];
+  component.playAction();
+
+  /*
+     var a = component.activeActions[0];
+
+      var b = _.sample(component.mixer._actions);
+
+      if (a) { a.crossFadeTo(b, tCrossfade); } else { b.fadeIn(tCrossfade); }
+
+      */
 }
