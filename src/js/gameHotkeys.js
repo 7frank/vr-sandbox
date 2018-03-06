@@ -10,7 +10,7 @@ import OptionsDialog from './dialogs/options/OptionDialog';
 
 import $ from 'jquery';
 import * as CANNON from 'cannon';
-import {addScript, findClosestEntity, getDirectionForEntity, playSound, toast} from './util';
+import {addScript, findClosestEntity, getDirectionForEntity, getPosition, playSound, setPosition, toast} from './util';
 import {getTextEditorInstance} from './a-editable/utils';
 import {startEditingTextarea} from './a-editable/editable-actor';
 
@@ -142,21 +142,25 @@ function addHotkeys () {
     };
   }
 
+  var drivingVehicle = false;
+  var whichVehicle = null;
   function enterOrExitVehicle () {
-    var target = findClosestEntity('a-simple-car', '.player', 5);
-
-    if (!target) {
-      toast('Get closer to a vehicle to enter it.', 'Got it.');
-      console.warn('no vehicle close enough ', 'a-simple-car');
-      playSound('.command-error');
-      return;
-    }
-
     var player = $('.player').get(0);
-    if (player.hasAttribute('customizable-wasd-controls')) {
+    if (!drivingVehicle) {
+      var target = findClosestEntity('a-simple-car', '.player', 5);
+
+      if (!target) {
+        toast('Get closer to a vehicle to enter it.', 'Got it.');
+        // console.warn('no vehicle close enough ', 'a-simple-car');
+        playSound('.command-error');
+        return;
+      }
+      whichVehicle = target;
       enterVehicle(player, target);
+      drivingVehicle = !drivingVehicle;
     } else {
-      exitVehicle(player, target);
+      exitVehicle(player, whichVehicle);
+      drivingVehicle = !drivingVehicle;
     }
   }
 
@@ -165,17 +169,24 @@ function addHotkeys () {
     toast('leaving vehicle');
     vehicle.removeAttribute('customizable-wasd-car-controls');
     player.setAttribute('customizable-wasd-controls', true);
+    player.setAttribute('look-controls', true);
+
     if (carCamControls) {
       carCamControls.undo();
     }
+    // FIXME exiting vehicle doesn't position player at correct place
+    var exitPos = getPosition(vehicle);
+    setPosition(player, exitPos);
   }
 
   function enterVehicle (player, vehicle) {
     vehicle.setAttribute('customizable-wasd-car-controls', true);
     player.removeAttribute('customizable-wasd-controls');
+    player.removeAttribute('look-controls');
     carCamControls = createAndAttachCarCameraControls(player, vehicle);
   }
 
+  // TODO this should be more like a "interact with object" button
   Hotkeys('enter-vehicle', 'r', enterOrExitVehicle, {
     category: 'car',
     description: 'Lets player enter the vehicle and switches from player camera to car camera.'
@@ -286,6 +297,15 @@ function addHotkeys () {
     var textarea = getTextEditorInstance().get(0);
     var oldScale = textarea.getAttribute('scale');
     textarea.setAttribute('scale', '' + oldScale.x * 0.8 + ' ' + oldScale.y * 0.8 + ' ' + 1);
+  }, {
+    category: 'editing'
+  });
+
+  Hotkeys('teleport to next region', 'shift+t', function () {
+    var el = $('[editable-region]')[2];
+    var targetLocation = el.object3D.position;
+    targetLocation.y += 20;
+    setPosition($('.player').get(0), targetLocation.x + ' ' + targetLocation.y + ' ' + targetLocation.z);
   }, {
     category: 'editing'
   });

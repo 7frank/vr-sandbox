@@ -6,6 +6,8 @@
 // make it eventable
 // TODO
 // tQuery.MicroeventMixin(Car.prototype);
+// FIXME flickering when moving
+// FIXME car not facing forward after crashes
 
 import extend from 'lodash.assignin';
 import {createCubeTexture} from './TextureCube';
