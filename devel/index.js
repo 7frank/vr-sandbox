@@ -62,7 +62,10 @@ console.log("--------------------------")
 console.log("publicPath:",publicPath)
 console.log("outputPath:",outputPath)
 /* serving static assets*/
-app.use(publicPath, express.static(outputPath,{index:false,redirect:false}));
+app.use(publicPath, express.static(outputPath,{index:false,redirect:false,setHeaders: function (res, path, stat) {
+   // res.set('Content-Type', "text/html")
+
+}}));
 
 //TODO check for interference if api folder exists
 app.use('/api', routing);
