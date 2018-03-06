@@ -1,0 +1,32 @@
+<!-- ="shape:box" physics interferes with rotation -->
+<a-entity class="enemy"
+          shadow="cast: true; receive: false"
+          scale="0.008 0.008 0.008"
+          behaviour-attraction="speed:0.5"
+          dynamic-body
+          position="10 0 5"
+          animation-mixer="clip: *;"
+          gltf-model="src: url(assets/models/Izzy/scene.gltf);">
+</a-entity>
+
+<a-entity class="enemy"
+          shadow="cast: true; receive: false"
+          scale="0.008 0.008 0.008"
+          behaviour-attraction="speed:-0.5"
+          dynamic-body
+          position="-10 0 5"
+          animation-mixer="clip: *;"
+          gltf-model="src: url(assets/models/Jade Blue/scene.gltf);">
+</a-entity>
+
+
+<!-- gltf-model="src: url(https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Monster/glTF/Monster.gltf);" -->
+<a-cylinder behaviour-attraction="speed:-1"
+            dynamic-body
+            position="0 5.75 0"
+            radius="0.5"
+            height="1.5"
+            color="#FFC65D">
+    <a-sphere  position="-0.1 0.75 0.6" radius="0.1" color="#000000"></a-sphere>
+    <a-sphere  position="0.1 0.75 0.6" radius="0.1" color="#000000"></a-sphere>
+</a-cylinder>
