@@ -77,7 +77,9 @@ module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls'
     var data = this.data;
     var el = this.el;
     var movementVector;
-    var position = this.position;
+    // depending on weather the element has a physics body we choose a position object
+    // TODO the question to answer here would be "do we want an element with physics to be able to move without a proper ground"
+    var position = this.el.body ? this.el.body.position : this.position;
     var velocity = this.velocity;
 
     if (!velocity[data.adAxis] && !velocity[data.wsAxis] &&

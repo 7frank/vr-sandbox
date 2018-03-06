@@ -3,6 +3,8 @@ import $ from 'jquery';
 import {playSound, setPosition} from './util';
 import CANNON from 'cannon';
 
+// TODO make it work with dynamic loadable regions
+
 export
 function attachGameLogic () {
   $('.player').on('collide', function (e) {
@@ -21,7 +23,7 @@ function attachGameLogic () {
   // everything that falls down to limbo gets spawned at the center of the playing field
   $('.limbo').on('collide', function (e) {
     var targetEl = e.detail.body.el;
-    setPosition(targetEl, '0 20 0');
+    setPosition(targetEl, '0 10 0');
   });
 
   $('.ball').on('collide', function (e) {

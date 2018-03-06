@@ -5,8 +5,9 @@ import 'aframe';
 
 import 'aframe-physics-system';
 import 'aframe-mouse-cursor-component';
-import 'aframe-extras/dist/aframe-extras.controls';
-
+// import 'aframe-extras/dist/aframe-extras.controls';
+import 'aframe-extras/dist/aframe-extras';
+import 'aframe-environment-component/dist/aframe-environment-component.min.js';
 // TODO track down error to be able to test kinematic-body for player element
 // import 'aframe-extras/dist/aframe-extras.misc';
 
@@ -23,6 +24,8 @@ import './a-editable/editable-actor';
 import './a-editable/editable-region';
 
 import './a-controls/customizable-wasd-controls';
+
+import './interactions/attraction';
 
 // Load Application
 import './a-project';

@@ -1,5 +1,5 @@
-
 import {BoxHelperExt} from '../three/BoxHelperExt';
+import {FPSCtrl} from '../util';
 
 window.AFRAME = require('aframe');
 const AFRAME = window.AFRAME;
@@ -14,6 +14,10 @@ const THREE = AFRAME.THREE;
  */
 
 AFRAME.registerComponent('bb', {
+  schema: {
+    // fps: 0.5
+
+  },
   init: function () {
     var obj = this.el.getObject3D('mesh') || this.el.object3D;
 
@@ -23,11 +27,10 @@ AFRAME.registerComponent('bb', {
 
     obj.parent.add(helper);
 
-    requestAnimationFrame(function animate () {
+    var fc = new FPSCtrl(0.5, function (e) {
+      // render each frame here
       helper.update(undefined, obj.parent, true, false);
-
-      // requestinf frame after update .. in case update fails it will not pollute the log
-      requestAnimationFrame(animate);
     });
+    fc.start();
   }
 });

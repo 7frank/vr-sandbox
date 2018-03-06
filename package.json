@@ -50,6 +50,7 @@
     "aframe": "^0.7.1",
     "aframe-daydream-controller-component": "^1.0.0",
     "aframe-dev-components": "^1.0.0",
+    "aframe-environment-component": "^1.0.0",
     "aframe-extras": "^3.13.1",
     "aframe-gridhelper-component": "^0.2.0",
     "aframe-html-shader": "^0.2.0",
@@ -61,6 +62,7 @@
     "babel-polyfill": "^6.23.0",
     "bootstrap": "^3.3.7",
     "cannon": "^0.6.2",
+    "css-selector-parser": "^1.3.0",
     "diff-dom": "^2.3.1",
     "easyrtc": "^1.1.0",
     "jquery": "^3.3.1",
@@ -74,6 +76,7 @@
     "pretty": "^2.0.0",
     "socket.io": "^2.0.4",
     "three-codeeditor": "^0.1.4-seth.6",
+    "util-inspect": "^0.1.8",
     "whatwg-fetch": "^2.0.3",
     "xml-formatter": "^1.0.1"
   },

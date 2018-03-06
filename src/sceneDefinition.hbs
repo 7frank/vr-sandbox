@@ -2,7 +2,7 @@
 <a-scene networked-scene="room: basic;debug: true;" light="shadowMapType: basic"
          visible="true"
          id="aframe-project"
-         physics="debug: false">
+         physics="debug: true"> <!-- TODO evaluate local region based physics -->
     <!--<a-camera class="player" static-body="shape:sphere;sphereRadius:1" ></a-camera>-->
 
 
@@ -16,9 +16,9 @@
 
     {{> form1}}
 
-     <!--wasd-controls universal-controls="rotationSensitivity:0.2" wasd-controls look-controls -->
-    <a-entity customizable-wasd-controls look-controls class="player" static-body="shape:sphere;sphereRadius:1"
-              networked="template:#avatar-template;showLocalTemplate:false;" camera spawn-in-circle="radius:3;"
+     <!--wasd-controls universal-controls="rotationSensitivity:0.2" wasd-controls look-controls  dynamic-body="shape:box;mass:50" -->
+    <a-entity customizable-wasd-controls look-controls class="player"  static-body="shape:sphere;sphereRadius:1"
+              networked="template:#avatar-template;showLocalTemplate:false;" camera="far:20000" spawn-in-circle="radius:3;"
               position="0 1.3 0"  laser-controls="hand: right">
 
 
@@ -34,8 +34,16 @@
                   material="color: black; shader: flat">
         </a-entity>
 
-    </a-entity>
 
+        <a-plane compass  position="0 0.6 -1" height="0.1" width="2" src="#compass-texture"
+                    material="transparent:true;opacity:0.7;repeat:0.25 1">
+        </a-plane>
+
+
+
+    </a-entity>
+<!-- TODO keep distance to player -->
+    <a-entity scale="2 2 2" environment="preset: contact; ground:none;dressing:none;dressingAmount:0"></a-entity>
 
 
     <a-sound src="src: url(assets/audio/22 Monkey Fight Menu.mp3)" autoplay="true" loop="true" volume=0.7
@@ -53,17 +61,22 @@
 
 
 
-    <a-entity editable-region="src:TODOaddSrc" position="0 0 0"></a-entity>
-    <a-entity editable-region="src:TODOaddSrc"  position="100 0 0"></a-entity>
-    <a-entity editable-region="src:TODOaddSrc"  position="200 0 0"></a-entity>
-    <a-entity editable-region="src:TODOaddSrc"  position="300 0 0"></a-entity>
-    <a-entity editable-region="src:TODOaddSrc"  position="400 0 0"></a-entity>
+    <a-box position="0 0 0" editable-region="src:assets/demo/region/animation-and-ai-testbed.html;loadDistance:50;unloadDistance:100"></a-box>
+    <a-box position="100 0 0" editable-region="src:assets/demo/region/contest-medieval2.html"></a-box>
+    <!--<a-box position="200 0 0" editable-region="src:assets/demo/region/contest-camp.html"></a-box>-->
+    <!-- <a-box position="200 0 0" editable-region="src:assets/demo/region/primitives.html"></a-box>
 
-    <a-entity editable-region="src:TODOaddSrc" position="50 0 0"></a-entity>
-    <a-entity editable-region="src:TODOaddSrc"  position="150 0 0"></a-entity>
-    <a-entity editable-region="src:TODOaddSrc"  position="250 0 0"></a-entity>
-    <a-entity editable-region="src:TODOaddSrc"  position="350 0 0"></a-entity>
-    <a-entity editable-region="src:TODOaddSrc"  position="450 0 0"></a-entity>
+<a-box position="0 0 100" editable-region="src:assets/demo/region/primitives.html"></a-box>
+  <a-box position="100 0 100" editable-region="src:assets/demo/region/primitives.html"></a-box>
+  <a-box position="200 0 100" editable-region="src:assets/demo/region/rocket-league.html"></a-box>
+
+  <a-box position="0 0 200" editable-region="src:TODOaddSrc"></a-box>
+  <a-box position="100 0 200" editable-region="src:TODOaddSrc"></a-box>
+  <a-box position="200 0 200" editable-region="src:assets/demo/region/rocket-league.html"></a-box>
+
+-->
+
+
 
 
     <a-plane class="limbo" shadow="cast: false; receive: false"

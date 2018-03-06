@@ -55,7 +55,13 @@ the goal of this project is to test the capabilities of a-frame together with so
         * nkre.area.html
         * xyz.area.html
     * if the execution time of an area for a certain user drops on a machine, the rendering of his area is temoprarily disabled for the user to prevent frame drops and harrasment
-* https://remotestorage.io/        
+* https://remotestorage.io/  
+* streaming of data
+ * conversation https://github.com/mrdoob/three.js/issues/11746
+ * a-link https://blog.mozvr.com/link-traversal/  
+ * janus-web https://github.com/jbaicoianu/janusweb
+ *THREE.UpdatableTexture https://github.com/spite/THREE.UpdatableTexture
+    
         
 
 

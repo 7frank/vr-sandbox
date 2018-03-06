@@ -193,7 +193,7 @@ Object.assign(Box3Ext.prototype, {
       excludeInvisibleMaterials = excludeInvisibleMaterials || false;
 
       var m;
-      if (reference !== undefined) {
+      if (reference != null) { // changed !== undefined to != null for deleted objects to pass
         m = new THREE.Matrix4();
         m.getInverse(reference.matrixWorld);
       }
