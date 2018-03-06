@@ -48,16 +48,11 @@
  */
 
 import $ from 'jquery';
-import {findClosestEntity, getDirectionForEntity, FPSCtrl} from '../util';
-import {getHotkeyDialog, getTextEditorInstance} from './utils';
-import pretty from 'pretty';
+import {FPSCtrl} from '../util';
 
 import 'aframe-gridhelper-component';
-import {Blob2Text, fetchHandleErrors, streamIn} from '../stream-utils';
-
-window.AFRAME = require('aframe');
-const AFRAME = window.AFRAME;
-const THREE = AFRAME.THREE;
+import {Blob2Text, streamIn} from '../stream-utils';
+import MaterialFadeMixin from '../mixins/MaterialFadeMixin';
 
 AFRAME.registerComponent('editable-region', {
   schema: {
@@ -65,7 +60,7 @@ AFRAME.registerComponent('editable-region', {
     height: {type: 'number', default: 1},
     width: {type: 'number', default: 100},
     depth: {type: 'number', default: 100},
-    loadDistance: {type: 'number', default: 150}, // TODO doesnt work as intended
+    loadDistance: {type: 'number', default: 150}, // TODO doesn't work as intended
     unloadDistance: {type: 'number', default: 250}
   },
   init: function () {
@@ -86,14 +81,15 @@ AFRAME.registerComponent('editable-region', {
     if (this.data.src) console.warn('a region must have a src attribute that links to a valid chunk of data (a html file containing a-frame definitions of registered objects)');
 
     /**
-       * TODO support performance by not only unloading far away regions but by only rendering elements that are big enough
-       * For example:
-       * el=jQuery("[gltf-model]")[2];
-       * having a query method that groups elements together by boundingSphere.radius
-       * queryResult=AFRAME.nk.querySelectorAll(el.object3D,".Mesh:where(geometry-boundingSphere-radius<50)");
-       * queryResult.forEach(obj=>obj.visible=!obj.visible)
-       * TODO also minimize necessary queries by listening to movement
-       */
+         * TODO support performance by not only unloading far away regions but by only rendering elements that are big enough
+         * For example:
+         * el=jQuery("[gltf-model]")[2];
+         * having a query method that groups elements together by boundingSphere.radius
+         * queryResult=AFRAME.nk.querySelectorAll(el.object3D,".Mesh:where(geometry-boundingSphere-radius<50)");
+         * queryResult.forEach(obj=>obj.visible=!obj.visible)
+         * TODO also minimize necessary queries by listening to movement
+         *
+         */
 
     var visiblityCheck = new FPSCtrl(1, function (e) {
       // change animation if possible at random
@@ -102,8 +98,13 @@ AFRAME.registerComponent('editable-region', {
       // el=jQuery("[gltf-model]")[2];
       // query elements of region that are smaller than 50 unit
       var queryResult = AFRAME.nk.querySelectorAll(this.el.object3D, '.Mesh:where(geometry-boundingSphere-radius<5)');
-
-      if (this.lastDistance > this.data.loadDistance * 5 / 6) { queryResult.forEach(obj => obj.visible = false); } else { queryResult.forEach(obj => obj.visible = true); }
+      // TODO create a Mixin that specifically targets fadeInOut with distance to camera AnimationMixing or MaterialFadeMixin
+      // MaterialFadeMixin()
+      if (this.lastDistance > this.data.loadDistance * 5 / 6) {
+        queryResult.forEach(obj => obj.visible = false);
+      } else {
+        queryResult.forEach(obj => obj.visible = true);
+      }
     }, this).start();
   },
   tick: function (time, timeDelta) {
@@ -130,7 +131,7 @@ AFRAME.registerComponent('editable-region', {
       var src = this.data.src;
 
       // TODO cancel loading if distance if greater again and unloading would occure while loading region
-      // TODo load and attach chunks of datta via actual stream ...
+      // TODO load and attach chunks of data via actual stream ...
       streamIn(src)
         .then(response => response.blob())
         .then(blob => Blob2Text(blob))
@@ -144,7 +145,7 @@ AFRAME.registerComponent('editable-region', {
           });
         })
         .catch(function (err) {
-          console.warn('fufufu', err);
+          console.warn('Error', err);
 
           var element = $(`<a-text look-at="src:[camera]" color="#f00" width=100 align="center" position="0 6 0" value="${err.status} ${err.statusText}"></a-text>`);
           $(el).append(element);
