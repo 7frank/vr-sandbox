@@ -56,11 +56,32 @@ else {
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
+//-----------------------------------------
+
+console.log("--------------------------")
+console.log("publicPath:",publicPath)
+console.log("outputPath:",outputPath)
+/* serving static assets*/
+app.use(publicPath, express.static(outputPath,{index:false,redirect:false}));
+
+//TODO check for interference if api folder exists
 app.use('/api', routing);
 app.use(history({
   verbose: false,
 }));
-app.use(publicPath, express.static(outputPath));
+
+//have a 404 response
+app.use(function(req, res) {
+
+       res.send('404: Page not Found', 404);
+
+});
+
+// Handle 500
+app.use(function(error, req, res, next) {
+    res.send('500: Internal Server Error', 500);
+});
+
 
 /*********************************************/
 //a-frame-network

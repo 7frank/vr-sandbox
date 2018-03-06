@@ -1,6 +1,7 @@
 import express from 'express';
 import clioutput from './clioutput';
 var path = require('path');
+var fs = require("fs");
 
 const routing = express.Router();
 
@@ -21,16 +22,44 @@ routing.get('/coverage/*', (req, res) => {
   res.status(200);
 });
 
+
+//TODO the router probably should not serve static assets
+//probably it's best to use the "copy webpack-addon thingy" or check out other options to provide access to certain node_modules
+//note this only serves /api/* in our use case atm
 routing.get('*', (req, res) => {
 
 
+
+    //TODO only forward files from dist folder and check if express.static interferes in any way with this code
+
   //FIXME change again for production
-  //clioutput.error('[404] Not Found ' + req.params[0]);
+  //clioutput.error('[404] Not Found ... ' + req.params[0]);
   //res.sendStatus(404).end()
 
-    clioutput.ok('[200] ' + req.params[0]);
-    res.sendFile(path.join(__dirname, '../../', req.params[0] ? req.params[0] : 'index.html'));
-    res.status(200);
+   // var mPath=path.join(__dirname, '../../', req.params[0] ? req.params[0] : 'index.html')
+    var mPath=path.join(__dirname, '../../', req.params[0])
+
+    console.log('routing *',mPath);
+    fs.stat(mPath, function(err, stat) {
+        if(err == null) {
+
+            clioutput.ok('[200] ' + req.params[0]);
+            res.sendFile(mPath);
+            res.status(200);
+
+        } else if(err.code == 'ENOENT') {
+            //res.status(404);
+
+            clioutput.error('[404] Not Found ' + req.params[0]);
+            res.sendStatus(404).end()
+
+
+        } else {
+            console.log('error with file: ', err.code);
+            clioutput.error('[404] Not Found ' + req.params[0]);
+            res.sendStatus(404).end()
+        }
+    });
 
 
 });
