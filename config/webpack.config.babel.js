@@ -310,6 +310,7 @@ module.exports = {
 
     new Webpack.ProvidePlugin({
       'fetch': 'imports-loader?this=>global!exports-loader?global.fetch!whatwg-fetch',
+
     }),
 
     new Webpack.LoaderOptionsPlugin({

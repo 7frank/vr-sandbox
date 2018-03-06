@@ -1,4 +1,9 @@
 {
+  "globals": {
+    "AFRAME": true,
+    "THREE": true
+  },
+
   "extends": "standard",
   "env": {
     "amd": true,

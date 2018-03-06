@@ -47,6 +47,7 @@
   "dependencies": {
     "@gladeye/aframe-preloader-component": "^1.0.2",
     "@nk/core-components": "0.1.0",
+    "@tweenjs/tween.js": "^17.2.0",
     "aframe": "^0.7.1",
     "aframe-daydream-controller-component": "^1.0.0",
     "aframe-dev-components": "^1.0.0",
@@ -77,6 +78,7 @@
     "socket.io": "^2.0.4",
     "three-codeeditor": "^0.1.4-seth.6",
     "three-to-cannon": "^1.2.0",
+    "tween": "^0.9.0",
     "util-inspect": "^0.1.8",
     "whatwg-fetch": "^2.0.3",
     "xml-formatter": "^1.0.1"
