@@ -33,12 +33,12 @@ var KEYS = [
  *
  *
  * Next up:
- * FIXME having humam input as backend does not fully work currently
+ * FIXME having human input as backend does not fully work currently
  * - test customising wasd
  * - have event mappings for undo/release
  * - keymap dialog does not show up if the scene has the focus when using "HumanInput"
- * - dialog neeeds some testing if all elements still are rendered correclty
- *
+ * - dialog needs some testing if all elements still are rendered correctly
+ * - make a kinematic compatible version for physics to work
  *
  *
  */
@@ -285,22 +285,6 @@ module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls'
     }
   }
 
-  /* onKeyDown: function (event) {
-    var code;
-    if (!shouldCaptureKeyEvent(event)) {
-      return;
-    }
-    code = event.code || KEYCODE_TO_CODE[event.keyCode];
-    if (KEYS.indexOf(code) !== -1) {
-      this.keys[code] = true;
-    }
-  },
-
-  onKeyUp: function (event) {
-    var code;
-    code = event.code || KEYCODE_TO_CODE[event.keyCode];
-    delete this.keys[code];
-  } */
 });
 
 function isEmptyObject (keys) {

@@ -5,13 +5,12 @@ import {FPSCtrl, stringifyWithPrecision} from './util';
 import * as CANNON from 'cannon';
 import * as _ from 'lodash';
 import {createNamespace, namespaceExists, namespaceInfo} from './namespace';
+import ZoomUtils from './utils/ZoomUtils';
 
 var mesh2shape = require('three-to-cannon');
 
-const AFRAME = window.AFRAME;
-const THREE = AFRAME.THREE;
-
-AFRAME.nk = {querySelectorAll};
+// if we really want to have a partially global object for debugging this should go into a separate file then..
+AFRAME.nk = {querySelectorAll, ZoomUtils};
 var debug = false;
 
 /**
@@ -32,6 +31,9 @@ var debug = false;
  */
 
 export function querySelectorAll (object3D, selector, mDebug = false) {
+  if (typeof object3D != 'object') throw new Error('first param must be a THREE.Obect3D');
+  if (typeof selector != 'string') throw new Error('second param must be a proper css-selector string');
+
   // Note: the parser removes singleQuotes and breaks some stuff this way
   // thats why we have to replace them
   selector = selector.replace(new RegExp("'", 'g'), '`');
@@ -307,17 +309,20 @@ export function testCompoundGLTF (modelEl, debug = false) {
   }
   var i = 0;
   items.forEach(el => {
-    if (i++ >= 10) {
-      el.visible = false;
-
-      return;
-    } // TODO only use first few elements for testing
-
     if (el.geometry) el.geometry.computeBoundingBox();
 
     var bb = el.geometry.boundingBox;
     var vCenter = bb.getCenter();
     var size = bb.getSize();
+
+    console.log(el.name, 'size', size.length());
+    // TODO don't ignore big stuff anymore
+    if (size.length() >= 20) {
+      // if (i++ >= 20) {
+      el.visible = false;
+
+      return;
+    } // TODO only use first few elements for testing
 
     // FIXME the physics are one global system so we need our bodys to be relative to the world for now
     // but later on we probably will need different independent worlds
@@ -405,7 +410,7 @@ export function testCompoundGLTF (modelEl, debug = false) {
         // console.log(modelEl, 'has collided with body ', e.detail.body);
         console.log('collision', e);
         e.body.el.setAttribute('color', _.sample('red', 'yellow', 'blue'));
-      // console.log('collision', e);
+        // console.log('collision', e);
         /*   e.detail.target.el;  // Original entity (playerEl).
             e.detail.body.el;    // Other entity, which playerEl touched.
             e.detail.contact;    // Stats about the collision (CANNON.ContactEquation).

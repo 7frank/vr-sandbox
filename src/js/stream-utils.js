@@ -1,4 +1,5 @@
 // TODO check out libraries that handle different types of stream chunks instead?
+// FIXME not supported by firefox as of yet also might be that the Content-Type is not set properly like mentioned in some comment
 export function streamIn (url) {
   // var test = true;
   // if (test) throw new Error('test');
@@ -6,6 +7,7 @@ export function streamIn (url) {
   return fetch(url)
     .then(fetchHandleErrors) // this is neceassary for 404 errors to bubble
     .then((response) => {
+      console.log('response', response);
       const reader = response.body.getReader();
       const stream = new ReadableStream({
         start (controller) {
