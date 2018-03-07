@@ -1,46 +1,46 @@
 import {CssSelectorParser} from 'css-selector-parser';
-import inspect from 'util-inspect';
-import {BoxHelperExt} from './three/BoxHelperExt';
-import {FPSCtrl, stringifyWithPrecision} from './util';
-import * as CANNON from 'cannon';
 import * as _ from 'lodash';
 import {createNamespace, namespaceExists, namespaceInfo} from './namespace';
-import ZoomUtils from './utils/ZoomUtils';
-
-var mesh2shape = require('three-to-cannon');
-
-// if we really want to have a partially global object for debugging this should go into a separate file then..
-AFRAME.nk = {querySelectorAll, ZoomUtils};
-var debug = false;
 
 /**
- *   Creates the option to query for parts of the three-js scene graph.
+ *  Creates the option to query for parts of the three-js scene graph.
+ *  Note: Nesting is only partially supported.
  *
- *   eg. selectors
- *   - find all cameras that are currently invisible
- *   ".PerspectiveCamera[visible=false]"
+ *  TODO have a factory method than extends any object to be used by querySelectorAll
+ *  TODO have broader nesting support
+ *  TODO have attribute equality comparators other than "equal"
  *
- *   - find all meshes whose bounding spheres have a smaller radius than 1 (this is working by having non-standard pseudo element 'get' which is parsed in a different manner)
- *   ".Mesh:where(geometry-boundingSphere-radius<1)
- *   - query for elements whose name property is wireframe
- *    "[name='wireframe']"
+ *  See {@link https://github.com/mdevils/node-css-selector-parser} for details of the parser.
  *
- * @param {THREE.Object3D} object3D - An object of the scene graph that will be the root.
- * @param {selector} selector - A css selector.
- * @returns {THREE.Object3D[]}
+ *  @example
+ *  //find all cameras that are currently invisible
+ *  querySelectorAll(".PerspectiveCamera[visible=false]")
+ *
+ *  @example
+ *  //find all meshes whose bounding spheres have a smaller radius than 1 (this is working by having non-standard pseudo element 'get' which is parsed in a different manner)
+ *  querySelectorAll(".Mesh:where(geometry-boundingSphere-radius<1)")
+ *
+ *  @example
+ *  //query for elements whose name property is wireframe
+ *  querySelectorAll("[name='wireframe']")
+ *
+ *  @param {THREE.Object3D} object3D - An object of the scene graph that will be the root.
+ *  @param {selector} selector - A css selector.
+ *  @returns {THREE.Object3D[]}
  */
 
-export function querySelectorAll (object3D, selector, mDebug = false) {
+export function querySelectorAll (object3D, selector, debug = false) {
   if (typeof object3D != 'object') throw new Error('first param must be a THREE.Obect3D');
   if (typeof selector != 'string') throw new Error('second param must be a proper css-selector string');
+  if (selector == '') selector = 'selector';
+  // convenience function allowing for simply dropping AFRAME elements
+  if (typeof object3D.object3D == 'object') { object3D = object3D.object3D; }
 
   // Note: the parser removes singleQuotes and breaks some stuff this way
-  // thats why we have to replace them
+  // that's why we have to replace them
   selector = selector.replace(new RegExp("'", 'g'), '`');
 
   var entry = parseCSSSelector(selector);
-
-  if (mDebug)debug = mDebug;
 
   if (debug) {
     console.group('threejs querySelectorAll');
@@ -48,25 +48,34 @@ export function querySelectorAll (object3D, selector, mDebug = false) {
   }
 
   /**
-     * Fields for rule type.
-     * @param rule
-     tagName — tag name for the rule (e.g. "div"), may be '*'.
-     classNames — list of CSS class names for the rule.
-     attrs — list of attribute rules; rule may contain fields:
-     name — attribute name, required field.
-     valueType — type of comparison value ("string" or "substitute").
-     operator — attribute value comparison operator.
-     value — comparison attribute value.
-     pseudos — list of pseudo class rules; rule may contain fields:
-     name — pseudo name, required field.
-     valueType — argument type ("string", "selector" or "substitute").
-     value — pseudo argument.
-     nestingOperator — the operator used to nest this rule (e.g. in selector "tag1 > tag2", tag2 will have nestingOperator=">")
-     rule — nested rule.
-
-     if result.length>0 result.filter by testing next partial rule for each result else use object3D
-
+     * Returns all child nodes of the element that contain a property "attrName"
+     *  examples: css selector        -- query
+     *            .PerspectiveCamera  -- attrName="type" value="PerspectiveCamera"
+     *            #test               -- attrName="id" value="test"
+     *            [visible=true]      -- attrName="visible" value=true
+     *
+     * @param {HTMLElement} el
+     * @param attrName - a property key of el.object3D
+     * @param {any|undefined} value - The value to test for equality.  Note: if value==undefined then it only test for the key to exist with any value
+     * @returns {THREE.Object3D[]}
      */
+
+  function getObjectsByAttr (object3D, attrName, value) {
+    if (debug) {
+      console.log('getObjectsByAttr', attrName, value);
+    }
+    if (!attrName) throw new Error('attrName must be defined');
+
+    var result = [];
+    object3D.traverse(function (object) {
+      if (object[attrName]) {
+        if (value == undefined || object[attrName] == value) { // undefined in this context means that any value is valid
+          result.push(object);
+        }
+      }
+    });
+    return result;
+  }
 
   /**
      * Parses a string containing <key> <operator> <value> of a partial  css-selector  ":where(<key> <operator> <value>)" into its parts
@@ -74,11 +83,14 @@ export function querySelectorAll (object3D, selector, mDebug = false) {
      * @param valueString
      */
   function parseWherePseudoCSSProperty (valueString) {
-    var operators = '<,<=,=,>=,>,!=,=='.split(',');
+    var operators = '<=,==,>=,!=,<,=,>'.split(',');
 
     var test = operators.map(function (op) {
       var tmp = valueString.split(op);
+
       if (tmp.length == 2) {
+        if (op == '=') op = '=='; // replace "=" from css notation which is for assigning stuff in js
+
         return {key: tmp[0], operator: op, value: tmp[1]};
       }
     });
@@ -86,21 +98,35 @@ export function querySelectorAll (object3D, selector, mDebug = false) {
     var item = _.find(test, function (o) {
       return typeof o == 'object';
     });
-    if (item) { return item; } else { return {key: valueString, operator: '', value: ''}; }
+    if (item) {
+      return item;
+    } else {
+      return {key: valueString, operator: '', value: undefined};
+    }
   }
 
   /**
-     * if the array contains elements those get 'and' connected with following partial css selectors
-     * @param arr
-     * @param object3D
-     * @param key
-     * @param value
+     * If the array contains elements those get 'and' connected with following partial css selectors.
+     * @param {THREE.Object3D[]} arr - The array of partial results that gets mutated.
+     * @param {THREE.Object3D} object3D - The Parent element.
+     * @param {string} key - An attribute key of  the 'object3D' param.
+     * @param {*} value - A value to compare to.
      */
   function filterOrPush (arr, object3D, key, value) {
     if (arr.length > 0) {
+      if (debug) {
+        console.log('filtering', key, value);
+      }
+
       for (let i = 0; i < arr.length; i++) {
         let curr = arr[i];
-        if (!curr[key] == value) {
+        // discard if key does not exist but value would accept any eg. css('[visibl]')
+        if ((curr[key] == undefined || curr[key] == null) && value == undefined) {
+          arr.splice(i, 1);
+          i--;
+        } else
+        // discard if key does exist but value isn't equal on the condition that value isn't undefined in which case any value is ok  eg. css('[visible]') or  eg. css('[visible=true]')
+        if (curr[key] != value && value != undefined) {
           arr.splice(i, 1);
           i--;
         }
@@ -108,15 +134,21 @@ export function querySelectorAll (object3D, selector, mDebug = false) {
     } else arr.push(...getObjectsByAttr(object3D, key, value));
   }
 
-  // TODO refactor .. bad practice for sure
-  // a custom quick fix for the where pseudo attribute of filterOrPush
+  /**
+     *
+     * A custom quick fix for the where pseudo attribute of filterOrPush.
+     *
+     *  TODO refactor .. bad practice
+     *
+     * @param arr
+     * @param object3D
+     * @param filterNamespaceExists
+     */
+
   function filterOrPushCustom (arr, object3D, filterNamespaceExists) {
     if (arr.length > 0) {
       for (let i = 0; i < arr.length; i++) {
         let curr = arr[i];
-        // let res = getObjectsByAttr(curr, key, value);
-        // console.log('res', res);
-        // if (!res.length) { arr.splice(i, 1); i--; }
         if (!filterNamespaceExists(curr)) {
           arr.splice(i, 1);
           i--;
@@ -126,40 +158,60 @@ export function querySelectorAll (object3D, selector, mDebug = false) {
   }
 
   /**
-     * Handles a  ruleSet rule of the css-selector-parser object.
-     * @param rule
+     * Handles a ruleSet-rule of the css-selector-parser object.
+     *
+     * @param rule - A rule as it is returned by {@link CssSelectorParser}
      * @returns {Array}
      */
-  function handleRule (rule) {
+  function handleRule (rule, object3D) {
     var result = [];
-    if (debug) { console.log('handle rule', rule); }
-    // we dont have a tagname but we do have "classes" so we'll take those instead
-    if (rule.tagName) {
-      filterOrPush(result, object3D, 'type', rule.tagName);
+    if (debug) {
+      console.log('handle rule', rule);
     }
-    // the same appliies to classnames which also get resolved to the class >> isntance.type attribute
+
+    // handle id parts like '#myId'
+    if (rule.id) {
+      filterOrPush(result, object3D, 'id', rule.id);
+      if (result.length == 0) return [];// we did not find anything and may return
+    }
+
+    // we dont have a tag name but we do have "classes" so we'll take those instead
+    if (rule.tagName) {
+      // the all operator "*" gets translated
+      // at least in threejs every element has at least an empty children array for this case
+      if (rule.tagName == '*') { filterOrPush(result, object3D, 'children', undefined); } else { filterOrPush(result, object3D, 'type', rule.tagName); }
+
+      if (result.length == 0) return [];// we did not find anything and may return
+    }
+    // the same applies to class names which also get resolved to the class >> instance.type attribute
     if (rule.classNames) {
       _.each(rule.classNames, (className) => filterOrPush(result, object3D, 'type', className));
+      if (result.length == 0) return [];// we did not find anything and may return
     }
-    //
+    // handle attribute selector like  "[title='hello']"
     if (rule.attrs) {
       _.each(rule.attrs, function (attr) {
-        if (attr.operator != '=') console.warn("only supports '=' operator");
+        if (attr.operator != '=' && attr.operator != undefined) console.warn("attribute clause only supports '=' - Operator: " + attr.operator);
 
         // parse or undefined which will be the same as * or all entries that contain the key itself
         // let mVal = attr.value ? JSON.parse(attr.value) : undefined;
         let mVal = attr.value ? eval(attr.value) : undefined; // eslint-disable-line no-eval
         filterOrPush(result, object3D, attr.name, mVal);
       });
+      if (result.length == 0) return [];// we did not find anything and may return
     }
+
+    // Handle css pseudo classes. Only ':where(...)' is implemented.
     if (rule.pseudos) {
       _.each(rule.pseudos, function (pseudo) {
         if (pseudo.name != 'where') {
-          console.warn("only supports 'where'-pseudo");
+          console.warn("only supports ':where'-pseudo");
           return;
         }
         var whereObject = parseWherePseudoCSSProperty(pseudo.value);
-        if (debug) { console.log('whereObject', whereObject); }
+        if (debug) {
+          console.log('whereObject', whereObject);
+        }
         var namespaceString = whereObject.key.replace(new RegExp('-', 'g'), '.');
         var info = namespaceInfo(namespaceString);
 
@@ -170,18 +222,60 @@ export function querySelectorAll (object3D, selector, mDebug = false) {
 
           var namespace = createNamespace(info.root, object3D);
 
-          // eval for lack of other reasonable options
-          let toEval = namespace[info.key] + whereObject.operator + whereObject.value;
-          return eval(toEval);// eslint-disable-line no-eval
+          var type = typeof namespace[info.key];
+
+          // handle edge case: no operator
+          // Note: if type == function then we could discard it but there is no need and checking for meshes who have specific mixin functions available might be useful idk.
+          if (whereObject.operator == '') {
+            return namespace[info.key] != undefined && namespace[info.key] != null;
+          } else if (type == 'object') {
+            if (whereObject.value != 'null') {
+              console.warn(':where object comparison can only be made with value null eg. :where(mObj==null)');
+              return false;
+            }
+
+            // handle explicit comparisons with  '!='  '==' or  '=' to null
+            if (whereObject.operator == '=') return namespace[info.key] == null;
+            if (whereObject.operator == '==') return namespace[info.key] == null;
+            if (whereObject.operator == '!=') return namespace[info.key] != null;
+          } else { // eval.. for lack of other reasonable options
+            let leftSide = namespace[info.key];
+            let rightSide = whereObject.value;
+            if (typeof leftSide == 'string') {
+              if (leftSide == '') leftSide = '``';
+              else {
+                leftSide = '`' + encodeURI(leftSide) + '`';
+                // TODO "" encoded to `%60%60` somewhere which might or might not become a problem
+                if (typeof rightSide == 'string') { rightSide = '`' + encodeURI(rightSide) + '`'; }
+              }
+            }
+
+            let toEval = leftSide + whereObject.operator + rightSide;
+            if (debug) console.log(toEval);
+            return eval(toEval);// eslint-disable-line no-eval
+          }
         }
 
         filterOrPushCustom(result, object3D, function (object3D) {
           return filterNamespaceExists(object3D);
         });
       });
+      if (result.length == 0) return [];// we did not find anything and may return
     }
 
-    if (rule.nestingOperator) console.warn('nesting not supported');
+    if (rule.rule) {
+      // TODO nesting operators other than null == traverse all descendant elements
+      // > children only
+      // + sibling immediately following
+      // ~ general sibling meaning same parent
+      var mRes = [];
+      _.each(result, function (object3D) {
+        if (debug) console.group('nesting', rule.nestingOperator);
+        mRes = _.union(mRes, handleRule(rule.rule, object3D));
+        if (debug) console.groupEnd();
+      });
+      result = mRes;
+    }
 
     return result;
   }
@@ -189,29 +283,44 @@ export function querySelectorAll (object3D, selector, mDebug = false) {
   var allResults = [];
 
   switch (entry.type) {
-    case 'selector':
+    case 'selectors':
       _.each(entry.selectors, function (selector) {
-        if (debug) { console.log('handling - selector'); }
-        allResults.push(...querySelectorAll(object3D, selector));
+        if (selector.rule.nestingOperator != null) { console.warn("nesting only supports '=' operator. Not supported: " + selector.rule.nestingOperator); }
+
+        if (debug) {
+          console.log('handling - selectors');
+        }
+        // allResults.push(...querySelectorAll(object3D, selector));
+        allResults = _.union(allResults, handleRule(selector.rule, object3D));
       });
       break;
     case 'ruleSet':
-      if (debug) { console.log('handling - ruleSet'); }
-      allResults.push(...handleRule(entry.rule));
+      if (debug) {
+        console.log('handling - ruleSet');
+      }
+      allResults.push(...handleRule(entry.rule, object3D));
       break;
     default:
       console.warn('SceneGraphCSS - unsupported type:', entry.type);
   }
-  if (debug) { console.groupEnd(); }
+  if (debug) {
+    console.groupEnd();
+  }
 
   return allResults;
 }
+
+/**
+ * Parses a css selector.
+ *
+ * @param {selector} selector- The selector.
+ */
 
 export function parseCSSSelector (selector) {
   var parser = new CssSelectorParser();
 
   parser.registerSelectorPseudos('has');
-  parser.registerNestingOperators('>', '+', '~');
+  parser.registerNestingOperators('>', '+', '~', ' ');
   parser.registerAttrEqualityMods('^', '$', '*', '~');
   parser.enableSubstitutes();
 
@@ -221,62 +330,12 @@ export function parseCSSSelector (selector) {
   return parsed;
 }
 
-export function addBoundingBox (obj) {
-  var helper = new BoxHelperExt(obj);
-
-  obj.parent.add(helper);
-
-  var fc = new FPSCtrl(0.5, function (e) {
-    // render each frame here
-    helper.update(undefined, obj.parent, true, false);
-  });
-  fc.start();
-  return helper;
-}
-
 /**
- * returns all child nodes of the element that contain a property geometry which should always be a mesh
- * @param {HTMLElement} el
- * @returns {THREE.Mesh[]}
- */
-function getMeshes (el) {
-  // noinspection JSValidateTypes
-  return getObjectsByAttr(el.object3D, 'geometry');
-}
-
-/**
- * Returns all child nodes of the element that contain a property "attrName"
- *  examples: css selector        -- query
- *            .PerspectiveCamera  -- attrName="type" value="PerspectiveCamera"
- *            #test               -- attrName="id" value="test"
- *            [visible=true]      -- attrName="visible" value=true
+ * Filter elements.
  *
- * @param {HTMLElement} el
- * @param attrName - a property key of el.object3D
- * @param value - the value to test for equality
- * @returns {THREE.Object3D[]}
- */
-
-function getObjectsByAttr (object3D, attrName, value) {
-  if (debug) { console.log('getObjectsByAttr', attrName, value); }
-  if (!attrName) throw new Error('attrName must be defined');
-
-  var result = [];
-  object3D.traverse(function (object) {
-    if (object[attrName]) {
-      if (value == undefined || object[attrName] == value) {
-        result.push(object);
-      }
-    }
-  });
-  return result;
-}
-
-/**
  *
- * @param object3D
- * @param attrName
- * @param value
+ * @param {THREE.Object3D} object3D - The parent element.
+ * @param {function} filterFunction - A custom filter function.
  * @returns {Array}
  */
 function getObjectsByFilter (object3D, filterFunction) {
@@ -286,209 +345,3 @@ function getObjectsByFilter (object3D, filterFunction) {
   });
   return result;
 }
-
-/**
- * goal find children of model and for example attach bounding boxes for physics
- *
- *
- * @param selector
- * @returns {*|jQuery|HTMLElement}
- */
-
-export function testCompoundGLTF (modelEl, debug = false) {
-//    modelEl=jQuery("[gltf-model]")[3];
-  // var items=modelEl.object3D.children[0].children[0].children[0].children[0].children
-  var items = getMeshes(modelEl);
-  items.shift();
-  if (debug) {
-    console.group('cannon-compound:testCompoundGLTF');
-  }
-
-  function localToObject (vector, object3D) {
-    return vector.applyMatrix4(object3D.matrix);
-  }
-  var i = 0;
-  items.forEach(el => {
-    if (el.geometry) el.geometry.computeBoundingBox();
-
-    var bb = el.geometry.boundingBox;
-    var vCenter = bb.getCenter();
-    var size = bb.getSize();
-
-    console.log(el.name, 'size', size.length());
-    // TODO don't ignore big stuff anymore
-    if (size.length() >= 20) {
-      // if (i++ >= 20) {
-      el.visible = false;
-
-      return;
-    } // TODO only use first few elements for testing
-
-    // FIXME the physics are one global system so we need our bodys to be relative to the world for now
-    // but later on we probably will need different independent worlds
-    var region = modelEl.parentEl;
-    //  var regionPosition = modelEl.object3D.position.clone().applyMatrix4(region.object3D.matrix);
-
-    // var vPosition = regionPosition.add(vCenter);
-    //  console.log(el.matrixWorld);
-    // var vPosition = el.localToWorld(el.position.clone());
-    // var vPosition = el.position.clone().applyMatrix4(region.object3D.matrix).add(vCenter);
-
-    // TODO shouldn't the center be applied Oo?
-    var vPosition = el.getWorldPosition();// .applyMatrix4(region.object3D.matrix)
-    // .add(vCenter);
-
-    var vScale = el.getWorldScale();
-    var vQuaternion = el.getWorldQuaternion();
-
-    var testMult = 1;
-    size.x *= vScale.x * testMult;
-    size.y *= vScale.y * testMult;
-    size.z *= vScale.z * testMult;
-
-    //    var vPosition = el.position.clone().add(vCenter);
-    // var vPosition = el.position.clone().add(vCenter);
-
-    // FIXME position is not correct
-    //    vPosition = localToObject(vPosition, modelEl.object3D);
-    // vPosition = localToObject(vCenter, modelEl.object3D);
-
-    /* // ---------------------------------------
-
-    var shape = new CANNON.Box(new CANNON.Vec3(size.x / 2, size.y / 2, size.z / 2));
-
-    var cannonPos = new CANNON.Vec3(vPosition.x, vPosition.y, vPosition.z);
-
-    modelEl.body.addShape(shape, cannonPos);
-*/
-    // ---------------------------------------
-    /*
-     var boxShape = new CANNON.Box(new CANNON.Vec3(size.x / 2, size.y / 2, size.z / 2));
-    var boxBody = new CANNON.Body({ mass: 000 });
-    boxBody.addShape(boxShape);
-    boxBody.position.set(vPosition.x, vPosition.y, vPosition.z);
-    modelEl.body.world.addBody(boxBody);
-*/
-    // ---------------------------------------
-    /* var geometry = new THREE.BoxGeometry(size.x / 2, size.y / 2, size.z / 2);
-    var material = new THREE.MeshBasicMaterial({color: 0x0000ff});
-    var cube = new THREE.Mesh(geometry, material);
-    cube.position.copy(vPosition);
-    modelEl.sceneEl.object3D.add(cube);
-*/
-    // ---------------------------------------
-
-    // ok so far the closest to something working ...
-    // el=jQuery("#physicsTestRegion").find("[gltf-model]")[0]
-    var boxShape = new CANNON.Box(new CANNON.Vec3(size.x / 2, size.y / 2, size.z / 2));
-    var boxBody = new CANNON.Body({ mass: 0 });
-    boxBody.addShape(boxShape);
-    boxBody.position.set(vPosition.x, vPosition.y, vPosition.z);
-    boxBody.quaternion.set(vQuaternion.x, vQuaternion.y, vQuaternion.z, vQuaternion.w);
-
-    modelEl.body.world.addBody(boxBody); var geometry = new THREE.BoxGeometry(size.x, size.y, size.z);
-    var material = new THREE.MeshBasicMaterial({color: 0x0000ff, wireframe: true});
-    var cube = new THREE.Mesh(geometry, material);
-    cube.position.set(vPosition.x, vPosition.y, vPosition.z);
-
-    cube.quaternion.set(vQuaternion.x, vQuaternion.y, vQuaternion.z, vQuaternion.w);
-
-    modelEl.sceneEl.object3D.add(cube);
-
-    // TODO the rotatiom is wrong
-    // el=jQuery("#physicsTestRegion").find("[gltf-model]")[0];el.object3D.quaternion.x=0.7;
-
-    // -------------------------------------------------
-    if (debug) {
-      // console.log(el);
-      // console.log('position', stringifyWithPrecision(vPosition), 'size', stringifyWithPrecision(size));
-
-      var helper = addBoundingBox(el);
-
-      // TODO collision per sub-element not working
-      boxBody.addEventListener('collide', _.debounce(function (e) {
-        // console.log(modelEl, 'has collided with body ', e.detail.body);
-        console.log('collision', e);
-        e.body.el.setAttribute('color', _.sample('red', 'yellow', 'blue'));
-        // console.log('collision', e);
-        /*   e.detail.target.el;  // Original entity (playerEl).
-            e.detail.body.el;    // Other entity, which playerEl touched.
-            e.detail.contact;    // Stats about the collision (CANNON.ContactEquation).
-            e.detail.contact.ni; // Normal (direction) of the collision (CANNON.Vec3).
-       */
-      }, 50));
-    }
-  });
-
-  if (debug) {
-    console.groupEnd();
-  }
-}
-
-// Box shape
-/*
-var boxShape = new CANNON.Box(new CANNON.Vec3(size,size,size));
-var boxBody = new CANNON.Body({ mass: mass });
-boxBody.addShape(boxShape);
-boxBody.position.set(-size*2,-size*2,size+1);
-world.addBody(boxBody);
-
-var shape = new CANNON.Box(new CANNON.Vec3(100,100,100));
-el=jQuery("[gltf-model]")[3];el.body.addShape(shape);
-
-*/
-
-/**
- *
- * @param {{selector|Class[]|Class}} selector
- * @returns {*|jQuery|HTMLElement}
- */
-/*
-ThreeJS.prototype.find=function(selector)
-{
-    var self=this
-
-    var res=$([])
-
-    var selectorList=selector.split(",")
-    if (selectorList.length>1)
-    {
-        var _arr=_.map(selectorList,function(selector){
-            return self.find(selector).toArray()
-        })
-
-        res=$(  _.uniq(_.concat.apply(null,_arr)))
-    }
-    else
-    {
-
-        if(selector=="*") selector=".THREE.Object3D"
-
-        if(selector[0]=="#") res= this.getByName(selector.substring(1))
-
-        if(selector[0]=="."){
-            var ns=selector.substring(1)
-            if (nk.namespaceExists(ns))
-                res= this.getByType(nk.namespace(ns))
-        }
-
-    }
-
-    res.setAll=function(valuesAsObject)
-    {
-        this.each(function(k,entry){ _.assign(entry,valuesAsObject) })
-        return this
-    }
-
-    res.getAll=function(valuesAsArray)
-    {
-        var result=[]
-
-        this.each(function(k,entry){ result.push(_.get(entry,valuesAsArray)) })
-        return result
-    }
-
-    return res
-}
-
-*/
