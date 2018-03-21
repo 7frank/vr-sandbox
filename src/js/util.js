@@ -1,9 +1,6 @@
 import $ from 'jquery';
 import * as _ from 'lodash';
 
-const AFRAME = window.AFRAME;
-const THREE = AFRAME.THREE;
-
 /**
  * Stringify coordinates from an object with keys [x y z].
  * Example: {x: 3, y: 10, z: -5} to "3 10 -5".
@@ -122,11 +119,11 @@ export function getDirectionForEntity (entity) {
   return direction;
 
   /* var pos = o3d.position;
-      var up = o3d.up;
-      var quaternion = o3d.quaternion;
-      var direction = new THREE.Vector3().copy(up);
-      direction.applyQuaternion(quaternion);
-      return direction; */
+          var up = o3d.up;
+          var quaternion = o3d.quaternion;
+          var direction = new THREE.Vector3().copy(up);
+          direction.applyQuaternion(quaternion);
+          return direction; */
 }
 
 /**
@@ -261,90 +258,6 @@ export function lookAwayFrom (me, target) {
 }
 
 /**
- * a simple fps limiter
- *
- * for reference see https://stackoverflow.com/a/19773537
- */
-
-export function FPSCtrl (fps, onFrame, context) {
-  var delay = 1000 / fps, // calc. time per frame
-    time = null, // start time
-    frame = -1, // frame count
-    tref; // rAF time reference
-
-  if (context != null) {
-    onFrame = onFrame.bind(context);
-  }
-
-  function loop (timestamp) {
-    if (time === null) time = timestamp; // init start time
-    var seg = Math.floor((timestamp - time) / delay); // calc frame no.
-    if (seg > frame) { // moved to next frame?
-      frame = seg; // update
-      onFrame({ // callback function
-        time: timestamp,
-        frame: frame
-      });
-    }
-    tref = requestAnimationFrame(loop);
-  }
-
-  // play status
-  this.isPlaying = false;
-
-  // set frame-rate
-  this.frameRate = function (newfps) {
-    if (!arguments.length) return fps;
-    fps = newfps;
-    delay = 1000 / fps;
-    frame = -1;
-    time = null;
-  };
-
-  // enable starting/pausing of the object
-  this.start = function () {
-    if (!this.isPlaying) {
-      this.isPlaying = true;
-      tref = requestAnimationFrame(loop);
-    }
-    return this;
-  };
-
-  this.pause = function () {
-    if (this.isPlaying) {
-      cancelAnimationFrame(tref);
-      this.isPlaying = false;
-      time = null;
-      frame = -1;
-    }
-    return this;
-  };
-}
-
-/**
- * container class
- * TODO
- */
-
-export class AiScripts {
-  constructor () {
-    this.scripts = {};
-  }
-
-  add (name, handler) {
-    this.scripts.name = {};
-  }
-
-  pause (name) {
-
-  }
-
-  play () {
-
-  }
-}
-
-/**
  * takes a unit vector (or should at least) and transforms it into a quaternion using an up-vector
  * @param {THREE.Vector3} mVec - The unit vector.
  * @param {THREE.Vector3} up - An up-vector.
@@ -441,11 +354,11 @@ export function playAnimation (el, animationName, tCrossfade) {
   component.playAction();
 
   /*
-     var a = component.activeActions[0];
+         var a = component.activeActions[0];
 
-      var b = _.sample(component.mixer._actions);
+          var b = _.sample(component.mixer._actions);
 
-      if (a) { a.crossFadeTo(b, tCrossfade); } else { b.fadeIn(tCrossfade); }
+          if (a) { a.crossFadeTo(b, tCrossfade); } else { b.fadeIn(tCrossfade); }
 
-      */
+          */
 }

@@ -30,7 +30,7 @@ import {createNamespace, namespaceExists, namespaceInfo} from './namespace';
  */
 
 export function querySelectorAll (object3D, selector, debug = false) {
-  if (typeof object3D != 'object') throw new Error('first param must be a THREE.Obect3D');
+  if (typeof object3D != 'object') throw new Error('first param must be a THREE.Obejct3D');
   if (typeof selector != 'string') throw new Error('second param must be a proper css-selector string');
   if (selector == '') selector = 'selector';
   // convenience function allowing for simply dropping AFRAME elements
