@@ -1,10 +1,6 @@
 import {testCompoundGLTF} from '../utils/physics-utils';
 import * as CANNON from 'cannon';
 
-window.AFRAME = require('aframe');
-const AFRAME = window.AFRAME;
-const THREE = AFRAME.THREE;
-
 /**
  * test for a static compound physics object
  * currently used for more complex gltf objects loaded

@@ -11,10 +11,7 @@ tQuery.registerStatic('createCarCameraControls', function(opts, world){
 */
 
 import Car from './tquery.car';
-import {lookAtAndOrient, lookAwayFrom} from '../../util';
-
-const AFRAME = window.AFRAME;
-const THREE = AFRAME.THREE;
+import {lookAtAndOrient, lookAwayFrom} from '../../utils/aframe-utils';
 
 export default class CarCameraControls {
   /**

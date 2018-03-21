@@ -1,5 +1,5 @@
 import TWEEN from '@tweenjs/tween.js';
-import {querySelectorAll} from '../selector-util';
+import {querySelectorAll} from './selector-utils';
 
 /**
  * static helper for smooth navigation within 3D space

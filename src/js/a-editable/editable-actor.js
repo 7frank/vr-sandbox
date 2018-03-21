@@ -1,11 +1,8 @@
 import $ from 'jquery';
-import {findClosestEntity, getDirectionForEntity} from '../util';
-import {getHotkeyDialog, getTextEditorInstance} from './utils';
-import pretty from 'pretty';
+import {findClosestEntity, getDirectionForEntity} from '../utils/aframe-utils';
 
-window.AFRAME = require('aframe');
-const AFRAME = window.AFRAME;
-const THREE = AFRAME.THREE;
+import pretty from 'pretty';
+import {getHotkeyDialog, getTextEditorInstance} from './utils';
 
 // ---------------------------------
 

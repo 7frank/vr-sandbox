@@ -1,8 +1,8 @@
 import {createTerrain} from '../../utils/terrain-utils';
 import {Terrain} from './lod-terrain-index';
 import {ImprovedNoise} from './PerlinNoise';
-import {updateHotComponent} from '../../utils/aframe-utils';
-import {FPSInfo, FPSCtrl} from '../../fps-util';
+import {updateHotComponent} from '../../utils/aframe-debug-utils';
+import {FPSInfo, FPSCtrl} from '../../utils/fps-utils';
 
 function toArray2D (vertices, options) {
   var tgt = new Array(options.xSegments),

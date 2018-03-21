@@ -1,6 +1,6 @@
 
 import {createTerrain} from '../utils/terrain-utils';
-import {updateHotComponent} from '../utils/aframe-utils';
+import {updateHotComponent} from '../utils/aframe-debug-utils';
 
 /**
  *  A terrain generator

@@ -1,6 +1,6 @@
 
 import $ from 'jquery';
-import {playSound, setPosition} from './util';
+import {playSound, setPosition} from './utils/aframe-utils';
 import CANNON from 'cannon';
 
 // TODO make it work with dynamic loadable regions

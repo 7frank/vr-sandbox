@@ -13,9 +13,6 @@ import extend from 'lodash.assignin';
 import {createCubeTexture} from './TextureCube';
 import './THREE-Car';
 
-const AFRAME = window.AFRAME;
-const THREE = AFRAME.THREE;
-
 class WorldShim {
   hook (fn) {
     // window.requestAnimationFrame(fn);

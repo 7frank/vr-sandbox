@@ -47,12 +47,12 @@ import {
 } from './network-sync';
 import {attachGameLogic} from './ballGameLogic';
 import * as _ from 'lodash';
-import {addLoadingListenersToScene} from './loadingBarUtils';
+import {addLoadingListenersToScene} from './utils/loadingBarUtils';
 import ZoomUtils from './utils/ZoomUtils';
-import {querySelectorAll} from './selector-util';
-import {Layers} from './misc/Layers';
+import {querySelectorAll} from './utils/selector-utils';
+import {Layers} from './types/Layers';
 
-import {createTextSampleCanvas, renderTextToCanvas} from './misc/handwriting';
+import {createTextSampleCanvas, renderTextToCanvas} from './gui/handwriting';
 
 // if we really want to have a partially global object for debugging this should go into a separate file then..
 AFRAME.nk = {querySelectorAll, ZoomUtils, Layers};

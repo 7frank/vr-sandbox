@@ -1,8 +1,4 @@
 
-window.AFRAME = require('aframe');
-const AFRAME = window.AFRAME;
-const THREE = AFRAME.THREE;
-
 // @author
 // https://raw.githubusercontent.com/blairmacintyre/aframe-look-at-billboard-component/master/index.js
 // TODO use npm import which fails atm jan/18

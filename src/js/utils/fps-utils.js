@@ -1,4 +1,4 @@
-import {NumberQueue} from './utils/NumberQueue';
+import {NumberQueue} from '../types/NumberQueue';
 
 /**
  * a simple fps limiter

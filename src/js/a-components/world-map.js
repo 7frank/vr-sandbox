@@ -4,10 +4,10 @@
  * we don't need to re-render all regions everytime static content can be rendered once, dynamic moving elements maybe more often
  */
 
-import {FPSInfo, FPSCtrl} from '../fps-util';
-import {updateHotComponent} from '../utils/aframe-utils';
-import {querySelectorAll} from '../selector-util';
-import {setLayersForObject, Layers} from '../misc/Layers';
+import {FPSInfo, FPSCtrl} from '../utils/fps-utils';
+import {updateHotComponent} from '../utils/aframe-debug-utils';
+import {querySelectorAll} from '../utils/selector-utils';
+import {setLayersForObject, Layers} from '../types/Layers';
 
 updateHotComponent('world-map');
 AFRAME.registerComponent('world-map', {

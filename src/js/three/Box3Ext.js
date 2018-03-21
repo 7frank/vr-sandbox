@@ -5,10 +5,6 @@
  *
  */
 
-window.AFRAME = require('aframe');
-const AFRAME = window.AFRAME;
-const THREE = AFRAME.THREE;
-
 const Vector3 = THREE.Vector3;
 const Sphere = THREE.Sphere;
 

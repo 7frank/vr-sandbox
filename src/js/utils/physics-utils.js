@@ -1,8 +1,8 @@
 import * as CANNON from 'cannon';
 import * as _ from 'lodash';
-import {querySelectorAll} from '../selector-util';
+import {querySelectorAll} from './selector-utils';
 import {BoxHelperExt} from '../three/BoxHelperExt';
-import {FPSCtrl} from '../fps-util';
+import {FPSCtrl} from './fps-utils';
 
 export function addBoundingBox (obj) {
   var helper = new BoxHelperExt(obj);

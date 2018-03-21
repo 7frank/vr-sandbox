@@ -7,10 +7,6 @@
 
 import {Box3Ext} from './Box3Ext';
 
-window.AFRAME = require('aframe');
-const AFRAME = window.AFRAME;
-const THREE = AFRAME.THREE;
-
 const Box3 = THREE.Box3;
 const LineSegments = THREE.LineSegments;
 const LineBasicMaterial = THREE.LineBasicMaterial;

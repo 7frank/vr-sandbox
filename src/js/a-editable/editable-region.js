@@ -48,14 +48,14 @@
  */
 
 import $ from 'jquery';
-import {FPSCtrl} from '../fps-util';
+import {FPSCtrl} from '../utils/fps-utils';
 
 import 'aframe-gridhelper-component';
-import {Blob2Text, streamIn} from '../stream-utils';
+import {Blob2Text, streamIn} from '../utils/stream-utils';
 import MaterialFadeMixin from '../mixins/MaterialFadeMixin';
 import * as _ from 'lodash';
 
-import {Layers, setLayersForObject} from '../misc/Layers';
+import {Layers, setLayersForObject} from '../types/Layers';
 
 AFRAME.registerComponent('editable-region', {
   schema: {

@@ -1,6 +1,12 @@
-import $ from 'jquery';
+
 import * as _ from 'lodash';
-import {FPSCtrl} from '../fps-util';
+import {FPSCtrl} from './fps-utils';
+
+/**
+ * Querys for components within the DOM that have specific attributes.
+ *
+ * @returns {Array.<*>}
+ */
 
 function getComponentsThatHavePerformanceInfo () {
   // find all components that have a performance info
@@ -16,7 +22,7 @@ function getComponentsThatHavePerformanceInfo () {
 }
 
 /**
- * returns an array of view-model and model objects one with relevat data to display one with more general informations
+ * Returns an array of view-model and model objects one with relevat data to display one with more general informations
  * @returns {{vm: Array, m: Array}}
  * @constructor
  */

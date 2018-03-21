@@ -57,8 +57,6 @@ import 'aframe-daydream-controller-component';
  *
  */
 
-const AFRAME = window.AFRAME;
-const THREE = AFRAME.THREE;
 // var extendDeep = AFRAME.utils.extendDeep;
 
 AFRAME.registerComponent('html-3d', {

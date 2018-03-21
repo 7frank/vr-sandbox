@@ -2,8 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-const AFRAME = window.AFRAME;
-const THREE = AFRAME.THREE;
+
 
 THREE.BinaryLoader = function (manager) {
   if (typeof manager === 'boolean') {

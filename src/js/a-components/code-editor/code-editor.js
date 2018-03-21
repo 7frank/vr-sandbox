@@ -1,6 +1,3 @@
-window.AFRAME = require('aframe');
-const AFRAME = window.AFRAME;
-const THREE = AFRAME.THREE;
 
 /**
  * creates a axis aligned bounding box (aabb) for a entity it is attached to

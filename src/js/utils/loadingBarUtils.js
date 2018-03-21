@@ -1,11 +1,7 @@
 import $ from 'jquery';
-import {template} from './util';
+import {template} from './misc-utils';
 
 import MutationSummary from 'mutation-summary';
-
-window.AFRAME = require('aframe');
-const AFRAME = window.AFRAME;
-const THREE = AFRAME.THREE;
 
 /**
  * sample loading bar
@@ -46,7 +42,7 @@ export function addLoadingListenersToScene (scene, loadedhandler = () => {
   var manager = assets.fileLoader.manager;
   manager.onStart = function (...args) {
     loadingBar.show();
-    console.log('scene assests start loading', args);
+    // console.log('scene assests start loading', args);
   };
 
   manager.onError = function (...args) {

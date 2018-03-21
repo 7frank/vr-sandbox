@@ -1,6 +1,5 @@
 // A-Frame
-const AFRAME = window.AFRAME;
-const THREE = AFRAME.THREE;
+
 AFRAME.registerShader('custom-shader', {
   schema: {
     dashSize: {default: 3},

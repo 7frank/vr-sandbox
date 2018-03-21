@@ -1,8 +1,4 @@
 
-window.AFRAME = require('aframe');
-const AFRAME = window.AFRAME;
-const THREE = AFRAME.THREE;
-
 AFRAME.registerComponent('compass', {
   init: function () {
 

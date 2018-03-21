@@ -1,7 +1,4 @@
 
-const AFRAME = window.AFRAME;
-const THREE = AFRAME.THREE;
-
 export function createCubeTexture (opts) {
   var urls, textureCube;
   var cube = new TextureCube();

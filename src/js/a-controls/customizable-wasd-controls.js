@@ -9,9 +9,6 @@ var KEYCODE_TO_CODE = {
   '68': 'KeyD'
 };
 
-window.AFRAME = require('aframe');
-const AFRAME = window.AFRAME;
-const THREE = AFRAME.THREE;
 var utils = AFRAME.utils;
 
 var bind = utils.bind;

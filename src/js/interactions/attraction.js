@@ -1,18 +1,14 @@
 import {
-  findClosestEntity, getAnimationNames, getDirectionForEntity, getPosition, getSignedAngle,
+  findClosestEntity, getDirectionForEntity, getPosition, getSignedAngle,
   getUnsignedAngle,
   lookAwayFrom,
-  playAnimation,
   setPosition,
   vector2Quaternion
-} from '../util';
+} from '../utils/aframe-utils';
 
 import * as _ from 'lodash';
-import {AiScripts, FPSCtrl, FPSInfo} from '../fps-util';
-
-window.AFRAME = require('aframe');
-const AFRAME = window.AFRAME;
-const THREE = AFRAME.THREE;
+import {AiScripts, FPSCtrl, FPSInfo} from '../utils/fps-utils';
+import {getAnimationNames, playAnimation} from '../utils/animation-utils';
 
 // TODO (1) test this with some small state machine .. eg. run away if distance gt 20; if distance smaller 5 run towards; if distance <2 attack
 //      (2) evaluate: is it better to have an extermal state component that keeps track of distance, health and such or is it better to have the state machine inside the the component itself?

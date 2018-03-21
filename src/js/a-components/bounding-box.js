@@ -1,6 +1,6 @@
 import {BoxHelperExt} from '../three/BoxHelperExt';
-import {FPSInfo, FPSCtrl} from '../fps-util';
-import {setLayersForObject, Layers} from '../misc/Layers';
+import {FPSInfo, FPSCtrl} from '../utils/fps-utils';
+import {setLayersForObject, Layers} from '../types/Layers';
 
 /**
  * creates a axis aligned bounding box (aabb) for a entity it is attached to

@@ -6,9 +6,6 @@
 
 import 'three/examples/js/loaders/BinaryLoader';
 
-const AFRAME = window.AFRAME;
-const THREE = AFRAME.THREE;
-
 THREE.Car = function () {
   var scope = this;
 

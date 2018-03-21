@@ -62,7 +62,7 @@ export function createCameraConfigGUI (camera) {
     return {name: v.name, ordinal: v.ordinal};
   });
     // test initial camera settings
-  _layers.forEach(l => l.visible = camera.layers.test({mask: 1 << l.ordinal}));
+  _layers.forEach(function (l) { l.visible = camera.layers.test({mask: 1 << l.ordinal}); });
 
   // template -------------------------------------
   var el = create(`

@@ -35,8 +35,6 @@ function restartPhysics (el, bodyType = 'dynamic-body', defaultVal = '', overrid
   el.setAttribute(bodyType, val);
 }
 
-const AFRAME = window.AFRAME;
-const THREE = AFRAME.THREE;
 var extendDeep = AFRAME.utils.extendDeep;
 
 /**

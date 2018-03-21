@@ -1,17 +1,16 @@
-import DialogComponent from '../DialogComponent';
-import '../DialogComponent.css';
+
 import template from './OptionsDialog.html';
 import $ from 'jquery';
 
 import _ from 'lodash';
 
-import {appendStyle, create, setCenter} from '../../utils/dom-utils';
+import {appendStyle, create, setCenter} from '../../../utils/dom-utils';
 
 import Vue from 'vue/dist/vue.esm';
 import KeenUI from 'keen-ui';
-import {createCameraConfigGUI} from '../../misc/Layers';
-import {ImpactObject} from '../../utils/performance-utils';
-import {createTable} from '../../gui/Table';
+import {createCameraConfigGUI} from '../../../types/Layers';
+import {ImpactObject} from '../../../utils/performance-utils';
+import {createTable} from '../../Table';
 // import keenCss from 'keen-ui/dist/keen-ui.css';
 // import 'keen-ui/dist/keen-ui.css';
 Vue.use(KeenUI);

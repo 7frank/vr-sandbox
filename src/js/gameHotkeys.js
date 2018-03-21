@@ -6,19 +6,17 @@
 // import '@nk/core-components/dist/bundle';
 
 import CarCameraControls from './a-car/car/CarCameraControls';
-import OptionsDialog, {createGeneralOptionsDialog} from './dialogs/options/OptionDialog';
+import {createGeneralOptionsDialog} from './gui/dialogs/options/OptionDialog';
 
 import $ from 'jquery';
 import * as CANNON from 'cannon';
-import {addScript, findClosestEntity, getDirectionForEntity, getPosition, playSound, setPosition, toast} from './util';
+import {findClosestEntity, getDirectionForEntity, getPosition, playSound, setPosition, toast} from './utils/aframe-utils';
 import {getTextEditorInstance} from './a-editable/utils';
 import {startEditingTextarea} from './a-editable/editable-actor';
 import {ImpactGUI} from './utils/performance-utils';
-import {createCameraConfigGUI} from './misc/Layers';
-import {create, setCenter} from './utils/dom-utils';
 
-const AFRAME = window.AFRAME;
-const THREE = AFRAME.THREE;
+import {create, setCenter} from './utils/dom-utils';
+import {addScript} from './utils/misc-utils';
 
 function handlerwrapper () {
   console.log('codeeditor', window.THREE);
@@ -28,7 +26,7 @@ function handlerwrapper () {
   });
 
   setTimeout(function handler (event) {
-    // <!-- FIXME remove in production  -->
+    // <!-- FIXME remove in production use CopyWebpackPlugin instead  -->
     addScript('http://localhost:9000/api/node_modules/@nk/core-components/dist/bundle.js', function () {
       addHotkeys();
     });
@@ -117,35 +115,6 @@ function addHotkeys () {
   Hotkeys('player-rotate-right', 'e', () => {
   }, () => {
   }, {category: 'player', description: 'Rotates the player.'});
-
-  // ---------------------------------------------------
-  // todo the keys for car would be the same wasd but only if player controler is set to car entity
-  // TODO how does this interfere with car contols existing and actions and customization
-  /* Hotkeys('move forward', 'i', () => {
-              window.car._car.controls().moveForward = true;
-            }, () => {
-              window.car._car.controls().moveForward = false;
-            }, {category: 'car', description: 'Accelerates the car in the forward direction.'});
-
-            Hotkeys('move backward', 'k', () => {
-              window.car._car.controls().moveBackward = true;
-            }, () => {
-              window.car._car.controls().moveBackward = false;
-            }, {category: 'car', description: 'Accelerates the car in the backward direction.'});
-
-            Hotkeys('steer left', 'j', () => {
-              window.car._car.controls().moveLeft = true;
-            }, () => {
-              window.car._car.controls().moveLeft = false;
-            }, {category: 'car'});
-
-            Hotkeys('steer right', 'l', () => {
-              window.car._car.controls().moveRight = true;
-            }, () => {
-              window.car._car.controls().moveRight = false;
-            }, {category: 'car'});
-
-          */
 
   // ---------------------------------------------------
 
@@ -241,10 +210,10 @@ function addHotkeys () {
     var ball = $('.ball').get(0);
 
     /* el.body.applyImpulse(
-                                                              // impulse  new CANNON.Vec3(0, 1, 0),
-                                                              // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
-                                                            );
-                                                            */
+                                                                  // impulse  new CANNON.Vec3(0, 1, 0),
+                                                                  // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
+                                                                );
+                                                                */
     var p = player.body.position;
     var b = ball.body.position;
 
@@ -261,10 +230,10 @@ function addHotkeys () {
     var ball = $('.ball').get(0);
 
     /* el.body.applyImpulse(
-                                                              // impulse  new CANNON.Vec3(0, 1, 0),
-                                                              // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
-                                                            );
-                                                            */
+                                                                  // impulse  new CANNON.Vec3(0, 1, 0),
+                                                                  // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
+                                                                );
+                                                                */
     var el = ball; // partially works with ball but not with player body as it seems
     el.body.applyImpulse(new CANNON.Vec3(0, 1, 0), new CANNON.Vec3(0, -1, 0)); // new CANNON.Vec3().copy(el.getComputedAttribute('position')));
   }, {category: 'game play', description: 'will elevate the player by a small margin'});

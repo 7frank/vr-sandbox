@@ -1,7 +1,4 @@
 
-const AFRAME = window.AFRAME;
-const THREE = AFRAME.THREE;
-
 // @author https://github.com/jeromeetienne/threex.htmlmixer
 export
 var THREEx = THREEx || {};
