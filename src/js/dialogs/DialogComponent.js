@@ -10,7 +10,7 @@ import './DialogComponent.css';
 /**
  * simple basic dialog
  *
- *
+ * @deprecated use nk-window  webcomponent meanwhile
  */
 
 export default class DialogComponent {
