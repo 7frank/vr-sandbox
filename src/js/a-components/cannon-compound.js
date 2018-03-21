@@ -1,4 +1,4 @@
-import {testCompoundGLTF} from '../selector-util';
+import {testCompoundGLTF} from '../utils/physics-utils';
 import * as CANNON from 'cannon';
 
 window.AFRAME = require('aframe');

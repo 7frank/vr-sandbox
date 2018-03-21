@@ -2,7 +2,7 @@ import {createTerrain} from '../../utils/terrain-utils';
 import {Terrain} from './lod-terrain-index';
 import {ImprovedNoise} from './PerlinNoise';
 import {updateHotComponent} from '../../utils/aframe-utils';
-import {FPSCtrl} from '../../util';
+import {FPSInfo, FPSCtrl} from '../../fps-util';
 
 function toArray2D (vertices, options) {
   var tgt = new Array(options.xSegments),
@@ -127,6 +127,11 @@ AFRAME.registerComponent('cdlod-terrain', {
   },
   tick: function (time, timeDelta) {
     // var mesh = this.el.getObject3D('mesh)'
+  },
+  getPerformanceInfo () {
+    return FPSInfo(this.name)
+      .add('followCameraScript', this.followCameraScript)
+      .compile();
   }
 
 });

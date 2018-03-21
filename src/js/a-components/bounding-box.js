@@ -1,9 +1,6 @@
 import {BoxHelperExt} from '../three/BoxHelperExt';
-import {FPSCtrl} from '../util';
-
-window.AFRAME = require('aframe');
-const AFRAME = window.AFRAME;
-const THREE = AFRAME.THREE;
+import {FPSInfo, FPSCtrl} from '../fps-util';
+import {setLayersForObject, Layers} from '../misc/Layers';
 
 /**
  * creates a axis aligned bounding box (aabb) for a entity it is attached to
@@ -23,14 +20,27 @@ AFRAME.registerComponent('bb', {
 
     if (!obj) console.error('no obj defined for bbox helper');
 
-    var helper = new BoxHelperExt(obj);
+    this.mHelper = new BoxHelperExt(obj);
 
-    obj.parent.add(helper);
+    setLayersForObject(this.mHelper, Layers.Bounds);
 
-    var fc = new FPSCtrl(0.5, function (e) {
+    obj.parent.add(this.mHelper);
+
+    this.updateHelperScript = new FPSCtrl(0.5, function (e) {
       // render each frame here
-      helper.update(undefined, obj.parent, true, false);
-    });
-    fc.start();
+      this.mHelper.update(undefined, obj.parent, true, false);
+    }, this);
+    this.updateHelperScript.start();
+  },
+  getPerformanceInfo () {
+    return FPSInfo('bb')
+      .add('updateHelperScript', this.updateHelperScript)
+      .compile();
+  },
+  remove: function () {
+    var obj = this.el.getObject3D('mesh') || this.el.object3D;
+    obj.parent.remove(this.mHelper);
+    this.updateHelperScript.pause();
   }
+
 });

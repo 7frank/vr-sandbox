@@ -48,11 +48,14 @@
  */
 
 import $ from 'jquery';
-import {FPSCtrl} from '../util';
+import {FPSCtrl} from '../fps-util';
 
 import 'aframe-gridhelper-component';
 import {Blob2Text, streamIn} from '../stream-utils';
 import MaterialFadeMixin from '../mixins/MaterialFadeMixin';
+import * as _ from 'lodash';
+
+import {Layers, setLayersForObject} from '../misc/Layers';
 
 AFRAME.registerComponent('editable-region', {
   schema: {
@@ -60,13 +63,80 @@ AFRAME.registerComponent('editable-region', {
     height: {type: 'number', default: 1},
     width: {type: 'number', default: 100},
     depth: {type: 'number', default: 100},
-    loadDistance: {type: 'number', default: 150}, // TODO doesn't work as intended
-    unloadDistance: {type: 'number', default: 250}
+    loadDistance: {type: 'number', default: 70}, // TODO changing parameters doesn't work as intended, see below
+    unloadDistance: {type: 'number', default: 150}
   },
   init: function () {
     this.mInitialized = false;
 
     if (this.el.tagName != 'A-BOX') throw new Error('currently only supports a-box');
+
+    // FIXME
+    setLayersForObject(this.el.getObject3D('mesh'), Layers.Default, Layers.Static);
+
+    // ------------------------------------------
+    // FIXME RenderMixin and extend to performanceMixin
+    //  TODO have some text util for stuff like this// rendering a-text for info offline will try to load font and not display stuff although we could/should use our local font
+    // add timers to track performance
+
+    function initInfo (obj) {
+    // TODO threejs object3D does not trigger before render
+
+      var meshes = AFRAME.nk.querySelectorAll(obj, '.Mesh');
+
+      for (var obj of meshes) {
+        if (typeof obj.deltaTimes == 'object') return; //
+
+        obj.deltaTimes = [];
+
+        var timer = new THREE.Clock(false);
+        obj.onBeforeRender = function () {
+          timer.start();
+        };
+        obj.onAfterRender = function () {
+          var dt = timer.getElapsedTime();
+
+          this.deltaTimes.push(dt * 1000);
+          // max queue length
+          if (this.deltaTimes.length > 60) {
+            this.deltaTimes.shift();
+          }
+        };
+      }
+    }
+
+    this.el.getPerfInfo = function () {
+      var meshes = AFRAME.nk.querySelectorAll(this.object3D, '.Mesh');
+
+      var tAvg = _.chain(meshes)
+        .map(obj => !obj.deltaTimes ? 0 : _.mean(obj.deltaTimes))
+        .sum()
+        .round(4)
+        .value();
+
+      return {
+        averageTime: tAvg, // _.round(_.sum(meshes.map(obj => !obj.deltaTimes ? 0 : _.mean(obj.deltaTimes))), 4),
+        averageTimeUnit: 'ms',
+        numMeshes: meshes.length,
+        meshes: meshes
+        // max: _.max(meshes.map(obj => _.mean(obj.deltaTimes))),
+      };
+    };
+
+    this.el.showPerfInfo = function () {
+      // TODO adaptive height or better foreground renderpass
+      var element = $(`<a-text  font="assets/fonts/DejaVu-sdf.fnt"  look-at="src:[camera]" color="#0f0" width=30 align="center" position="0 10 0" value="0 mSec"></a-text>`);
+      $(this).append(element);
+      new FPSCtrl(1, function () {
+        initInfo(this.object3D);
+
+        var info = this.getPerfInfo();
+        element.get(0).setAttribute('value', `tAvg(${info.averageTimeUnit}):${info.averageTime}`);
+      }, this)
+        .start();
+    };
+
+    // ------------------------------------------
 
     this.el.setAttribute('depth', this.data.depth);
     this.el.setAttribute('height', this.data.height);
@@ -101,9 +171,13 @@ AFRAME.registerComponent('editable-region', {
       // TODO create a Mixin that specifically targets fadeInOut with distance to camera AnimationMixing or MaterialFadeMixin
       // MaterialFadeMixin()
       if (this.lastDistance > this.data.loadDistance * 5 / 6) {
-        queryResult.forEach(obj => obj.visible = false);
+        queryResult.forEach(obj => {
+          obj.visible = false;
+        });
       } else {
-        queryResult.forEach(obj => obj.visible = true);
+        queryResult.forEach(obj => {
+          obj.visible = true;
+        });
       }
     }, this).start();
   },
@@ -122,6 +196,7 @@ AFRAME.registerComponent('editable-region', {
       console.log('detach content');
       this.mInitialized = false;
 
+      // TODO this deletes the current state of the region .. but we might want to be able to store a state of the region (maybe on the server or cache it)
       $(el).html('');
     }
     if (distance < loadDistance && this.mInitialized == false) {
@@ -136,9 +211,6 @@ AFRAME.registerComponent('editable-region', {
         .then(response => response.blob())
         .then(blob => Blob2Text(blob))
         .then(function (text) {
-          //  var element = $(`<a-box bb src="#region-road" static-body color="#CCC" depth="50" height="1" width="50"></a-box>`);
-          // element.append(text);
-          //  $(el).append(element);
           $(el).append(text).attr({
             // 'src': '#region-road',
             color: '#CCC'
