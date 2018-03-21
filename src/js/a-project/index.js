@@ -19,7 +19,7 @@ window.addEventListener('load', function () {
     path: '/api/v1',
     port: '9000',
     scheme: 'http',
-    stats: false
+    stats: true
   });
 
   if (aframeScene.hasLoaded) {

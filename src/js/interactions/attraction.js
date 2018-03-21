@@ -1,6 +1,6 @@
 import {
-  AiScripts,
-  findClosestEntity, FPSCtrl, getAnimationNames, getDirectionForEntity, getPosition, getSignedAngle, getUnsignedAngle,
+  findClosestEntity, getAnimationNames, getDirectionForEntity, getPosition, getSignedAngle,
+  getUnsignedAngle,
   lookAwayFrom,
   playAnimation,
   setPosition,
@@ -8,6 +8,7 @@ import {
 } from '../util';
 
 import * as _ from 'lodash';
+import {AiScripts, FPSCtrl, FPSInfo} from '../fps-util';
 
 window.AFRAME = require('aframe');
 const AFRAME = window.AFRAME;
@@ -111,5 +112,13 @@ AFRAME.registerComponent('behaviour-attraction', {
       //
       this.el.emit('behaviour', {type: 'attraction', target: this.currentTarget});
     }, this).start();
+  },
+
+  getPerformanceInfo () {
+    return FPSInfo('attraction')
+      .add('moveActor', this.aiScripts.moveActor)
+      .add('proximityCheck', this.aiScripts.proximityCheck)
+      .compile();
   }
+
 });

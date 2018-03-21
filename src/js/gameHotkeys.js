@@ -6,13 +6,16 @@
 // import '@nk/core-components/dist/bundle';
 
 import CarCameraControls from './a-car/car/CarCameraControls';
-import OptionsDialog from './dialogs/options/OptionDialog';
+import OptionsDialog, {createGeneralOptionsDialog} from './dialogs/options/OptionDialog';
 
 import $ from 'jquery';
 import * as CANNON from 'cannon';
 import {addScript, findClosestEntity, getDirectionForEntity, getPosition, playSound, setPosition, toast} from './util';
 import {getTextEditorInstance} from './a-editable/utils';
 import {startEditingTextarea} from './a-editable/editable-actor';
+import {ImpactGUI} from './utils/performance-utils';
+import {createCameraConfigGUI} from './misc/Layers';
+import {create, setCenter} from './utils/dom-utils';
 
 const AFRAME = window.AFRAME;
 const THREE = AFRAME.THREE;
@@ -57,14 +60,46 @@ function addHotkeys () {
   var Hotkeys = hotkeyDialog.addHotkeys.bind(hotkeyDialog);
 
   var optionsDialog;
-  Hotkeys('show help', 'o', function () {
+  var dlg;
+
+  function createOD () {
     if (!optionsDialog) {
-      optionsDialog = new OptionsDialog();
-    } else optionsDialog.$.toggle();
+      optionsDialog = createGeneralOptionsDialog();
+
+      // dialog -------------------------------------
+
+      dlg = create("<nk-window title='Options Dialog' class='card card-1'>");
+      dlg.appendChild(optionsDialog.$el);
+      dlg.closingAction = 1; // hide on close //FIXME
+
+      document.body.appendChild(dlg);
+      // TODO implementation: setCenter on appendCallback via "center" attribute in nk-window
+      setCenter(dlg);
+    } else $(dlg).toggle();
+  }
+
+  function selectOD (id) {
+    if (!optionsDialog) {
+      createOD();
+      var tab = optionsDialog.$children[0];
+      setTimeout(() => tab.setActiveTab(id), 1);
+    } else {
+      var tab = optionsDialog.$children[0];
+      if (tab.activeTabId == id) {
+        $(dlg).toggle();
+      } else {
+        setTimeout(() => tab.setActiveTab(id), 1);
+        $(dlg).show();
+      }
+    }
+  }
+
+  Hotkeys('show help', 'o', function () {
+    selectOD('general');
   });
 
   // ----------------------------------------------
-  Hotkeys('player-move-forward', 'w', () => {
+  Hotkeys('player-move-forward', ['w', 'touch'], () => {
   }, () => {
   }, {category: 'player', description: 'Moves the player in the forward direction.'});
   Hotkeys('player-move-backward', 's', () => {
@@ -87,30 +122,30 @@ function addHotkeys () {
   // todo the keys for car would be the same wasd but only if player controler is set to car entity
   // TODO how does this interfere with car contols existing and actions and customization
   /* Hotkeys('move forward', 'i', () => {
-      window.car._car.controls().moveForward = true;
-    }, () => {
-      window.car._car.controls().moveForward = false;
-    }, {category: 'car', description: 'Accelerates the car in the forward direction.'});
+              window.car._car.controls().moveForward = true;
+            }, () => {
+              window.car._car.controls().moveForward = false;
+            }, {category: 'car', description: 'Accelerates the car in the forward direction.'});
 
-    Hotkeys('move backward', 'k', () => {
-      window.car._car.controls().moveBackward = true;
-    }, () => {
-      window.car._car.controls().moveBackward = false;
-    }, {category: 'car', description: 'Accelerates the car in the backward direction.'});
+            Hotkeys('move backward', 'k', () => {
+              window.car._car.controls().moveBackward = true;
+            }, () => {
+              window.car._car.controls().moveBackward = false;
+            }, {category: 'car', description: 'Accelerates the car in the backward direction.'});
 
-    Hotkeys('steer left', 'j', () => {
-      window.car._car.controls().moveLeft = true;
-    }, () => {
-      window.car._car.controls().moveLeft = false;
-    }, {category: 'car'});
+            Hotkeys('steer left', 'j', () => {
+              window.car._car.controls().moveLeft = true;
+            }, () => {
+              window.car._car.controls().moveLeft = false;
+            }, {category: 'car'});
 
-    Hotkeys('steer right', 'l', () => {
-      window.car._car.controls().moveRight = true;
-    }, () => {
-      window.car._car.controls().moveRight = false;
-    }, {category: 'car'});
+            Hotkeys('steer right', 'l', () => {
+              window.car._car.controls().moveRight = true;
+            }, () => {
+              window.car._car.controls().moveRight = false;
+            }, {category: 'car'});
 
-  */
+          */
 
   // ---------------------------------------------------
 
@@ -144,6 +179,7 @@ function addHotkeys () {
 
   var drivingVehicle = false;
   var whichVehicle = null;
+
   function enterOrExitVehicle () {
     var player = $('.player').get(0);
     if (!drivingVehicle) {
@@ -165,6 +201,7 @@ function addHotkeys () {
   }
 
   var carCamControls;
+
   function exitVehicle (player, vehicle) {
     toast('leaving vehicle');
     vehicle.removeAttribute('customizable-wasd-car-controls');
@@ -204,10 +241,10 @@ function addHotkeys () {
     var ball = $('.ball').get(0);
 
     /* el.body.applyImpulse(
-                                              // impulse  new CANNON.Vec3(0, 1, 0),
-                                              // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
-                                            );
-                                            */
+                                                              // impulse  new CANNON.Vec3(0, 1, 0),
+                                                              // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
+                                                            );
+                                                            */
     var p = player.body.position;
     var b = ball.body.position;
 
@@ -224,10 +261,10 @@ function addHotkeys () {
     var ball = $('.ball').get(0);
 
     /* el.body.applyImpulse(
-                                              // impulse  new CANNON.Vec3(0, 1, 0),
-                                              // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
-                                            );
-                                            */
+                                                              // impulse  new CANNON.Vec3(0, 1, 0),
+                                                              // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
+                                                            );
+                                                            */
     var el = ball; // partially works with ball but not with player body as it seems
     el.body.applyImpulse(new CANNON.Vec3(0, 1, 0), new CANNON.Vec3(0, -1, 0)); // new CANNON.Vec3().copy(el.getComputedAttribute('position')));
   }, {category: 'game play', description: 'will elevate the player by a small margin'});
@@ -300,7 +337,7 @@ function addHotkeys () {
   }, {
     category: 'editing'
   });
-
+  // FIXME not working ..
   Hotkeys('teleport to next region', 'shift+t', function () {
     var el = $('[editable-region]')[2];
     var targetLocation = el.object3D.position;
@@ -308,6 +345,31 @@ function addHotkeys () {
     setPosition($('.player').get(0), targetLocation.x + ' ' + targetLocation.y + ' ' + targetLocation.z);
   }, {
     category: 'editing'
+  });
+
+  Hotkeys('toggle world map', 'Tab', function () {
+    var worldMap = $('.the-world-map:first').get(0);
+    if (worldMap.hasAttribute('world-map')) {
+      worldMap.removeAttribute('world-map');
+    } else worldMap.setAttribute('world-map', true);
+  }, {
+    category: 'HUD'
+  });
+
+  Hotkeys('show region performance', 'i', function () {
+    document.querySelectorAll('[editable-region]').forEach(r => console.log(r.showPerfInfo()));
+  }, {
+    category: 'debug'
+  });
+  Hotkeys('show scripts performance', 'p', function () {
+    selectOD('performance');
+  }, {
+    category: 'debug'
+  });
+  Hotkeys('show layers dialog', 'l', function () {
+    selectOD('layers');
+  }, {
+    category: 'debug'
   });
 
   // ------------------------------------

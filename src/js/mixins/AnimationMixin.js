@@ -74,7 +74,7 @@ export default function AnimationMixin (origObject) {
 
     var keys = Object.keys(flattened_to);
     var flattened_from = {};
-    keys.forEach(k => flattened_from[k] = getValue(that, k));
+    keys.forEach(k => { flattened_from[k] = getValue(that, k); });
 
     var tween = new TWEEN.Tween(flattened_from);
     tween.to(flattened_to, mDuration)

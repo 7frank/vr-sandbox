@@ -59,6 +59,8 @@ export function namespaceExists (namespace, base) {
     base = window;
   }
 
+  if (namespace == '') return true;
+
   var splitNs = namespace.split('.');
   var builtNs = splitNs[0];
 

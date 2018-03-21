@@ -48,6 +48,14 @@ import {
 import {attachGameLogic} from './ballGameLogic';
 import * as _ from 'lodash';
 import {addLoadingListenersToScene} from './loadingBarUtils';
+import ZoomUtils from './utils/ZoomUtils';
+import {querySelectorAll} from './selector-util';
+import {Layers} from './misc/Layers';
+
+import {createTextSampleCanvas, renderTextToCanvas} from './misc/handwriting';
+
+// if we really want to have a partially global object for debugging this should go into a separate file then..
+AFRAME.nk = {querySelectorAll, ZoomUtils, Layers};
 
 // ------------------
 
@@ -139,6 +147,8 @@ onTagChanged('a-scene', function (elementsInfo) {
 function reloadSceneToDOM () {
   console.log('reloadSceneToDOM');
   $('body').addClass('splash-screen');
+
+  var loadingInfoText = createTextSampleCanvas();
 
   var elem = document.querySelector('.overlay-editor .content-area');
 
@@ -286,4 +296,24 @@ function reloadSceneToDOM () {
   initSceneFromTextarea();
 
   elem.addEventListener('keypress', debounce(initSceneFromTextarea, 2000));
+
+  addListeners();
+}
+
+/**
+ * for those of us that want to use aframe with desktop
+ * //TODO improve
+ */
+function addListeners () {
+  var scene = $('a-scene');
+  var cam = scene.camera;
+  scene.on('enter-vr', function () {
+    cam.fov = 80;
+    cam.updateProjectionMatrix();
+  });
+
+  scene.on('exit-vr', function () {
+    cam.fov = 45;
+    cam.updateProjectionMatrix();
+  });
 }
