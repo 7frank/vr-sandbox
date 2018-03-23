@@ -31,8 +31,10 @@ export function addLoadingListenersToScene (scene, loadedhandler = () => {
 }) {
   var assets = scene.querySelector('a-assets');
 
-  var loadingBar = createLoadingbar(`<div style="background-color:slateblue;width:calc({curr}/{max} * 100%)">{name}</div>`);
+  var loadingBar = createLoadingbar(`<div style="z-Index:20000;background-color:slateblue;width:calc({curr}/{max} * 100%)">{name}</div>`);
 
+  // TODO we should use the asset manager to have only oe loading response or alterntivly emit import-progress events and others
+  window.mLoadingbar = loadingBar;
   if (assets == null) {
     console.log('scene does not contain assets for the loader');
     loadedhandler();
@@ -54,7 +56,7 @@ export function addLoadingListenersToScene (scene, loadedhandler = () => {
   };
 
   manager.onLoad = function () {
-    //  console.log('scene assests loaded', arguments);
+    //  console.log('scene assets loaded', arguments);
     loadingBar.hide();
 
     loadedhandler();

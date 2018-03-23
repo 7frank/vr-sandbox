@@ -2,6 +2,7 @@ import $ from 'jquery';
 
 import {create} from './dom-utils';
 import {setLayersForObject} from '../types/Layers';
+import * as _ from 'lodash';
 
 /**
  * @deprecated this won't work with elements from different regions TODO getWorldPosition should be used in some way
@@ -308,4 +309,17 @@ export function getSignedAngle (v1, v2, normalVector) {
   let det = n.dot(v1.cross(v2)); // det(v1,v2,n)=n⋅(v1×v2)  //3d case
   let angle = Math.atan2(det, dot); //  # atan2(y, x) or atan2(sin, cos)
   return angle;
+}
+
+export
+function scaleEntity (el, size) {
+  var bb = new THREE.Box3();
+  bb.setFromObject(el.object3DMap.mesh);
+  var sphere = bb.getBoundingSphere();
+  console.log('sphere', sphere);
+  var newScale = _.round(size / sphere.radius, 2);
+  console.log('newScale', newScale, size, sphere.radius);
+  el.setAttribute('scale', `${newScale} ${newScale} ${newScale}`)
+
+  ;
 }

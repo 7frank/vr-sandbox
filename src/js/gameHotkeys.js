@@ -14,7 +14,7 @@ import {
   findClosestEntity,
   getDirectionForEntity,
   getPosition,
-  playSound,
+  playSound, scaleEntity,
   setPosition,
   toast
 } from './utils/aframe-utils';
@@ -329,14 +329,22 @@ function addHotkeys () {
 
   Hotkeys('load sketchfab browser', 'shift+l', function () {
     function renderBufferedGLTFContent (rewrittenLinksURL) {
-      var tpl = `<a-entity
+      var tpl = `<a-entity class="imported-model"
         scale="1 1 1"
         animation-mixer="clip: *;"
         gltf-model="src: url(${rewrittenLinksURL});">
         </a-entity>`;
 
       var el = $(tpl);
+
+      var playerPos = document.querySelector('.player').object3D.getWorldPosition();
+      el.get(0).object3D.position.copy(playerPos);
+
       $('a-scene').append(el);
+
+      scaleEntity(el.get(0), 10);
+
+      window.mLoadingbar.hide();
     }
 
     // -----------------------------
@@ -345,6 +353,9 @@ function addHotkeys () {
     var sf = loadBrowser(function onFileImportStart (result) {
       importResult(result, function (rewrittenLinksURL) {
         renderBufferedGLTFContent(rewrittenLinksURL);
+      }, function onProgress (info) {
+        window.mLoadingbar.show();
+        window.mLoadingbar.set('importing:' + result.model.name, info.current, info.size);
       });
     });
     $(dlg).focus();
@@ -363,31 +374,6 @@ function addHotkeys () {
           return response.json();
         });
     }
-
-    /*
-         downloadZip('assets/demo/bicycle.zip', function (entries) {
-           convertEntriesPromise(entries).then(function (fileUrls) {
-             // -------------------
-             getJSON(fileUrls['scene.gltf'].url)
-               .then(function (sceneFileContent) {
-                 var rewrittenLinksURL = rewritePathsOfSceneGLTF(sceneFileContent, fileUrls);
-
-                 console.log('rewritten URL', rewrittenLinksURL);
-
-                 getJSON(rewrittenLinksURL)
-                   .then(function (rewrittenContent) {
-                     console.log('fileUrls', fileUrls);
-                     console.log('rewrittenContent', rewrittenContent);
-                   });
-
-                 renderBufferedGLTFContent(rewrittenLinksURL);
-               });
-
-             // -------------------
-           });
-         });
-
-         */
 
     $(sf).css('height', '100%');
 

@@ -56,6 +56,10 @@ import {Layers} from './types/Layers';
 
 import {createTextSampleCanvas, renderTextToCanvas} from './gui/handwriting';
 import {streamIn} from './utils/stream-utils';
+import {Logger} from './utils/Logger';
+
+// TODO per instance of global active inactive
+// Logger.setState(true);
 
 // if we really want to have a partially global object for debugging this should go into a separate file then..
 AFRAME.nk = {querySelectorAll, ZoomUtils, Layers, streamIn};

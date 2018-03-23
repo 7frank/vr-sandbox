@@ -1,9 +1,14 @@
+
+import {Logger} from '../utils/Logger';
+
+var console = Logger.getLogger('stream-utils.js');
+
 // TODO check out libraries that handle different types of stream chunks instead?
 // FIXME not supported by firefox as of yet also might be that the Content-Type is not set properly like mentioned in some comment
-export function streamIn (url) {
+export function streamIn (url, onProgress, knownMaxSize = -1) {
   // var test = true;
   // if (test) throw new Error('test');
-
+  var progressSize = 0;
   return fetch(url)
     .then(fetchHandleErrors) // this is neceassary for 404 errors to bubble
     .then((response) => {
@@ -16,12 +21,17 @@ export function streamIn (url) {
           // "done" ist ein Boolean und "value" ein "Uint8Array"
             return reader.read().then(({done, value}) => {
             // Gibt es weitere Daten zu laden?
+
               if (done) {
               // Teile dem Browser mit, dass wir fertig mit dem Senden von Daten sind
               // / TODO throws error
 
                 controller.close();
                 return;
+              } else {
+                progressSize += value.length;
+
+                if (onProgress) onProgress({ current: progressSize, size: knownMaxSize});
               }
 
               // Bekomme die Daten und sende diese an den Browser durch den Controller weiter

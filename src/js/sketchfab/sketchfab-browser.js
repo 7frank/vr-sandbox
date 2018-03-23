@@ -3,9 +3,14 @@ import {addScript} from '../utils/misc-utils';
 import {create} from '../utils/dom-utils';
 import {zip} from 'beta-dev-zip/lib/zip';
 import * as _ from 'lodash';
+import {streamIn} from '../utils/stream-utils';
+import {Logger} from '../utils/Logger';
+
 window.zip = zip;
 
 require('beta-dev-zip/lib/zip-ext'); // otherwise doesn't find zip
+
+var console = Logger.getLogger('sketchfab-browser');
 
 /**
  * In here all relevant code for importing,unzipping,converting, and pre-rendering models from sketchfab is located
@@ -39,12 +44,11 @@ export function loadBrowser (onImport) {
   return container;
 }
 
-export
-function importResult (result, onConverted) {
+export function importResult (result, onConverted, onProgress) {
   var url = result.download.gltf.url;
-  // result.download.gltf.size
+  var fileSize = result.download.gltf.size;
   // result.download.gltf.expires
-
+  console.log('importResult', result);
   downloadZip(url, function (entries) {
     convertEntriesPromise(entries).then(function (fileUrls) {
       // -------------------
@@ -59,24 +63,23 @@ function importResult (result, onConverted) {
 
       // -------------------
     });
-  });
+  }, fileSize, onProgress);
 }
 
-export
-function convertEntriesPromise (entries) {
+export function convertEntriesPromise (entries) {
   console.log('entries', entries);
 
   var promises = _.map(entries, function (entry) {
     return entry.uncompressedSize == 0 ? undefined : new Promise(function (resolve, reject) {
-    /*
-      entry.getData(new zip.BlobWriter('text/plain'), function onEnd (data) {
-        var url = window.URL.createObjectURL(data);
+      /*
+              entry.getData(new zip.BlobWriter('text/plain'), function onEnd (data) {
+                var url = window.URL.createObjectURL(data);
 
-        var res = {};
-        res[entry.filename] = {url: url, size: entry.uncompressedSize};
-        resolve(res);
-      });
-      */
+                var res = {};
+                res[entry.filename] = {url: url, size: entry.uncompressedSize};
+                resolve(res);
+              });
+              */
 
       entry.getData(new zip.ArrayBufferWriter(), function onEnd (data) {
         data = new Blob([new Uint8Array(data)]);
@@ -115,9 +118,8 @@ function downloadZip (url, entriesCallback) {
 
 */
 
-export
-function downloadZip (url, entriesCallback) {
-  AFRAME.nk.streamIn(url).then(response => response.blob())
+export function downloadZip (url, entriesCallback, knownSize = -1, onProgress) {
+  streamIn(url, onProgress, knownSize).then(response => response.blob())
     .then(function (blob) {
       console.log('blob', blob);
       console.log('arguments', arguments);
@@ -178,7 +180,7 @@ export function rewritePathsOfSceneGLTF (sceneFileContent, fileUrls) {
   }
 
   var updatedSceneFileContent = JSON.stringify(json, null, 2);
-  var updatedBlob = new Blob([updatedSceneFileContent], { type: 'text/plain' });
+  var updatedBlob = new Blob([updatedSceneFileContent], {type: 'text/plain'});
   var updatedUrl = window.URL.createObjectURL(updatedBlob);
   // -> blob:http://example.com/a9b5c659-b032-4b7e-df19-5c42798fc049
   return updatedUrl;
@@ -200,7 +202,9 @@ function HttpReader2 (url) {
     if (!that.data) {
       request = new XMLHttpRequest();
       request.addEventListener('load', function () {
-        if (!that.size) { that.size = Number(request.getResponseHeader('Content-Length')); }
+        if (!that.size) {
+          that.size = Number(request.getResponseHeader('Content-Length'));
+        }
         that.data = new Uint8Array(request.response);
         callback();
       }, false);
@@ -208,7 +212,9 @@ function HttpReader2 (url) {
       request.open('GET', url);
       request.responseType = 'arraybuffer';
       request.send();
-    } else { callback(); }
+    } else {
+      callback();
+    }
   }
 
   function init (callback, onerror) {
@@ -232,5 +238,6 @@ function HttpReader2 (url) {
   that.init = init;
   that.readUint8Array = readUint8Array;
 }
+
 HttpReader2.prototype = new zip.Reader();
 HttpReader2.prototype.constructor = HttpReader2;
