@@ -55,9 +55,10 @@ import {querySelectorAll} from './utils/selector-utils';
 import {Layers} from './types/Layers';
 
 import {createTextSampleCanvas, renderTextToCanvas} from './gui/handwriting';
+import {streamIn} from './utils/stream-utils';
 
 // if we really want to have a partially global object for debugging this should go into a separate file then..
-AFRAME.nk = {querySelectorAll, ZoomUtils, Layers};
+AFRAME.nk = {querySelectorAll, ZoomUtils, Layers, streamIn};
 
 // ------------------
 

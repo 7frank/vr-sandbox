@@ -4,22 +4,13 @@ import {create} from '../utils/dom-utils';
 import {zip} from 'beta-dev-zip/lib/zip';
 import * as _ from 'lodash';
 window.zip = zip;
+
 require('beta-dev-zip/lib/zip-ext'); // otherwise doesn't find zip
 
 /**
- * In here all relevant code for importing,unzipping,converting, and prerendering models from sketchfab is located
+ * In here all relevant code for importing,unzipping,converting, and pre-rendering models from sketchfab is located
  *
- * {@link https://sketchfab.com/d
- *
- *
- *
- *
- *
- *
- *
- *
- *
- * evelopers/download-api/downloading-models/javascript}
+ * {@link https://sketchfab.com/developers/download-api/downloading-models/javascript}
  * {@link https://sketchfab.com/developers/download-api/libraries}
  *
  */
@@ -54,19 +45,10 @@ function importResult (result, onConverted) {
   // result.download.gltf.size
   // result.download.gltf.expires
 
-  // FIXME CORS when running locally  ....
   downloadZip(url, function (entries) {
     convertEntriesPromise(entries).then(function (fileUrls) {
-      var options = {
-        method: 'GET',
-        headers: {
-          Authorization: 'Bearer {INSERT_OAUTH_ACCESS_TOKEN_HERE}'
-        },
-        mode: 'cors'
-      };
-
       // -------------------
-      fetch(fileUrls['scene.gltf'].url, options)
+      fetch(fileUrls['scene.gltf'].url)
         .then(function (response) {
           return response.json();
         })
@@ -110,9 +92,13 @@ function convertEntriesPromise (entries) {
   return Promise.all(promises).then(data => _.merge(...data));
 }
 
+/*
+
 export
 function downloadZip (url, entriesCallback) {
   zip.workerScriptsPath = '/lib/zip/';
+  // zip.useWebWorkers = false;
+
   var reader = new HttpReader2(url); // zip.HttpReader
   zip.createReader(
     reader,
@@ -125,6 +111,32 @@ function downloadZip (url, entriesCallback) {
       console.error(error);
     }
   );
+}
+
+*/
+
+export
+function downloadZip (url, entriesCallback) {
+  AFRAME.nk.streamIn(url).then(response => response.blob())
+    .then(function (blob) {
+      console.log('blob', blob);
+      console.log('arguments', arguments);
+      zip.workerScriptsPath = '/lib/zip/';
+      // zip.useWebWorkers = false;
+
+      var reader = new zip.BlobReader(blob);
+      zip.createReader(
+        reader,
+        function (zipReader) {
+          zipReader.getEntries(function (entries) {
+            entriesCallback(entries);
+          });
+        },
+        function (error) {
+          console.error(error);
+        }
+      );
+    });
 }
 
 /**
