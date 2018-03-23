@@ -10,13 +10,24 @@ import {createGeneralOptionsDialog} from './gui/dialogs/options/OptionDialog';
 
 import $ from 'jquery';
 import * as CANNON from 'cannon';
-import {findClosestEntity, getDirectionForEntity, getPosition, playSound, setPosition, toast} from './utils/aframe-utils';
+import {
+  findClosestEntity,
+  getDirectionForEntity,
+  getPosition,
+  playSound,
+  setPosition,
+  toast
+} from './utils/aframe-utils';
 import {getTextEditorInstance} from './a-editable/utils';
 import {startEditingTextarea} from './a-editable/editable-actor';
 import {ImpactGUI} from './utils/performance-utils';
 
 import {create, setCenter} from './utils/dom-utils';
 import {addScript} from './utils/misc-utils';
+import {
+  convertEntriesPromise, downloadZip, importResult, loadBrowser,
+  rewritePathsOfSceneGLTF
+} from './sketchfab/sketchfab-browser';
 
 function handlerwrapper () {
   console.log('codeeditor', window.THREE);
@@ -210,10 +221,10 @@ function addHotkeys () {
     var ball = $('.ball').get(0);
 
     /* el.body.applyImpulse(
-                                                                  // impulse  new CANNON.Vec3(0, 1, 0),
-                                                                  // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
-                                                                );
-                                                                */
+                                                                      // impulse  new CANNON.Vec3(0, 1, 0),
+                                                                      // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
+                                                                    );
+                                                                    */
     var p = player.body.position;
     var b = ball.body.position;
 
@@ -230,10 +241,10 @@ function addHotkeys () {
     var ball = $('.ball').get(0);
 
     /* el.body.applyImpulse(
-                                                                  // impulse  new CANNON.Vec3(0, 1, 0),
-                                                                  // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
-                                                                );
-                                                                */
+                                                                      // impulse  new CANNON.Vec3(0, 1, 0),
+                                                                      // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
+                                                                    );
+                                                                    */
     var el = ball; // partially works with ball but not with player body as it seems
     el.body.applyImpulse(new CANNON.Vec3(0, 1, 0), new CANNON.Vec3(0, -1, 0)); // new CANNON.Vec3().copy(el.getComputedAttribute('position')));
   }, {category: 'game play', description: 'will elevate the player by a small margin'});
@@ -312,6 +323,78 @@ function addHotkeys () {
     var targetLocation = el.object3D.position;
     targetLocation.y += 20;
     setPosition($('.player').get(0), targetLocation.x + ' ' + targetLocation.y + ' ' + targetLocation.z);
+  }, {
+    category: 'editing'
+  });
+
+  Hotkeys('load sketchfab browser', 'shift+l', function () {
+    function renderBufferedGLTFContent (rewrittenLinksURL) {
+      var tpl = `<a-entity
+        scale="1 1 1"
+        animation-mixer="clip: *;"
+        gltf-model="src: url(${rewrittenLinksURL});">
+        </a-entity>`;
+
+      var el = $(tpl);
+      $('a-scene').append(el);
+    }
+
+    // -----------------------------
+    // FIXME CORS when running locally  ....
+    var dlg = create("<nk-window title='Sketchfab Browser - Import' class='card card-1' style='height:400px;width: 800px;' >");
+    var sf = loadBrowser(function onFileImportStart (result) {
+      importResult(result, function (rewrittenLinksURL) {
+        renderBufferedGLTFContent(rewrittenLinksURL);
+      });
+    });
+    $(dlg).focus();
+
+    // TODO promisify functions
+    /* downloadZip()
+              .then(convertEntriesPromise)
+              .then(fetchScene)
+              .then(rewritePathsOfSceneGLTF)
+              .then(renderBufferedGLTFContent)
+        */
+
+    function getJSON (url) {
+      return fetch(url)
+        .then(function (response) {
+          return response.json();
+        });
+    }
+
+    /*
+         downloadZip('assets/demo/bicycle.zip', function (entries) {
+           convertEntriesPromise(entries).then(function (fileUrls) {
+             // -------------------
+             getJSON(fileUrls['scene.gltf'].url)
+               .then(function (sceneFileContent) {
+                 var rewrittenLinksURL = rewritePathsOfSceneGLTF(sceneFileContent, fileUrls);
+
+                 console.log('rewritten URL', rewrittenLinksURL);
+
+                 getJSON(rewrittenLinksURL)
+                   .then(function (rewrittenContent) {
+                     console.log('fileUrls', fileUrls);
+                     console.log('rewrittenContent', rewrittenContent);
+                   });
+
+                 renderBufferedGLTFContent(rewrittenLinksURL);
+               });
+
+             // -------------------
+           });
+         });
+
+         */
+
+    $(sf).css('height', '100%');
+
+    dlg.appendChild(sf);
+    document.body.appendChild(dlg); // TODO have show method that if no parent is set sets to d.body
+
+    setCenter(dlg);
   }, {
     category: 'editing'
   });
