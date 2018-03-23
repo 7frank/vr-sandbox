@@ -26,21 +26,21 @@ AFRAME.registerComponent('bb', {
 
     obj.parent.add(this.mHelper);
 
-    this.updateHelperScript = new FPSCtrl(0.5, function (e) {
+    this.updateBBoxScript = new FPSCtrl(0.5, function (e) {
       // render each frame here
       this.mHelper.update(undefined, obj.parent, true, false);
     }, this);
-    this.updateHelperScript.start();
+    this.updateBBoxScript.start();
   },
   getPerformanceInfo () {
     return FPSInfo('bb')
-      .add('updateHelperScript', this.updateHelperScript)
+      .add('updateBBoxScript', this.updateBBoxScript)
       .compile();
   },
   remove: function () {
     var obj = this.el.getObject3D('mesh') || this.el.object3D;
     obj.parent.remove(this.mHelper);
-    this.updateHelperScript.pause();
+    this.updateBBoxScript.pause();
   }
 
 });

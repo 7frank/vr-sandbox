@@ -1,5 +1,5 @@
 // A-Frame
-const AFRAME = window.AFRAME;
+
 var extendDeep = AFRAME.utils.extendDeep;
 // The mesh mixin provides common material properties for creating mesh-based primitives.
 // This makes the material component a default component and maps all the base material properties.

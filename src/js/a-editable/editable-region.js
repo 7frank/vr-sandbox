@@ -56,10 +56,11 @@ import MaterialFadeMixin from '../mixins/MaterialFadeMixin';
 import * as _ from 'lodash';
 
 import {Layers, setLayersForObject} from '../types/Layers';
+import {debugText} from '../utils/aframe-utils';
 
 AFRAME.registerComponent('editable-region', {
   schema: {
-    src: {type: 'string'},
+    src: {type: 'string', default: ''},
     height: {type: 'number', default: 1},
     width: {type: 'number', default: 100},
     depth: {type: 'number', default: 100},
@@ -148,7 +149,7 @@ AFRAME.registerComponent('editable-region', {
 
     //  this.el.setAttribute('physics', 'debug: true');
 
-    if (this.data.src) console.warn('a region must have a src attribute that links to a valid chunk of data (a html file containing a-frame definitions of registered objects)');
+    if (!this.data.src) console.warn('a region must have a src attribute that links to a valid chunk of data (a html file containing a-frame definitions of registered objects)');
 
     /**
          * TODO support performance by not only unloading far away regions but by only rendering elements that are big enough
@@ -205,27 +206,31 @@ AFRAME.registerComponent('editable-region', {
       //  var element = $(`<a-entity static-body gridhelper="size:100;divisions:50"></a-entity>`);
       var src = this.data.src;
 
-      // TODO cancel loading if distance if greater again and unloading would occure while loading region
+      // TODO cancel loading if distance if greater again and unloading would occur while loading region
       // TODO load and attach chunks of data via actual stream ...
-      streamIn(src)
-        .then(response => response.blob())
-        .then(blob => Blob2Text(blob))
-        .then(function (text) {
-          $(el).append(text).attr({
+      if (src) {
+        streamIn(src)
+          .then(response => response.blob())
+          .then(blob => Blob2Text(blob))
+          .then(function (text) {
+            $(el).append(text).attr({
             // 'src': '#region-road',
-            color: '#CCC'
+              color: '#CCC'
+            });
+
+            $(el).append(debugText(src, Layers.Log));
+          })
+          .catch(function (err) {
+            console.warn('Error', err);
+
+            var element = $(`<a-text look-at="src:[camera]" color="#f00" width=100 align="center" position="0 6 0" value="${err.status} ${err.statusText}"></a-text>`);
+            $(el).append(element);
+            var element2 = $(`<a-text look-at="src:[camera]" color="#f00" width=50 align="center" position="0 3 0" value="'${err.url}'"></a-text>`);
+            $(el).append(element2);
+
+            $(el).attr({color: '#F66'});
           });
-        })
-        .catch(function (err) {
-          console.warn('Error', err);
-
-          var element = $(`<a-text look-at="src:[camera]" color="#f00" width=100 align="center" position="0 6 0" value="${err.status} ${err.statusText}"></a-text>`);
-          $(el).append(element);
-          var element = $(`<a-text look-at="src:[camera]" color="#f00" width=50 align="center" position="0 3 0" value="'${err.url}'"></a-text>`);
-          $(el).append(element);
-
-          $(el).attr({color: '#F66'});
-        });
+      }
     }
   }
 

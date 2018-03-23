@@ -1,5 +1,5 @@
 // A-Frame
-const AFRAME = window.AFRAME;
+
 AFRAME.registerSystem('custom-system', {
   init () {
     this.entities = [];

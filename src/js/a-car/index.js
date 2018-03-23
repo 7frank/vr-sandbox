@@ -168,9 +168,6 @@ AFRAME.registerPrimitive('a-simple-car', utils.extendDeep({}, meshMixin, {
   }
 }));
 
-// window.AFRAME = require('aframe');
-// const AFRAME = window.AFRAME;
-// const THREE = AFRAME.THREE;
 var utils = AFRAME.utils;
 
 var bind = utils.bind;
