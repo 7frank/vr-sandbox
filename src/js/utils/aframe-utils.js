@@ -1,5 +1,14 @@
 import $ from 'jquery';
 
+import {create} from './dom-utils';
+import {setLayersForObject} from '../types/Layers';
+
+/**
+ * @deprecated this won't work with elements from different regions TODO getWorldPosition should be used in some way
+ * FIXME body position is currently always absolute
+ * @param el
+ * @returns {*}
+ */
 export function getPosition (el) {
   if (el.body != null && el.body.position != null) {
     return new THREE.Vector3().copy(el.body.position);
@@ -8,6 +17,12 @@ export function getPosition (el) {
   }
 }
 
+/**
+ * @deprecated this won't work with elements from different regions TODO getWorldPosition should be used in some way
+ * FIXME body position is currently always absolute
+ * @param el
+ * @returns {*}
+ */
 export function setPosition (el, v) {
   var arr, v2;
 
@@ -110,15 +125,15 @@ export function getDirectionForEntity (entity) {
   return direction;
 
   /* var pos = o3d.position;
-          var up = o3d.up;
-          var quaternion = o3d.quaternion;
-          var direction = new THREE.Vector3().copy(up);
-          direction.applyQuaternion(quaternion);
-          return direction; */
+            var up = o3d.up;
+            var quaternion = o3d.quaternion;
+            var direction = new THREE.Vector3().copy(up);
+            direction.applyQuaternion(quaternion);
+            return direction; */
 }
 
 /**
- *
+ * TODO refactor improve performance
  * @param {(selector|HTMLElement[])} targetSelector - A selector to query for elements that might be close.
  * @param (selector|HTMLElement) selector - The element that we want to find other close elements for.
  * @param {number} minDistance - if the distance between selector-Element and targetSelector-Elements is bigger than minDistance the targetSelector-Element gets discarded.
@@ -130,10 +145,10 @@ export function findClosestEntity (targetSelector, selector = '.player', minDist
 
   if (!targets.length) throw new Error('probably invalid targetSelector');
 
-  var p = player.object3D.position;
+  var p = player.object3D.getWorldPosition();// .position;
 
   function getDir (ball) {
-    var b = ball.object3D.position;
+    var b = ball.object3D.getWorldPosition();// .position;
     var direction = p.clone().sub(b);
 
     return direction;
@@ -188,6 +203,21 @@ export function toast (msg, action) {
     item.setAttribute('position', `0 ${i} 1`);
     i += 0.15;
   }
+}
+
+/**
+ * ... TODO check why the create method does not work but jquery does
+ * @param txt
+ * @param layer
+ */
+export function debugText (txt, layer) {
+  var el = $(`<a-text look-at="src:[camera]" color="#ccc" width=50 align="center" position="0 3 0" value="'${txt}'"></a-text>`);
+  setTimeout(function loop () {
+    var t = el.get(0).getObject3D('text');
+    if (t) { setLayersForObject(t, layer); } else { setTimeout(loop, 100); }
+  }, 100);
+
+  return el.get(0);
 }
 
 /**

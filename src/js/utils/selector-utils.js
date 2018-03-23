@@ -34,7 +34,9 @@ export function querySelectorAll (object3D, selector, debug = false) {
   if (typeof selector != 'string') throw new Error('second param must be a proper css-selector string');
   if (selector == '') selector = 'selector';
   // convenience function allowing for simply dropping AFRAME elements
-  if (typeof object3D.object3D == 'object') { object3D = object3D.object3D; }
+  if (typeof object3D.object3D == 'object') {
+    object3D = object3D.object3D;
+  }
 
   // Note: the parser removes singleQuotes and breaks some stuff this way
   // that's why we have to replace them
@@ -179,7 +181,11 @@ export function querySelectorAll (object3D, selector, debug = false) {
     if (rule.tagName) {
       // the all operator "*" gets translated
       // at least in threejs every element has at least an empty children array for this case
-      if (rule.tagName == '*') { filterOrPush(result, object3D, 'children', undefined); } else { filterOrPush(result, object3D, 'type', rule.tagName); }
+      if (rule.tagName == '*') {
+        filterOrPush(result, object3D, 'children', undefined);
+      } else {
+        filterOrPush(result, object3D, 'type', rule.tagName);
+      }
 
       if (result.length == 0) return [];// we did not find anything and may return
     }
@@ -246,7 +252,9 @@ export function querySelectorAll (object3D, selector, debug = false) {
               else {
                 leftSide = '`' + encodeURI(leftSide) + '`';
                 // TODO "" encoded to `%60%60` somewhere which might or might not become a problem
-                if (typeof rightSide == 'string') { rightSide = '`' + encodeURI(rightSide) + '`'; }
+                if (typeof rightSide == 'string') {
+                  rightSide = '`' + encodeURI(rightSide) + '`';
+                }
               }
             }
 
@@ -285,7 +293,9 @@ export function querySelectorAll (object3D, selector, debug = false) {
   switch (entry.type) {
     case 'selectors':
       _.each(entry.selectors, function (selector) {
-        if (selector.rule.nestingOperator != null) { console.warn("nesting only supports '=' operator. Not supported: " + selector.rule.nestingOperator); }
+        if (selector.rule.nestingOperator != null) {
+          console.warn("nesting only supports '=' operator. Not supported: " + selector.rule.nestingOperator);
+        }
 
         if (debug) {
           console.log('handling - selectors');
@@ -345,3 +355,47 @@ function getObjectsByFilter (object3D, filterFunction) {
   });
   return result;
 }
+
+// ----------------------------------------------------------
+// ----------------------------------------------------------
+// ----------------------------------------------------------
+// ----------------------------------------------------------
+
+/**
+ * creates a querySelectorAll function for arbitrary object structures
+ *
+ * TODO
+ */
+/*
+function querySelectorAllFactory (options) {
+  var defaults = {
+    // how to traverse
+    traverse: function (that,callback) {
+      callback(that);
+
+      var children = getChildren(that);// this.children;
+
+      for (var i = 0, l = children.length; i < l; i++) {
+        children[ i ].traverse(callback);
+      }
+    },
+    // how to access children
+    children: function (that) {
+      return that.children;
+    },
+    id:function(that){ return that.id}
+    clazz:function(that){ return }
+
+  };
+
+  // defaults
+}
+
+// TODO how to handle edge cases like recursion
+var myQSA = querySelectorAllFactory({
+  // traverse:(item,callback) =>  ...,
+   //children:() => .., return typeof object
+    clazz:function(that){ return typeof that}
+
+});
+*/

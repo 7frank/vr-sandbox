@@ -3,17 +3,25 @@ import * as _ from 'lodash';
 import {querySelectorAll} from './selector-utils';
 import {BoxHelperExt} from '../three/BoxHelperExt';
 import {FPSCtrl} from './fps-utils';
+import {setLayersForObject, Layers} from '../types/Layers';
 
-export function addBoundingBox (obj) {
+/**
+ * TODO direct fpsctrls are not tracked by performance view. .... how to best track them as well
+ * @param obj
+ * @returns {BoxHelperExt}
+ */
+export function addBoundingBox (obj, bAnimate = true) {
   var helper = new BoxHelperExt(obj);
 
   obj.parent.add(helper);
 
-  var fc = new FPSCtrl(0.5, function (e) {
-    // render each frame here
-    helper.update(undefined, obj.parent, true, false);
-  });
-  fc.start();
+  if (bAnimate) {
+    new FPSCtrl(0.5, function (e) {
+      // render each frame here
+      helper.update(undefined, obj.parent, true, false);
+    }).start();
+  } else { helper.update(undefined, obj.parent, true, false); }
+
   return helper;
 }
 
@@ -25,7 +33,7 @@ export function addBoundingBox (obj) {
  * @returns {*|jQuery|HTMLElement}
  */
 
-export function testCompoundGLTF (modelEl, debug = false) {
+export function testCompoundGLTF (modelEl, debug = false, maxSize = 20) {
   var items = querySelectorAll(modelEl.object3D, '.Mesh');
   items.shift();
   if (debug) {
@@ -46,7 +54,7 @@ export function testCompoundGLTF (modelEl, debug = false) {
 
     console.log(el.name, 'size', size.length());
     // TODO don't ignore big stuff anymore
-    if (size.length() >= 20) {
+    if (maxSize > 0 && size.length() >= maxSize) {
       // if (i++ >= 20) {
       el.visible = false;
 
@@ -119,6 +127,9 @@ export function testCompoundGLTF (modelEl, debug = false) {
     var geometry = new THREE.BoxGeometry(size.x, size.y, size.z);
     var material = new THREE.MeshBasicMaterial({color: 0x0000ff, wireframe: true});
     var cube = new THREE.Mesh(geometry, material);
+
+    setLayersForObject(cube, Layers.Bounds);
+
     cube.position.set(vPosition.x, vPosition.y, vPosition.z);
 
     cube.quaternion.set(vQuaternion.x, vQuaternion.y, vQuaternion.z, vQuaternion.w);
@@ -133,7 +144,9 @@ export function testCompoundGLTF (modelEl, debug = false) {
       // console.log(el);
       // console.log('position', stringifyWithPrecision(vPosition), 'size', stringifyWithPrecision(size));
 
-      var helper = addBoundingBox(el);
+      var helper = addBoundingBox(el, false);// disable updates for performance reasons of large gltp models ..
+
+      setLayersForObject(helper, Layers.Bounds);
 
       // TODO collision per sub-element not working
       boxBody.addEventListener('collide', _.debounce(function (e) {

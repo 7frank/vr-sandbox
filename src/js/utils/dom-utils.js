@@ -12,14 +12,16 @@ const create = (domstring) => {
   let html = new DOMParser().parseFromString(domstring, 'text/html');
   return html.body.firstChild;
 };
-
+// Access-Control-Expose-Headers:Content-Length, X-My-Custom-Header, X-Another-Custom-Header
 // TODO refactor into nk-window class and wait for appendCallback
 export
 function setCenter (el) {
   var child = $(el);
   var parent = $(el.parentElement);
   child.css('position', 'absolute');
-  child.css('top', ((parent.height() - child.outerHeight()) / 2) + parent.scrollTop() + 'px');
+
+  var top = ((parent.height() - child.outerHeight()) / 2) + parent.scrollTop();
+  child.css('top', (top > 0 ? top : 0) + 'px');
   child.css('left', ((parent.width() - child.outerWidth()) / 2) + parent.scrollLeft() + 'px');
 }
 

@@ -8,6 +8,12 @@ class LayersProto extends Enum {
 
 LayersProto.initEnum(['Default', 'Static', 'Dynamic', 'Environment', 'Log', 'Warn', 'Error', 'Bounds']);
 
+LayersProto.enumValueOfOrdinal = function (ordinal) {
+  return this.enumValues.find(function (x) {
+    return x.ordinal === ordinal;
+  });
+};
+
 /**
  * Note: to self.. aframe.. use getObject3D('mesh') instead of object3D both of which are different objects. the later (a group) is not impacted by layers
  * @param obj
@@ -23,6 +29,8 @@ export function setLayersForObject (obj, ...layers) {
 
   // enable only layers that where omitted
   layers.forEach((l) => {
+    if (l.ordinal == undefined) { console.warn(l); throw new Error('contains invalid layer'); }
+
     obj.layers.enable(l.ordinal);
   });
 }
@@ -58,7 +66,7 @@ export var Layers = new Proxy(LayersProto, handler);
  */
 export function createCameraConfigGUI (camera) {
   // datasource -------------------------------------
-  var _layers = AFRAME.nk.Layers.enumValues.map(v => {
+  var _layers = Layers.enumValues.map(v => {
     return {name: v.name, ordinal: v.ordinal};
   });
     // test initial camera settings
