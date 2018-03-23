@@ -3,6 +3,8 @@
 
 import 'aframe';
 
+import 'three-vrcontrols'; // currently missing from (aframe 0.8.1) for aframe-extras(3.1.3)
+
 import 'aframe-physics-system';
 import 'aframe-mouse-cursor-component';
 // import 'aframe-extras/dist/aframe-extras.controls';

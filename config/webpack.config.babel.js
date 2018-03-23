@@ -9,7 +9,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const StyleLintPlugin = require('stylelint-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const WpPluginWatchOffset = require('wp-plugin-watch-offset');
+const WpPluginWatchOffset = require('@ff0000-ad-tech/wp-plugin-watch-offset');
 const helper = require('../devel/utils/helpers');
 const argv = helper.parseArguments(process.argv.slice(2));
 const isDevel = process.env.NODE_ENV !== 'production' && !argv['env.production'];
@@ -378,7 +378,8 @@ module.exports = {
 
         new CopyWebpackPlugin([
             {from: 'assets', to: 'assets'},
-            {from: '../node_modules/aframe-material-snickell/assets', to: 'assets'}
+            {from: '../node_modules/aframe-material-snickell/assets', to: 'assets'},
+            {from: '../node_modules/beta-dev-zip/lib', to: 'lib/zip'},
         ]),
 
         new Webpack.NamedModulesPlugin(),

@@ -24,7 +24,7 @@
     "no-redeclare":0,
     "no-new":0,
     "no-use-before-define":0,
-
+    "standard/object-curly-even-spacing":0,
     "semi-spacing": [2, {
       "before": false,
       "after": true
