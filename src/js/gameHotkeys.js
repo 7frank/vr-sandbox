@@ -14,7 +14,7 @@ import {
   findClosestEntity,
   getDirectionForEntity,
   getPosition,
-  playSound, scaleEntity,
+  playSound, renderGLTFOrGlbURL, scaleEntity,
   setPosition,
   toast
 } from './utils/aframe-utils';
@@ -221,10 +221,10 @@ function addHotkeys () {
     var ball = $('.ball').get(0);
 
     /* el.body.applyImpulse(
-                                                                      // impulse  new CANNON.Vec3(0, 1, 0),
-                                                                      // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
-                                                                    );
-                                                                    */
+                                                                          // impulse  new CANNON.Vec3(0, 1, 0),
+                                                                          // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
+                                                                        );
+                                                                        */
     var p = player.body.position;
     var b = ball.body.position;
 
@@ -241,10 +241,10 @@ function addHotkeys () {
     var ball = $('.ball').get(0);
 
     /* el.body.applyImpulse(
-                                                                      // impulse  new CANNON.Vec3(0, 1, 0),
-                                                                      // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
-                                                                    );
-                                                                    */
+                                                                          // impulse  new CANNON.Vec3(0, 1, 0),
+                                                                          // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
+                                                                        );
+                                                                        */
     var el = ball; // partially works with ball but not with player body as it seems
     el.body.applyImpulse(new CANNON.Vec3(0, 1, 0), new CANNON.Vec3(0, -1, 0)); // new CANNON.Vec3().copy(el.getComputedAttribute('position')));
   }, {category: 'game play', description: 'will elevate the player by a small margin'});
@@ -328,31 +328,12 @@ function addHotkeys () {
   });
 
   Hotkeys('load sketchfab browser', 'shift+l', function () {
-    function renderBufferedGLTFContent (rewrittenLinksURL) {
-      var tpl = `<a-entity class="imported-model"
-        scale="1 1 1"
-        animation-mixer="clip: *;"
-        gltf-model="src: url(${rewrittenLinksURL});">
-        </a-entity>`;
-
-      var el = $(tpl);
-
-      var playerPos = document.querySelector('.player').object3D.getWorldPosition();
-      el.get(0).object3D.position.copy(playerPos);
-
-      $('a-scene').append(el);
-
-      scaleEntity(el.get(0), 10);
-
-      window.mLoadingbar.hide();
-    }
-
     // -----------------------------
     // FIXME CORS when running locally  ....
     var dlg = create("<nk-window title='Sketchfab Browser - Import' class='card card-1' style='height:400px;width: 800px;' >");
     var sf = loadBrowser(function onFileImportStart (result) {
       importResult(result, function (rewrittenLinksURL) {
-        renderBufferedGLTFContent(rewrittenLinksURL);
+        renderGLTFOrGlbURL(rewrittenLinksURL);
       }, function onProgress (info) {
         window.mLoadingbar.show();
         window.mLoadingbar.set('importing:' + result.model.name, info.current, info.size);
@@ -362,11 +343,11 @@ function addHotkeys () {
 
     // TODO promisify functions
     /* downloadZip()
-              .then(convertEntriesPromise)
-              .then(fetchScene)
-              .then(rewritePathsOfSceneGLTF)
-              .then(renderBufferedGLTFContent)
-        */
+                  .then(convertEntriesPromise)
+                  .then(fetchScene)
+                  .then(rewritePathsOfSceneGLTF)
+                  .then(renderGLTFOrGlbURL)
+            */
 
     function getJSON (url) {
       return fetch(url)

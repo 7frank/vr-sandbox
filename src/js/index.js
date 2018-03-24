@@ -56,7 +56,10 @@ import {Layers} from './types/Layers';
 
 import {createTextSampleCanvas, renderTextToCanvas} from './gui/handwriting';
 import {streamIn} from './utils/stream-utils';
+
 import {Logger} from './utils/Logger';
+import {createDropZone} from './import/fileupload';
+import {renderGLTFOrGlbURL} from './utils/aframe-utils';
 
 // TODO per instance of global active inactive
 // Logger.setState(true);
@@ -322,5 +325,10 @@ function addListeners () {
   scene.on('exit-vr', function () {
     cam.fov = 45;
     cam.updateProjectionMatrix();
+  });
+
+  createDropZone(scene.get(0), function (blob) {
+    var url = window.URL.createObjectURL(blob);
+    var el = renderGLTFOrGlbURL(url);
   });
 }

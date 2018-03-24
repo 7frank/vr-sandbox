@@ -25,6 +25,12 @@ import { BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 */
 
+/**
+ *
+ * @param {THREE.Object3D} object
+ * @param color
+ * @constructor
+ */
 function BoxHelperExt (object, color) {
   this.object = object;
 

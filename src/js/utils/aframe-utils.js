@@ -3,6 +3,7 @@ import $ from 'jquery';
 import {create} from './dom-utils';
 import {setLayersForObject} from '../types/Layers';
 import * as _ from 'lodash';
+import {BoxHelperExt} from '../three/BoxHelperExt';
 
 /**
  * @deprecated this won't work with elements from different regions TODO getWorldPosition should be used in some way
@@ -126,11 +127,11 @@ export function getDirectionForEntity (entity) {
   return direction;
 
   /* var pos = o3d.position;
-            var up = o3d.up;
-            var quaternion = o3d.quaternion;
-            var direction = new THREE.Vector3().copy(up);
-            direction.applyQuaternion(quaternion);
-            return direction; */
+              var up = o3d.up;
+              var quaternion = o3d.quaternion;
+              var direction = new THREE.Vector3().copy(up);
+              direction.applyQuaternion(quaternion);
+              return direction; */
 }
 
 /**
@@ -215,7 +216,11 @@ export function debugText (txt, layer) {
   var el = $(`<a-text look-at="src:[camera]" color="#ccc" width=50 align="center" position="0 3 0" value="'${txt}'"></a-text>`);
   setTimeout(function loop () {
     var t = el.get(0).getObject3D('text');
-    if (t) { setLayersForObject(t, layer); } else { setTimeout(loop, 100); }
+    if (t) {
+      setLayersForObject(t, layer);
+    } else {
+      setTimeout(loop, 100);
+    }
   }, 100);
 
   return el.get(0);
@@ -311,15 +316,64 @@ export function getSignedAngle (v1, v2, normalVector) {
   return angle;
 }
 
-export
-function scaleEntity (el, size) {
-  var bb = new THREE.Box3();
-  bb.setFromObject(el.object3DMap.mesh);
-  var sphere = bb.getBoundingSphere();
-  console.log('sphere', sphere);
-  var newScale = _.round(size / sphere.radius, 2);
-  console.log('newScale', newScale, size, sphere.radius);
-  el.setAttribute('scale', `${newScale} ${newScale} ${newScale}`)
+export function scaleEntity (el, size) {
+  /*
+  */
+  var mesh = el.getObject3D('mesh');
 
-  ;
+  if (mesh) onMeshLoaded();
+  else el.addEventListener('model-loaded', onMeshLoaded);
+
+  function onMeshLoaded () {
+    var mesh = el.getObject3D('mesh');
+
+    var bb = new THREE.Box3();
+    bb.setFromObject(mesh);
+    console.log('boundingbox', bb);
+    var sphere = bb.getBoundingSphere();
+
+    var newScale = _.round(size / sphere.radius * 2, 2);
+
+    el.setAttribute('scale', `${newScale} ${newScale} ${newScale}`);
+
+    // TODO put on level ground
+    var sphereHeight = sphere.radius * 2;
+    var boxHeight = bb.max.y - bb.min.y;
+    var posYScale = boxHeight / sphereHeight * newScale;
+    var cy = bb.getCenter().y;
+    var ty = cy - bb.min.y;
+
+    // set to about ground level
+    /* el.object3D.translate(0, -1 * bb2.min.y,0);
+    console.log(el.object3D.position);
+    console.log(0, sphere.radius * newScale, 0);
+
+    */
+    // ToooooOoo late... too stupid *n8* oOoOoo
+    // el.object3D.translateY(sphere.radius * newScale / 2);
+    el.object3D.position.y = ty * newScale * 2;
+
+    console.log(el.object3D.position);
+  }
+}
+
+export function renderGLTFOrGlbURL (rewrittenLinksURL) {
+  var tpl = `<a-entity class="imported-model"
+        scale="1 1 1"
+        animation-mixer="clip: *;"
+        gltf-model="src: url(${rewrittenLinksURL});">
+        </a-entity>`;
+
+  var el = $(tpl);
+  var playerPos = document.querySelector('.player').object3D.getWorldPosition();
+
+  el.get(0).setAttribute('position', AFRAME.utils.coordinates.stringify(playerPos));
+
+  $('a-scene').append(el);
+  // FIXME
+  scaleEntity(el.get(0), 1);
+
+  window.mLoadingbar.hide();
+
+  return el.get(0);
 }
