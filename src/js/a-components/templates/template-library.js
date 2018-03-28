@@ -3,10 +3,15 @@ import * as _ from 'lodash';
 import 'aframe-gui/dist/aframe-gui';
 import {FPSCtrl} from '../../utils/fps-utils';
 import {toast} from '../../utils/aframe-utils';
+
+import {Logger} from '../../utils/Logger';
+
 // a list that contains template-containers to select them
 // first lets have a simple select like in fallout 4
 // goal is to select and place
 // when placing the templates into the world we should use editable-actor
+
+var console = Logger.getLogger('template-library');
 
 var templates = [
   {name: 'helloTemplate', template: '<a-box></a-box>'},
@@ -90,6 +95,7 @@ AFRAME.registerComponent('gui-list-view', {
     var preview = $(`<a-entity><a-box></a-box></a-entity>`);
 
     new FPSCtrl(30, function () {
+      if (!this.object3D) return;
       this.object3D.rotation.y += 0.01;
     }, preview.get(0)).start();
 
@@ -221,6 +227,8 @@ AFRAME.registerComponent('template-droppable', {
   },
   onClickTestAccept: function (event) {
     var targetEl = this.el;
+
+    console.log('onClickTestAccept', event);
 
     if (!this.data.allowNestedDrop) {
       console.log(event.srcElement, targetEl);

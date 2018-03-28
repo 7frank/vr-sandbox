@@ -98,6 +98,7 @@ onAttributeChange(undefined, 'position', function () {
 if (module.hot) {
   module.hot.accept();
 }
+
 // Load html
 let aScene = require('../scene/index.hbs');
 document.addEventListener('DOMContentLoaded', function () {

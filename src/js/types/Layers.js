@@ -1,6 +1,6 @@
 import {Enum} from 'enumify';
 import Vue from 'vue/dist/vue.esm';
-import {create, setCenter} from '../utils/dom-utils';
+import {createHTML, setCenter} from '../utils/dom-utils';
 
 class LayersProto extends Enum {
 
@@ -73,7 +73,7 @@ export function createCameraConfigGUI (camera) {
   _layers.forEach(function (l) { l.visible = camera.layers.test({mask: 1 << l.ordinal}); });
 
   // template -------------------------------------
-  var el = create(`
+  var el = createHTML(`
   <div>
   
  

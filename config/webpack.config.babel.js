@@ -305,7 +305,8 @@ module.exports = {
             }, {
                 test: /\.svg$/,
                 use: 'url-loader?name=[name].[ext]&limit=8192&mimetype=image/svg+xml'
-            }, {
+            }
+            , {
                 test: /\.woff?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
                 use: ['url-loader?name=[name].[ext]&limit=100000&mimetype=application/font-woff']
             }, {
@@ -380,6 +381,7 @@ module.exports = {
             {from: 'assets', to: 'assets'},
             {from: '../node_modules/aframe-material-snickell/assets', to: 'assets'},
             {from: '../node_modules/beta-dev-zip/lib', to: 'lib/zip'},
+            {from: '../node_modules/@nk/core-components/dist/assets', to: 'assets'},
         ]),
 
         new Webpack.NamedModulesPlugin(),

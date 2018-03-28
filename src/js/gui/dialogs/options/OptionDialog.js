@@ -4,13 +4,14 @@ import $ from 'jquery';
 
 import _ from 'lodash';
 
-import {appendStyle, create, setCenter} from '../../../utils/dom-utils';
+import {appendStyle, createHTML, setCenter} from '../../../utils/dom-utils';
 
 import Vue from 'vue/dist/vue.esm';
 import KeenUI from 'keen-ui';
 import {createCameraConfigGUI} from '../../../types/Layers';
 import {ImpactObject} from '../../../utils/performance-utils';
 import {createTable} from '../../Table';
+import {createOptions} from '../GeneralOptions';
 // import keenCss from 'keen-ui/dist/keen-ui.css';
 // import 'keen-ui/dist/keen-ui.css';
 Vue.use(KeenUI);
@@ -130,25 +131,18 @@ export function createGeneralOptionsDialog (camera) {
   var _layers = [{name: 'test', visible: true}];
 
   // template -------------------------------------
-  var el = create(`
+  var el = createHTML(`
   <div>
- <!-- <ol>
- 
-    <li v-for="l in layers">
-      <input class="toggle" type="checkbox" v-model="l.visible" @click="onRowClicked(l)" >
-      {{ l.name }}
-    </li>
-  </ol>
-    -->
-
     <ui-tabs type="icon-and-text">
         <ui-tab id="general" title="General" icon="exit_to_app"  v-on:select="createOrShowGeneralOptions($event)">
+        </ui-tab>
+         <ui-tab id="controls" title="Controls" icon="google_controller"  v-on:select="createOrShowControlsOptions($event)">
         </ui-tab>
         <ui-tab id="performance" title="Performance"  icon="trending_up" v-on:select="createOrShowPerformanceInfo($event)">
         </ui-tab>
         <ui-tab  id="layers" title="Layers" icon="visibility_off"  v-on:select="createOrShowLayers($event)" >
         </ui-tab>
-        
+                 
     </ui-tabs>
 
   
@@ -189,13 +183,20 @@ export function createGeneralOptionsDialog (camera) {
           console.log("you now can access full 'details' from 'window' scope", details);
           console.groupEnd();
         });
-        window.A = vueTable;
+
         for (var entry of data.vm) { vueTable.addRow(entry); }
 
-        that.append(create('<button>refresh list</button><br>'));
+        that.append(createHTML('<button>refresh list</button><br>'));
         that.append(vueTable.$el);
       },
       createOrShowGeneralOptions: function (that) {
+        var that = this.$el.querySelector('#' + that);
+
+        var app = createOptions();
+        that.innerHTML = '';
+        that.append(app.$el);
+      },
+      createOrShowControlsOptions: function (that) {
         var that = this.$el.querySelector('#' + that);
         var optionsDialog = new OptionsDialog();
 

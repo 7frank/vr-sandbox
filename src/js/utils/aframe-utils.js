@@ -1,6 +1,6 @@
 import $ from 'jquery';
 
-import {create} from './dom-utils';
+import {createHTML} from './dom-utils';
 import {setLayersForObject} from '../types/Layers';
 import * as _ from 'lodash';
 import {BoxHelperExt} from '../three/BoxHelperExt';

@@ -7,7 +7,7 @@ import $ from 'jquery';
  * @returns {*|Node|exports.TreeWalkerImpl.firstChild|null}
  */
 export
-const create = (domstring) => {
+const createHTML = (domstring) => {
   if (domstring == null) throw new Error('needs param');
   let html = new DOMParser().parseFromString(domstring, 'text/html');
   return html.body.firstChild;

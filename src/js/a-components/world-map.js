@@ -1,13 +1,42 @@
 /**
  * A world map implementation
  * TODO improve performance
- * we don't need to re-render all regions everytime static content can be rendered once, dynamic moving elements maybe more often
+ * we don't need to re-render all regions every time static content can be rendered once, dynamic moving elements maybe more often
+ * -also currently every region is rendered and although only specific layers are rendered the child elements still are checked
+ *
+ *
+ *
+ *
+ *
+ *
  */
 
 import {FPSInfo, FPSCtrl} from '../utils/fps-utils';
 import {updateHotComponent} from '../utils/aframe-debug-utils';
 import {querySelectorAll} from '../utils/selector-utils';
 import {setLayersForObject, Layers} from '../types/Layers';
+
+AFRAME.registerComponent('foreground', {
+  // dependencies: ['world-map'],
+  schema: {},
+  init: function () {
+    // FIXME should work without loop
+    new FPSCtrl(1, function () {
+      this.update();
+    }, this).start();
+  },
+
+  update: function () {
+    var mesh = this.el.getObject3D('mesh');
+
+    if (!mesh) return;
+
+    var g = this.el.object3D;
+    var m = g.children[0];
+    m.material.depthTest = false;
+    m.material.depthWrite = false;
+  }
+});
 
 updateHotComponent('world-map');
 AFRAME.registerComponent('world-map', {
@@ -42,6 +71,8 @@ AFRAME.registerComponent('world-map', {
     document.querySelector('body').addEventListener('wheel', this.onWheel.bind(this), {passive: true});
 
     // -----------------------------------
+    this.el.setAttribute('foreground', true);
+    // -----------------------------------
 
     var width = 256, height = 256;
 
@@ -63,14 +94,19 @@ AFRAME.registerComponent('world-map', {
 
     var renderer = this.el.sceneEl.renderer;
 
+    renderer.setClearColor(0x000000, 0.2);
+
     // var renderer = new THREE.WebGLRenderer();
     // renderer.setSize(512, 512);
     // document.body.appendChild(renderer.domElement);
 
     // ---------------------------------
     var bufferScene = new THREE.Scene();
+    window.w = {renderer, bufferScene, material, geometry, that: this};
+
     // FIXME improve performance of map
-    bufferScene.autoUpdate = false; // this might improve performance as the matrixes already should be compiled
+    // This does not work recursivly
+    // bufferScene.autoUpdate = false; // this might improve performance as the matrix already should be compiled
 
     var nl = document.querySelectorAll('[editable-region]');
     var arr = Array.prototype.slice.call(nl);
@@ -101,7 +137,7 @@ AFRAME.registerComponent('world-map', {
 
     // add stuff here that will show up
 
-    this.el.setObject3D('map-instance', plane);
+    this.el.setObject3D('mesh', plane);
 
     this.updateWorldMapScript = new FPSCtrl(1, function () {
       // center map at player position
@@ -147,7 +183,7 @@ AFRAME.registerComponent('world-map', {
   },
 
   remove: function () {
-    this.el.removeObject3D('map-instance');
+    this.el.removeObject3D('mesh');
     this.updateWorldMapScript.pause();
 
     document.querySelector('body').removeEventListener('wheel', this.onWheel.bind(this));

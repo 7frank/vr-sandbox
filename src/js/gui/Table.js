@@ -1,6 +1,6 @@
 import {Enum} from 'enumify';
 import Vue from 'vue/dist/vue.esm';
-import {create, setCenter} from '../utils/dom-utils';
+import {createHTML, setCenter} from '../utils/dom-utils';
 
 import {ClientTable, Event} from 'vue-tables-2';
 
@@ -13,7 +13,7 @@ export function createTable (onRowClick = function () {}) {
   // datasource -------------------------------------
 
   // template -------------------------------------
-  var el = create(`<div id="people">
+  var el = createHTML(`<div id="people">
   <v-client-table :data="tableData" :columns="columns" :options="options"   @row-click="onRowClicked" ></v-client-table>
 </div>`);
 

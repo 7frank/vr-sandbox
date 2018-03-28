@@ -2,7 +2,7 @@ export function addScript (src, load) {
   var s = document.createElement('script');
   s.onload = load;
   s.setAttribute('src', src);
-  document.body.appendChild(s);
+  document.head.appendChild(s);
   return s;
 }
 

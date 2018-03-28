@@ -1,5 +1,5 @@
 import dragDrop from 'drag-drop';
-import {create} from '../utils/dom-utils';
+import {createHTML} from '../utils/dom-utils';
 
 var styleTpl = `
 position: fixed;
@@ -46,7 +46,7 @@ function createDropZone (el, onBlobCreated) {
   dragDrop(el, {
     onDrop: onFileDrop,
     onDragEnter: function () {
-      if (!dropHelper) dropHelper = create(`<i class="fa fa-cloud-upload fa-4x" style="${styleTpl}" aria-hidden="true"></i>`);
+      if (!dropHelper) dropHelper = createHTML(`<i class="fa fa-cloud-upload fa-4x" style="${styleTpl}" aria-hidden="true"></i>`);
       el.parentElement.append(dropHelper);
     },
     onDragOver: function () {

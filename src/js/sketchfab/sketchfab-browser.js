@@ -1,6 +1,6 @@
 import {addScript} from '../utils/misc-utils';
 
-import {create} from '../utils/dom-utils';
+import {createHTML} from '../utils/dom-utils';
 import {zip} from 'beta-dev-zip/lib/zip';
 import * as _ from 'lodash';
 import {streamIn} from '../utils/stream-utils';
@@ -27,7 +27,7 @@ var console = Logger.getLogger('sketchfab-browser');
  */
 
 export function loadBrowser (onImport) {
-  var container = create(`<div class="skfb-widget"></div>`);
+  var container = createHTML(`<div class="skfb-widget"></div>`);
 
   document.body.append(container);
 
