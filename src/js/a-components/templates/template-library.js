@@ -194,7 +194,7 @@ AFRAME.registerComponent('gui-list-view', {
     $(this.el).append(wrapper);
 
     var listView = createTemplateListView(templates);
-    window['listView'] = listView;
+
     $(this.el).append(listView.$el);
 
     // onmouseenter => focus

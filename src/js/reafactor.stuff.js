@@ -68,15 +68,16 @@ export function renderZipFile (url, file = {}) {
     });
   }, file.size, onProgress);
 }
-alert('continue loadSketchfabBrowser');
+// alert('continue loadSketchfabBrowser');
 export function loadSketchfabBrowser () {
   var dlg = createHTML("<nk-window title='Sketchfab Browser - Import' class='card card-1' style='height:400px;width: 800px;' >");
   var sf = loadBrowser(function onFileImportStart (result) {
-    alert('continue');
-    importOrLoadFromCache(result.download.gltf.url);
+    // alert('continue');
+    // importOrLoadFromCache(result.download.gltf.url);
 
     importResult(result, function (rewrittenLinksURL) {
       var modelEl = renderGLTFOrGlbURL(rewrittenLinksURL);
+      // var modelEl = importOrLoadFromCache(result.download.gltf.url);
       addControlsToModel(modelEl);
     }, function onProgress (info) {
       window.mLoadingbar.show();

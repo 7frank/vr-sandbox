@@ -6,8 +6,13 @@ import * as _ from 'lodash';
 import {streamIn} from '../utils/stream-utils';
 import {Logger} from '../utils/Logger';
 
-window.zip = zip;
+/* eslint-disable */
+import  SketchfabOAuth2 from './sketchfab.oauth2-1.1.0';
+import {importOrLoadFromCache} from "../index";
+import {addControlsToModel} from "../reafactor.stuff";
+/* eslint-enable */
 
+window.zip = zip; // leave here as zip need to be global
 require('beta-dev-zip/lib/zip-ext'); // otherwise doesn't find zip
 
 var console = Logger.getLogger('sketchfab-browser');
@@ -95,29 +100,6 @@ export function convertEntriesPromise (entries) {
   return Promise.all(promises).then(data => _.merge(...data));
 }
 
-/*
-
-export
-function downloadZip (url, entriesCallback) {
-  zip.workerScriptsPath = '/lib/zip/';
-  // zip.useWebWorkers = false;
-
-  var reader = new HttpReader2(url); // zip.HttpReader
-  zip.createReader(
-    reader,
-    function (zipReader) {
-      zipReader.getEntries(function (entries) {
-        entriesCallback(entries);
-      });
-    },
-    function (error) {
-      console.error(error);
-    }
-  );
-}
-
-*/
-
 export function downloadZip (url, entriesCallback, knownSize = -1, onProgress) {
   streamIn(url, onProgress, knownSize).then(response => response.blob())
     .then(function (blob) {
@@ -186,58 +168,87 @@ export function rewritePathsOfSceneGLTF (sceneFileContent, fileUrls) {
   return updatedUrl;
 }
 
-// ------------------------------
-// ------------------------------
-// ------------------------------
 /**
- * from beta-dev-zip/zip-ext to test circumvention of CORS
- * @param url
- * @constructor
+ * the login dialog asking for permissions
+ * @param pendingCallback
  */
-function HttpReader2 (url) {
-  var that = this;
+function openUserLogin (pendingCallback) {
+  var config = {
+    hostname: 'sketchfab.com',
+    client_id: 'L3MirrReWDeKytcjKCTNX2pS4ci6hkSoNPWx8yaC',
+    useDefaultURI: true
+    // redirect_uri: '127.0.0.1:9000'
+  };
 
-  function getData (callback, onerror) {
-    var request;
-    if (!that.data) {
-      request = new XMLHttpRequest();
-      request.addEventListener('load', function () {
-        if (!that.size) {
-          that.size = Number(request.getResponseHeader('Content-Length'));
-        }
-        that.data = new Uint8Array(request.response);
-        callback();
-      }, false);
-      request.addEventListener('error', onerror, false);
-      request.open('GET', url);
-      request.responseType = 'arraybuffer';
-      request.send();
-    } else {
-      callback();
-    }
-  }
+  var client = new SketchfabOAuth2(config);
 
-  function init (callback, onerror) {
-    var request = new XMLHttpRequest();
-    request.addEventListener('load', function () {
-      that.size = Number(request.getResponseHeader('Content-Length'));
-      callback();
-    }, false);
-    request.addEventListener('error', onerror, false);
-    request.open('HEAD', url);
-    request.send();
-  }
-
-  function readUint8Array (index, length, callback, onerror) {
-    getData(function () {
-      callback(new Uint8Array(that.data.subarray(index, index + length)));
-    }, onerror);
-  }
-
-  that.size = 0;
-  that.init = init;
-  that.readUint8Array = readUint8Array;
+  return client.connect(pendingCallback)
+    .then(function onSuccess (grant) {
+      return grant;
+    }).catch(function onError (error) {
+      return error;
+    });
 }
 
-HttpReader2.prototype = new zip.Reader();
-HttpReader2.prototype.constructor = HttpReader2;
+var auth;
+
+/**
+ * Gets the authentication data for the current client.
+ * If none is logged into sketchfab with this app, then a login dialog will ask for permissions.
+ *
+ * @returns {Promise}
+ */
+function getAuth () {
+  return new Promise(function (resolve, reject) {
+    if (auth) resolve(auth);
+    else {
+      openUserLogin(console.log).then(function (result) {
+        auth = result.grant;
+        resolve(auth);
+      }).catch(reject);
+    }
+  });
+}
+
+/**
+ * imports a model from sketchfab with initial login/auth
+ *
+ * @param url
+ */
+
+function importModel (url) {
+  getAuth().then(function (grant) {
+    console.log('grant', grant);
+
+    var url = 'https://api.sketchfab.com/v3/models/429e0904ae0d40acb650d01b6b05a797/download';
+    var options = {
+      method: 'GET',
+      headers: {
+        Authorization: 'Bearer ' + grant.access_token
+      },
+      mode: 'cors'
+    };
+
+    fetch(url, options).then(function (response) {
+      return response.json();
+    }).then(function (data) {
+      console.log('download file info', data);
+
+      doLoadAndRenderNetworked(data, url);
+    });
+  });
+}
+
+window.importModel = importModel;
+
+function doLoadAndRenderNetworked (data, url) {
+  var result = {download: data, model: {name: url}};
+
+  importResult(result, function (rewrittenLinksURL) {
+    var modelEl = importOrLoadFromCache(rewrittenLinksURL);
+    addControlsToModel(modelEl);
+  }, function onProgress (info) {
+    window.mLoadingbar.show();
+    window.mLoadingbar.set('importing:' + result.model.name, info.current, info.size);
+  });
+}
