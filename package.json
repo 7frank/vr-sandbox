@@ -167,6 +167,7 @@
     "stylelint": "^8.0.0",
     "stylelint-config-standard": "^17.0.0",
     "stylelint-webpack-plugin": "^0.9.0",
+    "three-transform-controls": "^1.0.4",
     "three-vrcontrols": "^1.0.0",
     "three.terrain.js": "^1.5.0",
     "ts-loader": "^3.3.0",

@@ -78,7 +78,7 @@ export function createCameraConfigGUI (camera) {
   
  
     <div v-for="l in layers">
-      <ui-switch v-model="l.visible" @change="onRowClicked(l)" >{{ l.name }}</ui-switch>
+      <ui-switch v-model="l.visible" @change="onRowClicked(l)">{{ l.name }}</ui-switch>
     </div>
   
     </div>

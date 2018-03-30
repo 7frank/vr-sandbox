@@ -59,7 +59,9 @@ import {streamIn} from './utils/stream-utils';
 
 import {Logger} from './utils/Logger';
 import {createDropZone} from './import/fileupload';
-import {renderGLTFOrGlbURL} from './utils/aframe-utils';
+import {renderGLTFOrGlbURL, scaleEntity} from './utils/aframe-utils';
+import {addControlsToModel, renderZipFile} from './reafactor.stuff';
+import {getPlayer} from './game-utils';
 
 // TODO per instance of global active inactive
 // Logger.setState(true);
@@ -69,32 +71,6 @@ AFRAME.nk = {querySelectorAll, ZoomUtils, Layers, streamIn};
 
 // ------------------
 
-// ----------------
-//
-// NOTE:Make sure that Bootstrap's CSS classes are included in your HTML.
-// global.jQuery = global.$ = $;
-
-// require('bootstrap');
-// require('@gladeye/aframe-preloader-component');
-// NOTE:use below approach if component above is not sufficient
-/* var manager = document.querySelector('a-assets').fileLoader.manager
- manager.onStart=function(){
-     console.log(arguments)
-
- };
-*/
-/*
-onAttributeChange(undefined, 'position', function () {
-  console.log('------------------------------');
-  console.log('changed element:', arguments);
-});
-*/
-
-// TODO track all elements with a position attribute (for now estimate that those are a-frame elements)
-/* onXYZAFrameChange('[position]', function (evt) {
-   console.log('Entity has moved from', evt, evt.detail, evt.detail.oldData, 'to', evt.detail.newData, '!');
-});
-*/
 if (module.hot) {
   module.hot.accept();
 }
@@ -114,6 +90,25 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   })
   );
+
+  /**
+     * this part should only create the initial scene without any additional fancy stuff
+     * TODO use instead of reloadSceneToDOM
+     */
+  function initSceneContent () {
+    var content = require('../staticContent.hbs');
+
+    var sceneDefinition = require('../sceneDefinition.hbs');
+
+    var copy = $(sceneDefinition()).append(trim(content()));
+    var scene = $('a-scene');
+    _.each(copy.children(), function (el) {
+      scene.append(el);
+    });
+  }
+
+  // initSceneContent();
+
   reloadSceneToDOM();
 });
 
@@ -137,12 +132,6 @@ onTagChanged('a-scene', function (elementsInfo) {
 
     addLoadingListenersToScene(elementsInfo.added[0], function () {
       scene.setAttribute('visible', true);
-
-      /*   var ball = $('.ball');
-                  // ball.removeAttribute("dynamic-body");
-                  ball.attr('position', '0 2 ' + _.random(-5, 15));
-                  console.log('initial ball position', ball.attr('position'));
-                  */
       attachGameLogic();
     });
   }
@@ -154,7 +143,9 @@ onTagChanged('a-scene', function (elementsInfo) {
 });
 
 // --------------------------------------
-
+/**
+ * @deprecated refactor useful parts
+ */
 function reloadSceneToDOM () {
   console.log('reloadSceneToDOM');
   $('body').addClass('splash-screen');
@@ -167,6 +158,8 @@ function reloadSceneToDOM () {
 
   elem.value = content();
 
+  // deprecated ---------------------------------------------
+
   function staticUpdateScene () {
     var sceneDefinition = require('../sceneDefinition.hbs');
 
@@ -174,11 +167,11 @@ function reloadSceneToDOM () {
 
     // FIXME no longer detecting loaded
     /*  copy.get(0).addEventListener('loaded', function () {
-              console.log('scene was loaded');
-              setTimeout(function () {
-                copy.attr('visible', true);
-              }, 500);
-            }); */
+                  console.log('scene was loaded');
+                  setTimeout(function () {
+                    copy.attr('visible', true);
+                  }, 500);
+                }); */
 
     $('a-scene').replaceWith(copy);
 
@@ -281,39 +274,26 @@ function reloadSceneToDOM () {
     // dd.apply(sceneOld, diff);
   }
 
+  // @deprecated TODO refactor - have the editing be part of a region rather than the whole scene
+
   function initSceneFromTextarea (staticUpdate = true) {
     console.log('changed');
-    // var scene = document.querySelector('#aframe-project');
-
-    // var el = htmlToElement(trim(elem.value));
-    // console.log('el:', el);
-    // scene.innerHTML += elem.value;
-    // scene.appendChild(el);
-
-    // document.querySelector('a-scene').append(el);
-
-    // $('a-scene').append(trim(elem.value));
 
     if (staticUpdate) {
       staticUpdateScene();
     } else {
       diffUpdateScene();
     }
-
-    // $('a-scene').get(0).originalHTML=trim(elem.value)
-    //   $('a-scene').get(0).reload();
   }
 
   initSceneFromTextarea();
-
-  elem.addEventListener('keypress', debounce(initSceneFromTextarea, 2000));
-
+  // elem.addEventListener('keypress', debounce(initSceneFromTextarea, 2000));
   addListeners();
 }
 
 /**
  * for those of us that want to use aframe with desktop
- * //TODO improve
+ *
  */
 function addListeners () {
   var scene = $('a-scene');
@@ -328,8 +308,56 @@ function addListeners () {
     cam.updateProjectionMatrix();
   });
 
-  createDropZone(scene.get(0), function (blob) {
+  // TODO use std lib
+  function getFileExt (file) {
+    return file.name.split('.').pop();
+  }
+
+  createDropZone(scene.get(0), function (data) {
+    var blob = data.blob;
+
+    var ext = getFileExt(data.file);
+
     var url = window.URL.createObjectURL(blob);
-    var el = renderGLTFOrGlbURL(url);
+
+    switch (ext) {
+      case 'glb':
+        var modelEl = renderGLTFOrGlbURL(url);
+        addControlsToModel(modelEl);
+        break;
+      case 'zip':
+        var el = renderZipFile(url, data.file);// TODO render zip
+
+        break;
+
+      default:
+        alert('unsupported file format. either use "*.glb" or a "*.zip" containing a file named "scene.gltf" as entry point');
+    }
   });
+}
+
+/**
+ * create an element that loads the data-url into a second instance on the same device
+ * TODO make it work x-device
+ * @deprecated
+ */
+export
+function importOrLoadFromCache (dataURL) {
+  var tpl = `<a-entity class="imported-model"  networked="template:#imported-element-template;showLocalTemplate:true;">
+        
+        </a-entity>`;
+
+  var el = $(tpl);
+
+  var playerPos = getPlayer().object3D.getWorldPosition();
+
+  el.get(0).setAttribute('position', AFRAME.utils.coordinates.stringify(playerPos));
+
+  $('a-scene').append(el);
+
+  setTimeout(() => el.find('.content').get(0).setAttribute('networked-imported-model', 'src:' + dataURL), 10);
+
+  window.mLoadingbar.hide();
+
+  return el.get(0);
 }

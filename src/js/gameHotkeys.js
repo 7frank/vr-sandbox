@@ -20,15 +20,22 @@ import {attachCodeEditor, loadSketchfabBrowser} from './reafactor.stuff';
 import {enterOrExitVehicle} from './car.refactor';
 import {createEditableNode} from './editing-utils';
 
-import {Hotkeys} from '@nk/core-components/dist/bundle';
+// import {Hotkeys} from '@nk/core-components/dist/bundle';
 
 const {detect} = require('detect-browser');
-const browser = detect();
+// const browser = detect();
+// if (browser.name == 'firefox')
 
 var hotkeyDialog;
+var Hotkeys;
 
-document.addEventListener('DOMContentLoaded', function () {
-  // if (browser.name == 'firefox') alert("FIXME hotkeys not working else scene won't load");
+/**
+ * this loads the hotkeys module which won't load via import
+ * Note: DomContentLoaded event will not work here (will still stay blank)
+ */
+window.addEventListener('load', function () {
+  var CustomComponents = require('@nk/core-components/dist/bundle');
+  Hotkeys = CustomComponents.Hotkeys;
 
   hotkeyDialog = createHTML("<nk-hotkey-dialog title='Input Configuration' class='card card-1' style='z-index: 1;top:50px;left:50%;position:absolute;width:600px;height:300px;display:none' ></nk-hotkey-dialog>");
   document.body.appendChild(hotkeyDialog);

@@ -14,3 +14,8 @@ import './world-map';
 import './cursor-wheel-listener';
 import './templates/template-library';
 import './camera-layers';
+import './networked-name-tag';
+import './transform-controls';
+import './player-state';
+import './hotkey-controls';
+import './networked-imported-model';

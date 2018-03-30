@@ -11,6 +11,21 @@ position: fixed;
     color: rgba(255,255,255,0.9);
 `;
 
+/**
+ *
+ * @typedef DropZoneCallback
+ * @type {object}
+ * @property file - A File descriptor.
+ * @property {blob} blob - The file content object.
+
+ *
+ */
+
+/**
+ *
+ * @param {HTMLElement} el - An element that will have the drop zone functionality.
+ * @param {DropZoneCallback} onBlobCreated - A callback which returns a data object containing file info and a corresponding blob.
+ */
 export
 function createDropZone (el, onBlobCreated) {
   function onFileDrop (files, pos) {
@@ -32,7 +47,7 @@ function createDropZone (el, onBlobCreated) {
         var blob = new Blob([arr]);
 
         // do something with the blob!
-        onBlobCreated(blob);
+        onBlobCreated({file, blob});
       });
       reader.addEventListener('error', function (err) {
         console.error('FileReader error' + err);
@@ -46,7 +61,9 @@ function createDropZone (el, onBlobCreated) {
   dragDrop(el, {
     onDrop: onFileDrop,
     onDragEnter: function () {
-      if (!dropHelper) dropHelper = createHTML(`<i class="fa fa-cloud-upload fa-4x" style="${styleTpl}" aria-hidden="true"></i>`);
+      // TODO drop hint is not showing up.. something with font-awesome?
+
+      if (!dropHelper) dropHelper = createHTML(`<i class="fa fa-cloud-upload fa-4x" style="${styleTpl}" aria-hidden="true">!</i>`);
       el.parentElement.append(dropHelper);
     },
     onDragOver: function () {

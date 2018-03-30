@@ -4,6 +4,7 @@ import {createHTML} from './dom-utils';
 import {setLayersForObject} from '../types/Layers';
 import * as _ from 'lodash';
 import {BoxHelperExt} from '../three/BoxHelperExt';
+import {getPlayer} from '../game-utils';
 
 /**
  * @deprecated this won't work with elements from different regions TODO getWorldPosition should be used in some way
@@ -362,10 +363,12 @@ export function renderGLTFOrGlbURL (rewrittenLinksURL) {
         scale="1 1 1"
         animation-mixer="clip: *;"
         gltf-model="src: url(${rewrittenLinksURL});">
+             
+        
         </a-entity>`;
 
   var el = $(tpl);
-  var playerPos = document.querySelector('.player').object3D.getWorldPosition();
+  var playerPos = getPlayer().object3D.getWorldPosition();
 
   el.get(0).setAttribute('position', AFRAME.utils.coordinates.stringify(playerPos));
 

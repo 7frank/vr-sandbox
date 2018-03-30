@@ -5,7 +5,8 @@ import {FPSCtrl} from '../../utils/fps-utils';
 import {toast} from '../../utils/aframe-utils';
 
 import {Logger} from '../../utils/Logger';
-
+import {createHTML} from '../../utils/dom-utils';
+import Vue from 'vue/dist/vue.esm';
 // a list that contains template-containers to select them
 // first lets have a simple select like in fallout 4
 // goal is to select and place
@@ -16,21 +17,25 @@ var console = Logger.getLogger('template-library');
 var templates = [
   {name: 'helloTemplate', template: '<a-box></a-box>'},
   {name: 'helloText', template: '<a-text value="{{text:string}}"></a-text>'},
-  {name: 'izzy', template: `<a-entity
+  {
+    name: 'izzy', template: `<a-entity
           shadow="cast: true; receive: false"
           scale="0.008 0.008 0.008"
           --behaviour-attraction="speed:0.5"
           animation-mixer="clip: *;"
           gltf-model="src: url(assets/models/Izzy/scene.gltf);">
-    </a-entity>`},
-  {name: 'animatedBox', template: `<a-box src="#boxTexture" 
+    </a-entity>`
+  },
+  {
+    name: 'animatedBox', template: `<a-box src="#boxTexture" 
         position="0 0.5 0" 
         rotation="0 45 45" 
         scale="1 1 1" 
         material="color:red">
         <a-animation attribute="position" to="0 2 -1" direction="alternate" dur="2000"
             repeat="indefinite"></a-animation>
-   </a-box>`}
+   </a-box>`
+  }
 ];
 
 var behaviourTemplates = {
@@ -55,7 +60,11 @@ AFRAME.registerComponent('template-library', {
 AFRAME.registerComponent('wireframe', {
   dependencies: ['material'],
   init: function () {
-    if (this.el.components.material) { this.el.components.material.material.wireframe = true; } else { console.warn("Can't set wireframe. Does not have material."); }
+    if (this.el.components.material) {
+      this.el.components.material.material.wireframe = true;
+    } else {
+      console.warn("Can't set wireframe. Does not have material.");
+    }
   }
 });
 
@@ -67,7 +76,8 @@ AFRAME.registerComponent('gui-list-view', {
     itemFactory: {
       default: function (item) {
         return item;
-      }}
+      }
+    }
   },
 
   init: function (HALPP = false) {
@@ -183,12 +193,88 @@ AFRAME.registerComponent('gui-list-view', {
     // note: wait to append otherwise items wont be aligned as component only aligns on init
     $(this.el).append(wrapper);
 
+    var listView = createTemplateListView(templates);
+    window['listView'] = listView;
+    $(this.el).append(listView.$el);
+
     // onmouseenter => focus
     // onmouseleave => blur
     // on player-move forward && hasFocus selected-=1
   }
 
 });
+
+// -----------------------------------------
+
+/**
+ * items need to have a .name and .template string property
+ * @param items
+ */
+function createTemplateListView (items) {
+  // template -------------------------------------
+  var el = createHTML(`
+    <a-entity ref="wrapper">
+      <a-entity ref="previewWrapper" position="3 0 0">
+          <a-entity ref="preview"><a-box></a-box></a-entity>
+      </a-entity>
+      
+       <a-gui-flex-container 
+        ref="listView"
+        align-items="normal"
+        flex-direction="column"  
+        component-padding="0.1"
+        opacity="0.7"
+        width="3.5"
+        position="0 0 0"
+        rotation="0 0 0">
+         <a-gui-button  
+              v-for="(item, index) in items"
+              v-bind:value="item.name"
+              
+              toggle="true"
+              width="2.5" 
+              height="0.75" 
+              font-family="Arial" 
+              margin="0 0 0.05 0" 
+              @click="onButtonClicked(item)" 
+              
+              ></a-gui-button>
+          </a-gui-flex-container>
+    
+    </a-entity>
+  `);
+
+    // vue -------------------------------------
+  var app = new Vue({
+    el: el,
+    data: {
+      items: items
+    },
+    methods: {
+      onButtonClicked: function (item) {
+        console.log(item);
+      }
+    },
+    watch: {
+      items: {
+        handler: function (val, oldVal) {
+          this.$refs.listView.components['gui-flex-container'].init();
+        },
+        deep: true
+      }
+    }
+  });
+
+  // TODO refactor :>
+  document.addEventListener('model-imported', function (e) {
+    var str = e.detail.modelEl.getAttribute('gltf-model');
+
+    app.$el.setAttribute('position', '0 0 3');
+    app.$data.items.push({name: str});
+  });
+
+  return app;
+}
 
 // -----------------------------------------
 

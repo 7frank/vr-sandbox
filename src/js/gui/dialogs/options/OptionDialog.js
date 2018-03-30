@@ -148,7 +148,6 @@ export function createGeneralOptionsDialog (camera) {
   
     </div>
   `);
-
     // vue -------------------------------------
   var app = new Vue({
     el: el,

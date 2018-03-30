@@ -1,13 +1,16 @@
-
 import {Logger} from '../utils/Logger';
+
+const {detect} = require('detect-browser');
+var browser = detect();
 
 var console = Logger.getLogger('stream-utils.js');
 
-// TODO check out libraries that handle different types of stream chunks instead?
-// FIXME not supported by firefox as of yet also might be that the Content-Type is not set properly like mentioned in some comment
+// TODO streaming standard not supported by firefox (resonse.body undefined)
 export function streamIn (url, onProgress, knownMaxSize = -1) {
-  // var test = true;
-  // if (test) throw new Error('test');
+  if (browser.name == 'firefox') {
+    return fetch(url);
+  }
+
   var progressSize = 0;
   return fetch(url)
     .then(fetchHandleErrors) // this is neceassary for 404 errors to bubble
@@ -16,22 +19,22 @@ export function streamIn (url, onProgress, knownMaxSize = -1) {
       const reader = response.body.getReader();
       const stream = new ReadableStream({
         start (controller) {
-        // Die folgende Funktion behandelt jeden Daten-Chunk
+          // Die folgende Funktion behandelt jeden Daten-Chunk
           function push () {
-          // "done" ist ein Boolean und "value" ein "Uint8Array"
+            // "done" ist ein Boolean und "value" ein "Uint8Array"
             return reader.read().then(({done, value}) => {
-            // Gibt es weitere Daten zu laden?
+              // Gibt es weitere Daten zu laden?
 
               if (done) {
-              // Teile dem Browser mit, dass wir fertig mit dem Senden von Daten sind
-              // / TODO throws error
+                // Teile dem Browser mit, dass wir fertig mit dem Senden von Daten sind
+                // / TODO throws error
 
                 controller.close();
                 return;
               } else {
                 progressSize += value.length;
 
-                if (onProgress) onProgress({ current: progressSize, size: knownMaxSize});
+                if (onProgress) onProgress({current: progressSize, size: knownMaxSize});
               }
 
               // Bekomme die Daten und sende diese an den Browser durch den Controller weiter
@@ -55,7 +58,7 @@ export function Blob2Text (blb) {
 
     // This fires after the blob has been read/loaded.
     reader.addEventListener('loadend', (e) => {
-      const text = e.srcElement.result;
+      const text = e.target.result;// e.srcElement.result;
       resolve(text);
     });
 
@@ -68,8 +71,7 @@ export function Blob2Text (blb) {
 
 /* quick 404 trigger for fetch via then */
 
-export
-function fetchHandleErrors (response) {
+export function fetchHandleErrors (response) {
   if (!response.ok) {
     var err = new Error(response);
     err.status = response.status;
