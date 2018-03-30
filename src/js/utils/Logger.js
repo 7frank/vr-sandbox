@@ -1,5 +1,8 @@
 import * as _ from 'lodash';
 
+// the logger instance that currently is visible on the console
+var activeLoggerTarget;
+
 /**
  * a handler method for the proxy that caches method calls to window.console
  * @type {{get: handler.get}}
@@ -10,6 +13,9 @@ var handler = {
     if (typeof console[name] == 'function') {
       return function (...args) {
         target.cached.push({method: name, args});
+
+        // for the last selected logger events are passed to the console
+        if (activeLoggerTarget == target) { console[name].apply(console, args); }
       };
     } else {
       return target[name];
@@ -31,12 +37,15 @@ class _Logger {
      */
 
   getLogger (name, options) {
-    var proxy = new Proxy({cached: []}, handler);
+    var obj = {cached: []};
+    var proxy = new Proxy(obj, handler);
 
     if (this[name]) return this[name];
 
     Reflect.defineProperty(this, name, {
       get: function () {
+        activeLoggerTarget = obj;
+
         clearConsole();
 
         _.each(proxy.cached, function (entry) {
