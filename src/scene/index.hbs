@@ -35,7 +35,18 @@
                 selector: '.head',
                 component: 'material',
                 property: 'color'
+            },
+            {
+                selector: '.name',
+                component: 'text',
+                property: 'value'
+            },
+            {
+                selector: '.say',
+                component: 'text',
+                property: 'value'
             }
+
         ]
     };
     NAF.schemas.add(avatarSchema);
@@ -49,6 +60,24 @@
         ]
     };
     NAF.schemas.add(ballSchema);
+
+
+
+    var importedElementSchema = {
+        template: '#imported-element-template',
+        components: [
+            'position',
+            'rotation',
+            'scale',
+            {
+                selector: '.content',
+                component: 'networked-imported-model',
+                property: 'src'
+            }
+        ]
+    };
+    NAF.schemas.add(importedElementSchema);
+
 
 
 </script>
@@ -70,9 +99,13 @@
 
 
 <!-- default scene which is currently needed to load aframe  LEAVE EMPTY-->
-<a-scene>
-    <!-- <a-entity camera look-controls mouse-cursor>-->
-  </a-scene>
+<!-- TODO reduce redundancy with sceneDefinition.hbs-->
+<a-scene networked-scene="room: basic;debug: true;" light="shadowMapType: basic"
+         visible="true"
+         id="aframe-project"
+         physics="debug: false">
+<!-- <a-entity camera look-controls mouse-cursor>-->
+</a-scene>
 
 
 
