@@ -56,6 +56,24 @@ else {
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
+
+//-----------------------------------------
+
+//TODO partially working: prevents loading half way
+//have a 401 for when the user did the sketchfab login and pressed cancel
+app.use(publicPath,function(req, res,next) {
+
+    var query = require('url').parse(req.headers.referer,true).query;
+
+    if (query.error=="access_denied")
+    res.send('401 Unauthorized', 401);
+    else next()
+
+
+});
+
+
+
 //-----------------------------------------
 
 console.log("--------------------------")
