@@ -221,7 +221,7 @@ module.exports = {
         'aframe-project': (isHot ? [
             '../devel/utils/webpack-runtime.js',
             'webpack-hot-middleware/client?path=/webpack-hot-module-replace&timeout=20000&reload=true',
-        ] : [] ).concat([
+        ] : [] ).concat(["babel-polyfill",
             './js/index.js',
             './sass/entry.scss',
         ]),
@@ -276,7 +276,7 @@ module.exports = {
                 include: [src],
                 exclude: [/node_modules/],
                 use: {
-                    loader: 'babel-loader',
+                    loader: 'babel-loader'
                 },
             }, {
                 test: /\.html$/,
