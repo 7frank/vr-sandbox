@@ -37,9 +37,8 @@ SketchfabOAuth2.prototype.connect = function (pendingCallback) {
       this.config.useDefaultURI ? '' : '&redirect_uri=' + encodeURIComponent(this.config.redirect_uri)
     ].join('');
 
-    var loginPopup = window.open(authorizeUrl, 'loginWindow', 'width=640,height=400');
-
-    // createSketchfabLoginFrame(authorizeUrl);
+    var loginPopup = window.lw = window.open(authorizeUrl, 'loginWindow', 'width=640,height=400');
+    var state = null;
 
     // Polling new window
     var timer = setInterval(function () {
@@ -58,7 +57,9 @@ SketchfabOAuth2.prototype.connect = function (pendingCallback) {
 
         // not yet loaded. wait a little bit
         if (url == 'about:blank') {
-          if (typeof pendingCallback == 'function') { pendingCallback({state: 'loading'}); }
+          if (typeof pendingCallback == 'function') {
+            pendingCallback({state: 'loading'});
+          }
           return;
         }
 
@@ -66,6 +67,7 @@ SketchfabOAuth2.prototype.connect = function (pendingCallback) {
         if (url.indexOf('?error=access_denied') !== -1) {
           clearInterval(timer);
           reject(new Error('Access denied (User canceled)'));
+          loginPopup.close();
           return;
         }
 
@@ -95,11 +97,16 @@ SketchfabOAuth2.prototype.connect = function (pendingCallback) {
           }
         }
       } catch (e) {
+        // the window has loaded the oauth page and we get cross origin exceptions thrown
         if (e.message.indexOf('cross-origin') > -1) {
-          if (typeof pendingCallback == 'function') { pendingCallback({state: 'pending'}); }
-        } else { console.error('Login failed:', e); }
+          if (typeof pendingCallback == 'function') {
+            pendingCallback({state: 'pending'});
+          }
+        } else {
+          console.error('Login failed:', e);
+        }
       }
-    }.bind(this), 100);
+    }.bind(this), 500);
   }.bind(this));
 };
 

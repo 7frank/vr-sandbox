@@ -78,14 +78,14 @@ export function convertEntriesPromise (entries) {
   var promises = _.map(entries, function (entry) {
     return entry.uncompressedSize == 0 ? undefined : new Promise(function (resolve, reject) {
       /*
-                    entry.getData(new zip.BlobWriter('text/plain'), function onEnd (data) {
-                      var url = window.URL.createObjectURL(data);
+                                entry.getData(new zip.BlobWriter('text/plain'), function onEnd (data) {
+                                  var url = window.URL.createObjectURL(data);
 
-                      var res = {};
-                      res[entry.filename] = {url: url, size: entry.uncompressedSize};
-                      resolve(res);
-                    });
-                    */
+                                  var res = {};
+                                  res[entry.filename] = {url: url, size: entry.uncompressedSize};
+                                  resolve(res);
+                                });
+                                */
 
       entry.getData(new zip.ArrayBufferWriter(), function onEnd (data) {
         data = new Blob([new Uint8Array(data)]);
@@ -192,8 +192,6 @@ export function openUserLogin (pendingCallback) {
   return client.connect(pendingCallback)
     .then(function onSuccess (grant) {
       return grant;
-    }).catch(function onError (error) {
-      return error;
     });
 }
 
@@ -205,24 +203,26 @@ var pendingAuth = null;// a promise for th user authentication
  * If none is logged into sketchfab with this app, then a login dialog will ask for permissions.
  * @returns {Promise}
  */
-export function getAuth () {
-  console.log('getAuth');
-  return new Promise(function (resolve, reject) {
-    if (auth) resolve(auth);
-    else {
-      // have only one login dialog even for multiple auth requests
-      if (!pendingAuth) { pendingAuth = openUserLogin(console.log); }
 
-      pendingAuth.then(function (result) {
-        auth = result.grant;
-        pendingAuth = null;
-        resolve(auth);
-      }).catch(function (e) {
-        pendingAuth = null;
-        reject(e);
-      });
+export
+async function getAuth () {
+  console.log('getAuthAsync');
+
+  if (auth) return auth;
+  else {
+    // have only one login dialog even for multiple auth requests
+    if (!pendingAuth) {
+      pendingAuth = openUserLogin(console.log);
     }
-  });
+
+    var result = await pendingAuth.catch((e) => {
+      pendingAuth = null;
+      throw e;
+    });
+    auth = result.grant;
+    pendingAuth = null;
+    return auth;
+  }
 }
 
 /**

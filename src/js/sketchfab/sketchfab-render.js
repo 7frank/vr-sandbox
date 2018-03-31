@@ -5,6 +5,12 @@ import {getPlayer} from '../game-utils';
 import {createNetworkedGLTFEntity} from './sketchfab-import';
 import {scaleEntity} from '../utils/aframe-utils';
 
+/**
+ * Adds transformable controls (translate rotate scale) to the entity
+ *
+ * @param el
+ */
+
 export function addControlsToModel (el) {
   var sceneEl = el.sceneEl;
 
@@ -17,34 +23,44 @@ export function addControlsToModel (el) {
   notifyModelImported(el);
 }
 
-function notifyModelImported (el) {
+/**
+ * Dispatch the event 'model-imported'
+ * TODO use this per editable-region as an indicator when regions are loaded
+ * @param el
+ * @param target
+ */
+
+function notifyModelImported (el, target = document) {
   var event = new CustomEvent('model-imported', {detail: {modelEl: el}});
 
   // Dispatch the event.
-  document.dispatchEvent(event);
+  target.dispatchEvent(event);
 }
+
+/**
+ * Creates an entity than loads the previously loaded model from memory
+ *
+ * @param dataURL
+ * @returns {HTMLElement}
+ */
 
 export function createGLTFEntityFromDataURL (dataURL) {
   var tpl = `<a-entity class="imported-model"
         scale="1 1 1"
         animation-mixer="clip: *;"
-        gltf-model="src: url(${dataURL});">
-             
-        
+        gltf-model="src: url(${dataURL});"> 
         </a-entity>`;
 
   return $(tpl).get(0);
 }
 
-export function renderGLTFOrGlbURL (rewrittenLinksURL) {
-  var tpl = `<a-entity class="imported-model"
-        scale="1 1 1"
-        animation-mixer="clip: *;"
-        gltf-model="src: url(${rewrittenLinksURL});">
-             
-        
-        </a-entity>`;
+/**
+ * Renders a previously imported gltf-model at the position the player is standing.
+ * @param rewrittenLinksURL
+ * @returns {HTMLElement}
+ */
 
+export function renderGLTFOrGlbURL (rewrittenLinksURL) {
   var el = createGLTFEntityFromDataURL(rewrittenLinksURL);
   renderAtPlayer(el);
 
@@ -53,12 +69,21 @@ export function renderGLTFOrGlbURL (rewrittenLinksURL) {
   return el;
 }
 
-export function renderAtPlayer (el) {
+/**
+ * TODO render imported elements within editable-region not scene
+ *
+ * @deprecated
+ *
+ *
+ * @param el
+ */
+
+export function renderAtPlayer (el, target = $('a-scene')) {
   var playerPos = getPlayer().object3D.getWorldPosition();
 
   el.setAttribute('position', AFRAME.utils.coordinates.stringify(playerPos));
 
-  $('a-scene').append(el);
+  target.append(el);
   // FIXME
   scaleEntity(el, 1);
 }
@@ -97,6 +122,10 @@ export function renderZipFile (url, file = {}) {
   }, file.size, onProgress);
 }
 
+/**
+ *
+ */
+
 export function loadSketchfabBrowser () {
   var dlg = createHTML("<nk-window title='Sketchfab Browser - Import' class='card card-1' style='height:400px;width: 800px;' >");
   var sf = loadBrowser(function onFileImportStart (result) {
@@ -128,6 +157,12 @@ export function loadSketchfabBrowser () {
   setCenter(dlg);
 }
 
+/**
+ * Creates an iframe.
+ * @deprecated
+ * @param url
+ */
+
 function prepareFrame (url) {
   var ifrm = document.createElement('iframe');
   ifrm.setAttribute('src', url);
@@ -137,7 +172,7 @@ function prepareFrame (url) {
 }
 
 /**
- * 'X-Frame-Options' same-origin set by sketchfab for oauth login
+ * FIXME 'X-Frame-Options' same-origin set by sketchfab for oauth login prevent loading the login dialog inline
  *
  * @deprecated
  * @param url
