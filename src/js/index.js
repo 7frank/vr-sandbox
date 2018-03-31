@@ -4,7 +4,6 @@
 import 'aframe';
 
 import 'three-vrcontrols'; // currently missing from (aframe 0.8.1) for aframe-extras(3.1.3)
-
 import 'aframe-physics-system';
 import 'aframe-mouse-cursor-component';
 // import 'aframe-extras/dist/aframe-extras.controls';
@@ -12,7 +11,6 @@ import 'aframe-extras/dist/aframe-extras';
 import 'aframe-environment-component/dist/aframe-environment-component.min.js';
 // TODO track down error to be able to test kinematic-body for player element
 // import 'aframe-extras/dist/aframe-extras.misc';
-
 // project entry
 import './a-systems';
 import './a-shaders';
@@ -28,7 +26,6 @@ import './a-editable/editable-region';
 import './a-controls/customizable-wasd-controls';
 
 import './interactions/attraction';
-
 // Load Application
 import './a-project';
 
@@ -37,16 +34,11 @@ import $ from 'jquery';
 import 'networked-aframe';
 
 import './gameHotkeys';
-
-import debounce from 'lodash.debounce';
 import trim from 'lodash.trim';
 
 import DiffDOM from 'diff-dom';
 
-import {
-  onAFrameAttributeChange, onAttributeChange, onElementChange, onTagChanged,
-  onXYZAFrameChange
-} from './network-sync';
+import {onTagChanged} from './network-sync';
 import {attachGameLogic} from './ballGameLogic';
 import * as _ from 'lodash';
 import {addLoadingListenersToScene} from './utils/loadingBarUtils';
@@ -54,14 +46,11 @@ import ZoomUtils from './utils/ZoomUtils';
 import {querySelectorAll} from './utils/selector-utils';
 import {Layers} from './types/Layers';
 
-import {createTextSampleCanvas, renderTextToCanvas} from './gui/handwriting';
+import {createTextSampleCanvas} from './gui/handwriting';
 import {streamIn} from './utils/stream-utils';
-
-import {Logger} from './utils/Logger';
 import {createDropZone} from './import/fileupload';
-import {renderGLTFOrGlbURL, scaleEntity} from './utils/aframe-utils';
-import {addControlsToModel, renderZipFile} from './reafactor.stuff';
-import {getPlayer} from './game-utils';
+import {renderGLTFOrGlbURL, addControlsToModel, renderZipFile} from './sketchfab/sketchfab-render';
+import {getAuth} from './sketchfab/sketchfab-browser';
 
 // TODO per instance of global active inactive
 // Logger.setState(true);
@@ -334,30 +323,4 @@ function addListeners () {
         alert('unsupported file format. either use "*.glb" or a "*.zip" containing a file named "scene.gltf" as entry point');
     }
   });
-}
-
-/**
- * create an element that loads the data-url into a second instance on the same device
- * TODO make it work x-device
- * @deprecated
- */
-export
-function importOrLoadFromCache (dataURL) {
-  var tpl = `<a-entity class="imported-model"  networked="template:#imported-element-template;showLocalTemplate:true;">
-        
-        </a-entity>`;
-
-  var el = $(tpl);
-
-  var playerPos = getPlayer().object3D.getWorldPosition();
-
-  el.get(0).setAttribute('position', AFRAME.utils.coordinates.stringify(playerPos));
-
-  $('a-scene').append(el);
-
-  setTimeout(() => el.find('.content').get(0).setAttribute('networked-imported-model', 'src:' + dataURL), 10);
-
-  window.mLoadingbar.hide();
-
-  return el.get(0);
 }

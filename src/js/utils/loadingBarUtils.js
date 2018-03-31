@@ -101,7 +101,7 @@ function handleChanges (summaries) {
       `);
 
       $(el).append(errorContainer);
-
+      console.warn('Error loading Model', e);
       var textEl = $(`<a-text look-at="src:[camera]" color="#f00" width=10 align="center" position="0 0.5 0" value="Error: Loader:${e.detail.format} - ${e.detail.src}"></a-text>`);
       $(errorContainer).append(textEl);
     }

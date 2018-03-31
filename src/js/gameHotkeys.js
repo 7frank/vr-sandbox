@@ -3,7 +3,7 @@ import {
   findClosestEntity,
   getDirectionForEntity,
   getPosition,
-  playSound, renderGLTFOrGlbURL, scaleEntity,
+  playSound, scaleEntity,
   setPosition,
   toast
 } from './utils/aframe-utils';
@@ -16,9 +16,10 @@ import {createHTML, setCenter} from './utils/dom-utils';
 import {openOptionsDialog} from './gameOptionsDialog';
 import {activateJetpack, getBall, getPlayer, playerKickBall} from './game-utils';
 
-import {attachCodeEditor, loadSketchfabBrowser} from './reafactor.stuff';
+import {attachCodeEditor} from './reafactor.stuff';
 import {enterOrExitVehicle} from './car.refactor';
 import {createEditableNode} from './editing-utils';
+import {loadSketchfabBrowser, renderGLTFOrGlbURL} from './sketchfab/sketchfab-render';
 
 // import {Hotkeys} from '@nk/core-components/dist/bundle';
 

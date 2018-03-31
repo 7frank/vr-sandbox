@@ -1,3 +1,5 @@
+import {createSketchfabLoginFrame} from './sketchfab-render';
+
 function SketchfabOAuth2 (config) {
   if (!config) {
     throw new Error('SketchfabOAuth2 config is missing.');
@@ -37,8 +39,13 @@ SketchfabOAuth2.prototype.connect = function (pendingCallback) {
 
     var loginPopup = window.open(authorizeUrl, 'loginWindow', 'width=640,height=400');
 
+    // createSketchfabLoginFrame(authorizeUrl);
+
     // Polling new window
     var timer = setInterval(function () {
+      // FIXME  in case popup was blocked
+      // if (!loginPopup) { loginPopup = window.open(authorizeUrl, 'loginWindow', 'width=640,height=400'); }
+
       try {
         var url = loginPopup.location.href;
 

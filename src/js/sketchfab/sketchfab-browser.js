@@ -7,9 +7,10 @@ import {streamIn} from '../utils/stream-utils';
 import {Logger} from '../utils/Logger';
 
 /* eslint-disable */
-import  SketchfabOAuth2 from './sketchfab.oauth2-1.1.0';
-import {importOrLoadFromCache} from "../index";
-import {addControlsToModel} from "../reafactor.stuff";
+import SketchfabOAuth2 from './sketchfab.oauth2-1.1.0';
+import {importOrLoadFromCache} from "./sketchfab-import";
+import {addControlsToModel} from "./sketchfab-render";
+import {createGLTFEntityFromDataURL} from "./sketchfab-render";
 /* eslint-enable */
 
 window.zip = zip; // leave here as zip need to be global
@@ -49,7 +50,7 @@ export function loadBrowser (onImport) {
   return container;
 }
 
-export function importResult (result, onConverted, onProgress) {
+export function importResult (result, onConverted, onProgress, onErr) {
   var url = result.download.gltf.url;
   var fileSize = result.download.gltf.size;
   // result.download.gltf.expires
@@ -64,7 +65,7 @@ export function importResult (result, onConverted, onProgress) {
         .then(function (sceneFileContent) {
           var rewrittenLinksURL = rewritePathsOfSceneGLTF(sceneFileContent, fileUrls);
           onConverted(rewrittenLinksURL);
-        });
+        }).catch(onErr);
 
       // -------------------
     });
@@ -77,14 +78,14 @@ export function convertEntriesPromise (entries) {
   var promises = _.map(entries, function (entry) {
     return entry.uncompressedSize == 0 ? undefined : new Promise(function (resolve, reject) {
       /*
-              entry.getData(new zip.BlobWriter('text/plain'), function onEnd (data) {
-                var url = window.URL.createObjectURL(data);
+                    entry.getData(new zip.BlobWriter('text/plain'), function onEnd (data) {
+                      var url = window.URL.createObjectURL(data);
 
-                var res = {};
-                res[entry.filename] = {url: url, size: entry.uncompressedSize};
-                resolve(res);
-              });
-              */
+                      var res = {};
+                      res[entry.filename] = {url: url, size: entry.uncompressedSize};
+                      resolve(res);
+                    });
+                    */
 
       entry.getData(new zip.ArrayBufferWriter(), function onEnd (data) {
         data = new Blob([new Uint8Array(data)]);
@@ -134,7 +135,7 @@ export function downloadZip (url, entriesCallback, knownSize = -1, onProgress) {
  */
 
 /**
- *
+ * Remaps urls found in json of schene.gltf to dataURLS
  * @param {object} sceneFileContent - The parsed JSON object file.
  * @param {Map<string,ZipFileInfo>} fileUrls - A map containing original filenames as key
  */
@@ -168,11 +169,17 @@ export function rewritePathsOfSceneGLTF (sceneFileContent, fileUrls) {
   return updatedUrl;
 }
 
+// ------------------------------
+// ------------------------------
+// ------------------------------
+// ------------------------------
+
 /**
  * the login dialog asking for permissions
  * @param pendingCallback
  */
-function openUserLogin (pendingCallback) {
+export function openUserLogin (pendingCallback) {
+  console.log('openUserLogin');
   var config = {
     hostname: 'sketchfab.com',
     client_id: 'L3MirrReWDeKytcjKCTNX2pS4ci6hkSoNPWx8yaC',
@@ -190,37 +197,47 @@ function openUserLogin (pendingCallback) {
     });
 }
 
-var auth;
+var auth = null;// the result of the auth
+var pendingAuth = null;// a promise for th user authentication
 
 /**
  * Gets the authentication data for the current client.
  * If none is logged into sketchfab with this app, then a login dialog will ask for permissions.
- *
  * @returns {Promise}
  */
-function getAuth () {
+export function getAuth () {
+  console.log('getAuth');
   return new Promise(function (resolve, reject) {
     if (auth) resolve(auth);
     else {
-      openUserLogin(console.log).then(function (result) {
+      // have only one login dialog even for multiple auth requests
+      if (!pendingAuth) { pendingAuth = openUserLogin(console.log); }
+
+      pendingAuth.then(function (result) {
         auth = result.grant;
+        pendingAuth = null;
         resolve(auth);
-      }).catch(reject);
+      }).catch(function (e) {
+        pendingAuth = null;
+        reject(e);
+      });
     }
   });
 }
 
 /**
  * imports a model from sketchfab with initial login/auth
+ *  TODO  we need 2 ways to import
+ * (1) locally for the user that does start the import
+ * (2)there should be a widget that shows models that need to be syncronised if the user clicks the sync button or if
  *
  * @param url
  */
-
-function importModel (url) {
-  getAuth().then(function (grant) {
+export function importModel (url) {
+  return getAuth().then(function (grant) {
     console.log('grant', grant);
-
-    var url = 'https://api.sketchfab.com/v3/models/429e0904ae0d40acb650d01b6b05a797/download';
+    console.log('url', url);
+    // var url = 'https://api.sketchfab.com/v3/models/429e0904ae0d40acb650d01b6b05a797/download';
     var options = {
       method: 'GET',
       headers: {
@@ -229,26 +246,31 @@ function importModel (url) {
       mode: 'cors'
     };
 
-    fetch(url, options).then(function (response) {
+    return fetch(url, options).then(function (response) {
       return response.json();
     }).then(function (data) {
       console.log('download file info', data);
 
-      doLoadAndRenderNetworked(data, url);
+      // TODO
+      return doLoadFileToDataUrl(data, url).then(function (dataURL) {
+        // var modelEl = importOrLoadFromCache(dataURL);
+        var modelEl = createGLTFEntityFromDataURL(dataURL);
+        // addControlsToModel(modelEl);
+        return modelEl;
+      });
     });
   });
 }
 
-window.importModel = importModel;
+export function doLoadFileToDataUrl (data, url) {
+  return new Promise(function (resolve, reject) {
+    var result = {download: data, model: {name: url}};
 
-function doLoadAndRenderNetworked (data, url) {
-  var result = {download: data, model: {name: url}};
-
-  importResult(result, function (rewrittenLinksURL) {
-    var modelEl = importOrLoadFromCache(rewrittenLinksURL);
-    addControlsToModel(modelEl);
-  }, function onProgress (info) {
-    window.mLoadingbar.show();
-    window.mLoadingbar.set('importing:' + result.model.name, info.current, info.size);
+    importResult(result, function (rewrittenLinksURL) {
+      resolve(rewrittenLinksURL);
+    }, function onProgress (info) {
+      window.mLoadingbar.show();
+      window.mLoadingbar.set('importing:' + result.model.name, info.current, info.size);
+    }, reject);
   });
 }

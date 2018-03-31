@@ -1,10 +1,6 @@
 import $ from 'jquery';
-
-import {createHTML} from './dom-utils';
 import {setLayersForObject} from '../types/Layers';
 import * as _ from 'lodash';
-import {BoxHelperExt} from '../three/BoxHelperExt';
-import {getPlayer} from '../game-utils';
 
 /**
  * @deprecated this won't work with elements from different regions TODO getWorldPosition should be used in some way
@@ -356,27 +352,4 @@ export function scaleEntity (el, size) {
 
     console.log(el.object3D.position);
   }
-}
-
-export function renderGLTFOrGlbURL (rewrittenLinksURL) {
-  var tpl = `<a-entity class="imported-model"
-        scale="1 1 1"
-        animation-mixer="clip: *;"
-        gltf-model="src: url(${rewrittenLinksURL});">
-             
-        
-        </a-entity>`;
-
-  var el = $(tpl);
-  var playerPos = getPlayer().object3D.getWorldPosition();
-
-  el.get(0).setAttribute('position', AFRAME.utils.coordinates.stringify(playerPos));
-
-  $('a-scene').append(el);
-  // FIXME
-  scaleEntity(el.get(0), 1);
-
-  window.mLoadingbar.hide();
-
-  return el.get(0);
 }

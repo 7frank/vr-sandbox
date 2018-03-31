@@ -1,8 +1,8 @@
 import {updateHotComponent} from '../utils/aframe-debug-utils';
 import {createHTML} from '../utils/dom-utils';
 import {Logger} from '../utils/Logger';
-import {renderGLTFOrGlbURL} from '../utils/aframe-utils';
-import {addControlsToModel, renderZipFile} from '../reafactor.stuff';
+import {renderGLTFOrGlbURL, renderZipFile, addControlsToModel} from '../sketchfab/sketchfab-render';
+import {importModel} from '../sketchfab/sketchfab-browser';
 /**
  * A component that handles the networked distribution of locally imported models
  * - (requirement) A model gets imported and stored to local file storage or ... this storage is accessible.
@@ -45,26 +45,19 @@ AFRAME.registerComponent('networked-imported-model', {
     src: {type: 'string', default: null}
   },
   init: function () {
-    // <a-entity  networked="template:#avatar-template;showLocalTemplate:false;" spawn-in-circle="radius:3;"
-
     console.log('networked-imported-model', this, this.data);
-
-    // this.el.setAttribute('networked', 'template:#imported-element-template;showLocalTemplate:true;');
-
-    // FIXME not rendering result of domparser
-    // var txt = this.data.src ? this.data.src : 'networked-imported-model';
-    // var el = createHTML(`<a-text font="assets/fonts/DejaVu-sdf.fnt"  look-at="src:[camera]" color="#ccc" width=10 align="center" position="0 0 0" value="${txt}"></a-text>`);
-    // this.el.appendChild(el);
   },
   update: function () {
+    var that = this;
     var url = this.data.src;
     if (!url) { console.warn('src invalid'); } else {
       console.log('loading', url);
 
-      renderZipFile(url);
-
-      // var modelEl = renderGLTFOrGlbURL(url);
-      // addControlsToModel(modelEl);
+      // import model and append
+      importModel(url).then(function (modelEl) {
+        that.el.append(modelEl);
+        addControlsToModel(modelEl);
+      }).catch(e => console.error('import model', e));
     }
   }
 });
