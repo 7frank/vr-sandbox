@@ -5,6 +5,8 @@ var activeLoggerTarget;
 
 /**
  * a handler method for the proxy that caches method calls to window.console
+ *
+ * FIXME preserve line numbers
  * @type {{get: handler.get}}
  */
 
@@ -60,8 +62,8 @@ class _Logger {
         console.warn("can't override");
       }
       /* writable: false,
-                        configurable: false,
-                        enumerable: true */
+                              configurable: false,
+                              enumerable: true */
     });
 
     return proxy;
@@ -76,8 +78,8 @@ class _Logger {
      */
 
   /* setState(activateLogging=true){
-    this.bActive=  activateLogging
-    } */
+      this.bActive=  activateLogging
+      } */
 }
 
 /**
