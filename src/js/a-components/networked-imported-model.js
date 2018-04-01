@@ -3,6 +3,13 @@ import {createHTML} from '../utils/dom-utils';
 import {Logger} from '../utils/Logger';
 import {renderGLTFOrGlbURL, renderZipFile, addControlsToModel} from '../sketchfab/sketchfab-render';
 import {importModel} from '../sketchfab/sketchfab-browser';
+
+import store from 'store';
+import * as _ from 'lodash';
+import {createNetworkedGLTFEntity} from '../sketchfab/sketchfab-import';
+
+var console = Logger.getLogger('networked-imported-model');
+
 /**
  * A component that handles the networked distribution of locally imported models
  * - (requirement) A model gets imported and stored to local file storage or ... this storage is accessible.
@@ -19,16 +26,58 @@ import {importModel} from '../sketchfab/sketchfab-browser';
  *          => for simplicity we can/could use the sketchfab upload/export
  */
 
-/*
-FileStorage
-{
-    map<OriginalURL,localOrMemoryURL>:{}
+class FileStorage {
+  constructor () {
+    // map<OriginalURL,localOrMemoryURL>:{}
+    //    onImport => !lookUpLocalExists
+    //         => push to map
 
-   onImport => !lookUpLocalExists
-            => push to map
+    document.addEventListener('model-imported', this.onModelImported.bind(this));
 
+    // FIXME dont loop infinitly
+    this.loadPreviouslyImported();
+  }
+
+  getModels () {
+    return store.get('region.models') || {};
+  }
+
+  onModelImported (e) {
+    console.log('FileStorage onModelImported', e);
+
+    var el = e.detail.modelEl;
+    var str = el.getAttribute('gltf-model');
+
+    var models = this.getModels();
+
+    // store some relevant info about the imported model
+    models[str] = {
+      position: el.getAttribute('position'),
+      rotation: el.getAttribute('rotation'),
+      scale: el.getAttribute('scale')
+    };
+
+    store.set('region.models', models);
+  }
+
+  loadPreviouslyImported () {
+    console.warn('TODO loadPreviouslyImported');
+    /*
+    _.each(this.getModels(), function (data, url) {
+      var el = createNetworkedGLTFEntity(url);
+
+      el.setAttribute('position', data.position);
+      el.setAttribute('rotation', data.rotation);
+      el.setAttribute('scale', data.scale);
+    });
+    */
+  }
 }
-*/
+
+window.addEventListener('load', function () {
+  var mStorage = new FileStorage();
+  window.mStorage = mStorage;
+});
 
 /**
  * For simplicity and to circumvent the ooauth and registration for sketchfab we'll use the temporary url given by the importer.
@@ -36,8 +85,6 @@ FileStorage
  *
  *
  */
-
-var console = Logger.getLogger('networked-imported-model');
 
 updateHotComponent('networked-imported-model');
 AFRAME.registerComponent('networked-imported-model', {
@@ -50,13 +97,17 @@ AFRAME.registerComponent('networked-imported-model', {
   update: function () {
     var that = this;
     var url = this.data.src;
-    if (!url) { console.warn('src invalid'); } else {
+    if (!url) {
+      console.warn('src invalid');
+    } else {
       console.log('loading', url);
+
+      addControlsToModel(this.el);
 
       // import model and append
       importModel(url).then(function (modelEl) {
         that.el.append(modelEl);
-        addControlsToModel(modelEl);
+        //  addControlsToModel(modelEl);
       }).catch(e => console.error('import model', e));
     }
   }

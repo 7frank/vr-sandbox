@@ -138,14 +138,14 @@ export function loadSketchfabBrowser () {
     renderAtPlayer(el);
 
     /* importResult(result, function (rewrittenLinksURL) {
-      var modelEl = renderGLTFOrGlbURL(rewrittenLinksURL);
-      // var modelEl = importOrLoadFromCache(result.download.gltf.url);
-      addControlsToModel(modelEl);
-    }, function onProgress (info) {
-      window.mLoadingbar.show();
-      window.mLoadingbar.set('importing:' + result.model.name, info.current, info.size);
-    });
-      */
+          var modelEl = renderGLTFOrGlbURL(rewrittenLinksURL);
+          // var modelEl = importOrLoadFromCache(result.download.gltf.url);
+          addControlsToModel(modelEl);
+        }, function onProgress (info) {
+          window.mLoadingbar.show();
+          window.mLoadingbar.set('importing:' + result.model.name, info.current, info.size);
+        });
+          */
   });
   $(dlg).focus();
 

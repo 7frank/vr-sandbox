@@ -13,10 +13,14 @@ var TransformControls = require('three-transform-controls')(THREE);
 /**
  * Helper for the transform controls. Any entity that has this attached will spawn the controls on click.
  */
+
+// alert('Next sync objects when moving them and when creating');
 AFRAME.registerComponent('transformable', {
   init: function () {
     this.el.addEventListener('click', function () {
-      this.el.sceneEl.setAttribute('transform-controls', {target: this.el});
+      var FIXME = this.el.parentEl.parentEl;// .querySelector('.content'); //null atm
+
+      this.el.sceneEl.setAttribute('transform-controls', {target: FIXME}); // FIXME the target is the child of the networked somewhat
     }.bind(this));
   }
 });
@@ -34,9 +38,19 @@ AFRAME.registerComponent('transform-controls', {
 
   },
   init: function () {
+    var that = this;
+    function onControlChange () {
+      // console.log(that.data.target.getAttribute('position'));
+      // console.log(that.data.target.object3D.position);
+      console.log(this, arguments);
+      that.data.target.setAttribute('position', this.position);// TODO works with bugs
+      that.data.target.setAttribute('rotation', this.rotation);// FIXME doesn't work
+      that.data.target.setAttribute('scale', this.scale);// same here, not working
+    }
+
     var scene = this.el.sceneEl;
     this.mControl = new TransformControls(scene.camera, scene.renderer.domElement);
-    // this.mControl.addEventListener('change', onControlChange);
+    this.mControl.addEventListener('change', onControlChange);
     this.addEventListeners();
 
     this.el.setObject3D('control', this.mControl);

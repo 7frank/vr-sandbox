@@ -6,6 +6,8 @@ import * as _ from 'lodash';
 import {streamIn} from '../utils/stream-utils';
 import {Logger} from '../utils/Logger';
 
+import store from 'store';
+window.store = store;
 /* eslint-disable */
 import SketchfabOAuth2 from './sketchfab.oauth2-1.1.0';
 import {importOrLoadFromCache} from "./sketchfab-import";
@@ -77,16 +79,6 @@ export function convertEntriesPromise (entries) {
 
   var promises = _.map(entries, function (entry) {
     return entry.uncompressedSize == 0 ? undefined : new Promise(function (resolve, reject) {
-      /*
-                                entry.getData(new zip.BlobWriter('text/plain'), function onEnd (data) {
-                                  var url = window.URL.createObjectURL(data);
-
-                                  var res = {};
-                                  res[entry.filename] = {url: url, size: entry.uncompressedSize};
-                                  resolve(res);
-                                });
-                                */
-
       entry.getData(new zip.ArrayBufferWriter(), function onEnd (data) {
         data = new Blob([new Uint8Array(data)]);
         var url = window.URL.createObjectURL(data);
@@ -97,7 +89,6 @@ export function convertEntriesPromise (entries) {
       });
     });
   });
-  console.log('promises', promises);
   return Promise.all(promises).then(data => _.merge(...data));
 }
 
@@ -195,8 +186,12 @@ export function openUserLogin (pendingCallback) {
     });
 }
 
-var auth = null;// the result of the auth
+var auth = store.get('user.auth');// the result of the auth
 var pendingAuth = null;// a promise for th user authentication
+
+function hasAuthExpired (auth) {
+  return parseInt(auth.state) + parseInt(auth.expires_in * 1000) - new Date().getTime() < 0;
+}
 
 /**
  * Gets the authentication data for the current client.
@@ -206,9 +201,7 @@ var pendingAuth = null;// a promise for th user authentication
 
 export
 async function getAuth () {
-  console.log('getAuthAsync');
-
-  if (auth) return auth;
+  if (auth && !hasAuthExpired(auth)) return auth;
   else {
     // have only one login dialog even for multiple auth requests
     if (!pendingAuth) {
@@ -220,6 +213,8 @@ async function getAuth () {
       throw e;
     });
     auth = result.grant;
+    store.set('user.auth', auth);
+
     pendingAuth = null;
     return auth;
   }
