@@ -1,9 +1,11 @@
 export function addScript (src, load) {
-  var s = document.createElement('script');
-  s.onload = load;
-  s.setAttribute('src', src);
-  document.head.appendChild(s);
-  return s;
+  return new Promise(function (resolve, reject) {
+    var s = document.createElement('script');
+    s.onload = resolve;
+    s.onerror = reject;
+    s.setAttribute('src', src);
+    document.head.appendChild(s);
+  });
 }
 
 /**
@@ -27,8 +29,7 @@ export function template (str) {
  * @param str - The String  containing '*' wildcards.
  * @returns {RegExp}
  */
-export
-function globStringToRegex (str) {
+export function globStringToRegex (str) {
   return new RegExp(preg_quote(str).replace(/\\\*/g, '.*').replace(/\\\?/g, '.'), 'g');
 }
 

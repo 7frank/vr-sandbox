@@ -7,6 +7,7 @@ import {streamIn} from '../utils/stream-utils';
 import {Logger} from '../utils/Logger';
 
 import store from 'store';
+
 window.store = store;
 /* eslint-disable */
 import SketchfabOAuth2 from './sketchfab.oauth2-1.1.0';
@@ -15,7 +16,7 @@ import {addControlsToModel} from "./sketchfab-render";
 import {createGLTFEntityFromDataURL} from "./sketchfab-render";
 /* eslint-enable */
 
-window.zip = zip; // leave here as zip need to be global
+window.zip = zip; // leave here as zip needs to be global for zip-ext
 require('beta-dev-zip/lib/zip-ext'); // otherwise doesn't find zip
 
 var console = Logger.getLogger('sketchfab-browser');
@@ -39,7 +40,7 @@ export function loadBrowser (onImport) {
 
   document.body.append(container);
 
-  addScript('https://apps.sketchfab.com/web-importer/sketchfab-importer.js', function () {
+  addScript('https://apps.sketchfab.com/web-importer/sketchfab-importer.js').then(function () {
     var el = container;// document.querySelector('.skfb-widget');
     var skfbWidget = new SketchfabImporter(el, { // eslint-disable-line no-undef
       onModelSelected: function (result) {
@@ -52,28 +53,44 @@ export function loadBrowser (onImport) {
   return container;
 }
 
-export function importResult (result, onConverted, onProgress, onErr) {
+/**
+ *  Imports the result of the download-query - for a certain url - to the sketchfab data api.
+ *  {download: data, model: {name: url}}
+ *
+ * @param {object} result -The result from the previous query.
+ * @param {object} result.download - A data object.
+ * @param {object} result.download.gltf - A descriptor for the zip-file - containing a "scene.gltf" file and other assets - for the actual download.
+ * @param {string} result.download.gltf.url - The target URL.
+ * @param {number} result.download.gltf.size - The size in byte.
+ * @param {number} result.download.gltf.expires - The time in seconds the download link is valid.
+ * @param {object} result.model
+ * @param {string} result.model.name - The persistent unique link to identify or restart the download.
+ * @param {callback} onProgress - Can be used to listen to the download progress.
+ * @returns {Promise.<URL>} - returns an URL of the scene-gltf file as memory object
+ */
+export
+async function importResult (result, onProgress) {
   var url = result.download.gltf.url;
   var fileSize = result.download.gltf.size;
   // result.download.gltf.expires
   console.log('importResult', result);
-  downloadZip(url, function (entries) {
-    convertEntriesPromise(entries).then(function (fileUrls) {
-      // -------------------
-      fetch(fileUrls['scene.gltf'].url)
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (sceneFileContent) {
-          var rewrittenLinksURL = rewritePathsOfSceneGLTF(sceneFileContent, fileUrls);
-          onConverted(rewrittenLinksURL);
-        }).catch(onErr);
 
-      // -------------------
-    });
-  }, fileSize, onProgress);
+  var entries = await downloadZip(url, fileSize, onProgress);
+  var fileUrls = await convertEntriesPromise(entries);
+  // -------------------
+  var response = await fetch(fileUrls['scene.gltf'].url);
+  var sceneFileContent = await response.json();
+
+  var rewrittenLinksURL = rewritePathsOfSceneGLTF(sceneFileContent, fileUrls);
+  return rewrittenLinksURL;
 }
 
+/**
+ * Takes the result of  the zip reader and converts the file entries into memory URLs.
+ *
+ * @param entries - The result object.
+ * @returns {Promise.<TResult>}
+ */
 export function convertEntriesPromise (entries) {
   console.log('entries', entries);
 
@@ -92,27 +109,34 @@ export function convertEntriesPromise (entries) {
   return Promise.all(promises).then(data => _.merge(...data));
 }
 
-export function downloadZip (url, entriesCallback, knownSize = -1, onProgress) {
-  streamIn(url, onProgress, knownSize).then(response => response.blob())
-    .then(function (blob) {
-      console.log('blob', blob);
-      console.log('arguments', arguments);
-      zip.workerScriptsPath = '/lib/zip/';
-      // zip.useWebWorkers = false;
+/**
+ *
+ * Downloads the actual zip file that contains the gltf scene
+ *
+ * @param url
+ * @param knownSize
+ * @param onProgress
+ * @returns {Promise}
+ */
 
-      var reader = new zip.BlobReader(blob);
-      zip.createReader(
-        reader,
-        function (zipReader) {
-          zipReader.getEntries(function (entries) {
-            entriesCallback(entries);
-          });
-        },
-        function (error) {
-          console.error(error);
-        }
-      );
-    });
+export
+async function downloadZip (url, knownSize = -1, onProgress) {
+  var response = await streamIn(url, onProgress, knownSize);
+  var blob = await response.blob();
+
+  zip.workerScriptsPath = '/lib/zip/';
+
+  return new Promise(function (resolve, reject) {
+    var reader = new zip.BlobReader(blob);
+    zip.createReader(
+      reader,
+      function (zipReader) {
+        zipReader.getEntries(function (entries) {
+          resolve(entries);
+        });
+      }, reject
+    );
+  });
 }
 
 /**
@@ -121,7 +145,6 @@ export function downloadZip (url, entriesCallback, knownSize = -1, onProgress) {
  * @type {object}
  * @property {string} url - the data url.
  * @property {number} size - The original filesize in byte.
-
  *
  */
 
@@ -132,8 +155,9 @@ export function downloadZip (url, entriesCallback, knownSize = -1, onProgress) {
  */
 export function rewritePathsOfSceneGLTF (sceneFileContent, fileUrls) {
   // sceneFileContent is the content of scene.gltf
-// and fileUrls is a key/value object,
-// keys being filenames and values being corresponding URLs
+  // and fileUrls is a key/value object,
+  // keys being filenames and values being corresponding URLs
+
   if (!fileUrls) throw new Error('needs a dictionary as second param to rewrite urls');
 
   var json = sceneFileContent;
@@ -166,10 +190,20 @@ export function rewritePathsOfSceneGLTF (sceneFileContent, fileUrls) {
 // ------------------------------
 
 /**
- * the login dialog asking for permissions
+ *
+ * @typedef SketchfabUserAuth
+ * @type {object}
+ * @property {string} access_token - Contains the token to authenticate the user for requests.
+ * @property {string} expires_in - The Time in seconds the auth will be invalidated.
+ * @property {string} scope - The level of priviliges e.g. "read+write"
+ * @property {string} state - The login time in milliseconds
+ * @property {string} token_type -  Default is 'Bearer'.
+
  * @param pendingCallback
+ * @returns {SketchfabUserAuth}
  */
-export function openUserLogin (pendingCallback) {
+export
+async function openUserLogin (pendingCallback) {
   console.log('openUserLogin');
   var config = {
     hostname: 'sketchfab.com',
@@ -179,12 +213,13 @@ export function openUserLogin (pendingCallback) {
   };
 
   var client = new SketchfabOAuth2(config);
-
-  return client.connect(pendingCallback)
-    .then(function onSuccess (grant) {
-      return grant;
-    });
+  var auth = await client.connect(pendingCallback);
+  return auth;
 }
+
+// ---------------------------------------
+// ---------------------------------------
+// ---------------------------------------
 
 var auth = store.get('user.auth');// the result of the auth
 var pendingAuth = null;// a promise for th user authentication
@@ -228,44 +263,49 @@ async function getAuth () {
  *
  * @param url
  */
-export function importModel (url) {
-  return getAuth().then(function (grant) {
-    console.log('grant', grant);
-    console.log('url', url);
-    // var url = 'https://api.sketchfab.com/v3/models/429e0904ae0d40acb650d01b6b05a797/download';
-    var options = {
-      method: 'GET',
-      headers: {
-        Authorization: 'Bearer ' + grant.access_token
-      },
-      mode: 'cors'
-    };
 
-    return fetch(url, options).then(function (response) {
-      return response.json();
-    }).then(function (data) {
-      console.log('download file info', data);
+export
+async function importModel (url) {
+  console.log('url', url);
+  var grant = await getAuth();
+  console.log('grant', grant);
 
-      // TODO
-      return doLoadFileToDataUrl(data, url).then(function (dataURL) {
-        // var modelEl = importOrLoadFromCache(dataURL);
-        var modelEl = createGLTFEntityFromDataURL(dataURL);
-        // addControlsToModel(modelEl);
-        return modelEl;
-      });
-    });
-  });
+  // var url = 'https://api.sketchfab.com/v3/models/429e0904ae0d40acb650d01b6b05a797/download';
+  var options = {
+    method: 'GET',
+    headers: {
+      Authorization: 'Bearer ' + grant.access_token
+    },
+    mode: 'cors'
+  };
+
+  var response = await fetch(url, options);
+  var data = await response.json();
+
+  console.log('fetch result', data);
+
+  var dataURL = await doLoadFileToDataUrl(data, url);
+  // var modelEl = importOrLoadFromCache(dataURL);
+  var modelEl = createGLTFEntityFromDataURL(dataURL);
+  // addControlsToModel(modelEl);
+  return modelEl;
 }
 
-export function doLoadFileToDataUrl (data, url) {
-  return new Promise(function (resolve, reject) {
-    var result = {download: data, model: {name: url}};
+/**
+ *
+ * @param data
+ * @param url - is only there for the  moment hopefully to match the result what the sketchfab browser returns
+ * @returns {Promise}
+ */
 
-    importResult(result, function (rewrittenLinksURL) {
-      resolve(rewrittenLinksURL);
-    }, function onProgress (info) {
-      window.mLoadingbar.show();
-      window.mLoadingbar.set('importing:' + result.model.name, info.current, info.size);
-    }, reject);
+export
+async function doLoadFileToDataUrl (data, url) {
+  var result = {download: data, model: {name: url}};
+
+  var rewrittenLinksURL = await importResult(result, function onProgress (info) {
+    window.mLoadingbar.show();
+    window.mLoadingbar.set('importing:' + result.model.name, info.current, info.size);
   });
+
+  return rewrittenLinksURL;
 }

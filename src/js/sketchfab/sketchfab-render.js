@@ -105,7 +105,7 @@ export function renderZipFile (url, file = {}) {
     window.mLoadingbar.set('importing:' + file.name, info.current, info.size);
   }
 
-  downloadZip(url, function (entries) {
+  downloadZip(url, file.size, onProgress).then(function (entries) {
     convertEntriesPromise(entries).then(function (fileUrls) {
       // -------------------
       fetch(fileUrls['scene.gltf'].url)
@@ -119,7 +119,7 @@ export function renderZipFile (url, file = {}) {
 
       // -------------------
     });
-  }, file.size, onProgress);
+  });
 }
 
 /**
