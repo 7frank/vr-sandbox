@@ -124,11 +124,11 @@ export function getDirectionForEntity (entity) {
   return direction;
 
   /* var pos = o3d.position;
-              var up = o3d.up;
-              var quaternion = o3d.quaternion;
-              var direction = new THREE.Vector3().copy(up);
-              direction.applyQuaternion(quaternion);
-              return direction; */
+                var up = o3d.up;
+                var quaternion = o3d.quaternion;
+                var direction = new THREE.Vector3().copy(up);
+                direction.applyQuaternion(quaternion);
+                return direction; */
 }
 
 /**
@@ -315,7 +315,7 @@ export function getSignedAngle (v1, v2, normalVector) {
 
 export function scaleEntity (el, size) {
   /*
-  */
+    */
   var mesh = el.getObject3D('mesh');
 
   if (mesh) onMeshLoaded();
@@ -342,10 +342,10 @@ export function scaleEntity (el, size) {
 
     // set to about ground level
     /* el.object3D.translate(0, -1 * bb2.min.y,0);
-    console.log(el.object3D.position);
-    console.log(0, sphere.radius * newScale, 0);
+        console.log(el.object3D.position);
+        console.log(0, sphere.radius * newScale, 0);
 
-    */
+        */
     // ToooooOoo late... too stupid *n8* oOoOoo
     // el.object3D.translateY(sphere.radius * newScale / 2);
     el.object3D.position.y = ty * newScale * 2;

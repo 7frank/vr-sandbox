@@ -49,7 +49,10 @@ import {Layers} from './types/Layers';
 import {createTextSampleCanvas} from './gui/handwriting';
 import {streamIn} from './utils/stream-utils';
 import {createDropZone} from './import/fileupload';
-import {renderGLTFOrGlbURL, addControlsToModel, renderZipFile, renderImage} from './sketchfab/sketchfab-render';
+import {
+  renderGLTFOrGlbURL, addControlsToModel, renderZipFile, renderImage,
+  appendImageToDOM
+} from './sketchfab/sketchfab-render';
 import {getAuth} from './sketchfab/sketchfab-browser';
 
 // TODO per instance of global active inactive
@@ -156,11 +159,11 @@ function reloadSceneToDOM () {
 
     // FIXME no longer detecting loaded
     /*  copy.get(0).addEventListener('loaded', function () {
-                      console.log('scene was loaded');
-                      setTimeout(function () {
-                        copy.attr('visible', true);
-                      }, 500);
-                    }); */
+                                          console.log('scene was loaded');
+                                          setTimeout(function () {
+                                            copy.attr('visible', true);
+                                          }, 500);
+                                        }); */
 
     $('a-scene').replaceWith(copy);
 
@@ -297,6 +300,12 @@ function addListeners () {
     cam.updateProjectionMatrix();
   });
 
+  // track if shift was pressed for alternative drop behaviour below
+  var bShift = false;
+  $(document).on('keyup keydown', function (e) {
+    bShift = e.shiftKey;
+  });
+
   // TODO use std lib
   function getFileExt (file) {
     return file.name.split('.').pop();
@@ -309,7 +318,9 @@ function addListeners () {
 
     if (data.file.type.indexOf('image') == 0) format = 'image';
     else if (data.file.type.indexOf('video') == 0) format = 'video';
-    else { format = getFileExt(data.file); }
+    else {
+      format = getFileExt(data.file);
+    }
 
     var url = window.URL.createObjectURL(blob);
 
@@ -323,10 +334,21 @@ function addListeners () {
 
         break;
       case 'image':
-        var el = renderImage(url);
-        window.el = el;
 
-        addControlsToModel(el);
+        // Note: the image as texture option should be the default case, it can be assumed that materials are rather often applied directly to an element instead of stand alone plane.
+        // TODO it seems we can't drag-hover images as the event does not contain the files
+        if (!bShift) {
+          // relying on the default raycaster //TODO set cursor to rayorigin:mouse while dropping or find a better solution
+          var intersects = document.querySelector('[cursor]').components['cursor'].intersectedEl;
+          var id = appendImageToDOM(url);
+
+          console.log('intersects', intersects);
+
+          intersects.setAttribute('material', {src: '#' + id});
+        } else {
+          var el = renderImage(url);
+          addControlsToModel(el);
+        }
         break;
 
       default:

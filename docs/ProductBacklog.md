@@ -54,6 +54,8 @@
 * remove drag & drop flickering bugs
 * create video-player component from https://github.com/etiennepinchon/aframe-videoplayer
 * if file dropped is texture create 1x1 plane for it
+    * if shift? is pressed while dropping the target element under the cursor will receive the image as material
+        * library hides drop event so additionally we need to capture the evt or raytrace into the scene from the position
 * if file dropped it is mp4 use video-player component   
 
 ## misc

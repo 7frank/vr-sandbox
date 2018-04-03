@@ -47,7 +47,7 @@ function createDropZone (el, onBlobCreated) {
         var blob = new Blob([arr]);
 
         // do something with the blob!
-        onBlobCreated({file, blob});
+        onBlobCreated({file, blob, pos});
       });
       reader.addEventListener('error', function (err) {
         console.error('FileReader error' + err);
@@ -67,6 +67,7 @@ function createDropZone (el, onBlobCreated) {
       el.parentElement.append(dropHelper);
     },
     onDragOver: function () {
+      console.log(arguments);
     },
     onDragLeave: function () {
       el.parentElement.removeChild(dropHelper);

@@ -54,7 +54,7 @@ function attachGameLogic () {
 
     console.log('ball has collided with body', targetEl.tagName, targetEl.getAttribute('class'));
 
-    if (!$(targetEl).hasClass('floor')) {
+    if (!$(targetEl).hasClass('floor') && !targetEl.hasAttribute('editable-region')) {
       if (!targetEl.__origColor__) targetEl.__origColor__ = targetEl.getAttribute('color');
 
       targetEl.setAttribute('color', 'red');
