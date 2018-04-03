@@ -49,7 +49,7 @@ import {Layers} from './types/Layers';
 import {createTextSampleCanvas} from './gui/handwriting';
 import {streamIn} from './utils/stream-utils';
 import {createDropZone} from './import/fileupload';
-import {renderGLTFOrGlbURL, addControlsToModel, renderZipFile} from './sketchfab/sketchfab-render';
+import {renderGLTFOrGlbURL, addControlsToModel, renderZipFile, renderImage} from './sketchfab/sketchfab-render';
 import {getAuth} from './sketchfab/sketchfab-browser';
 
 // TODO per instance of global active inactive
@@ -156,11 +156,11 @@ function reloadSceneToDOM () {
 
     // FIXME no longer detecting loaded
     /*  copy.get(0).addEventListener('loaded', function () {
-                  console.log('scene was loaded');
-                  setTimeout(function () {
-                    copy.attr('visible', true);
-                  }, 500);
-                }); */
+                      console.log('scene was loaded');
+                      setTimeout(function () {
+                        copy.attr('visible', true);
+                      }, 500);
+                    }); */
 
     $('a-scene').replaceWith(copy);
 
@@ -305,11 +305,15 @@ function addListeners () {
   createDropZone(scene.get(0), function (data) {
     var blob = data.blob;
 
-    var ext = getFileExt(data.file);
+    var format;
+
+    if (data.file.type.indexOf('image') == 0) format = 'image';
+    else if (data.file.type.indexOf('video') == 0) format = 'video';
+    else { format = getFileExt(data.file); }
 
     var url = window.URL.createObjectURL(blob);
 
-    switch (ext) {
+    switch (format) {
       case 'glb':
         var modelEl = renderGLTFOrGlbURL(url);
         addControlsToModel(modelEl);
@@ -318,9 +322,15 @@ function addListeners () {
         var el = renderZipFile(url, data.file);// TODO render zip
 
         break;
+      case 'image':
+        var el = renderImage(url);
+        window.el = el;
+
+        addControlsToModel(el);
+        break;
 
       default:
-        alert('unsupported file format. either use "*.glb" or a "*.zip" containing a file named "scene.gltf" as entry point');
+        alert('unsupported file format. either use "*.glb" or a "*.zip" containing a file named "scene.gltf" as entry point or image or video assets');
     }
   });
 }

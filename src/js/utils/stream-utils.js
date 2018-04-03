@@ -13,7 +13,7 @@ export function streamIn (url, onProgress, knownMaxSize = -1) {
 
   var progressSize = 0;
   return fetch(url)
-    .then(fetchHandleErrors) // this is neceassary for 404 errors to bubble
+    .then(fetchHandleErrors) // this is necessary for 404 errors to bubble
     .then((response) => {
       console.log('response', response);
       const reader = response.body.getReader();
@@ -52,13 +52,11 @@ export function streamIn (url, onProgress, knownMaxSize = -1) {
 
 export function Blob2Text (blb) {
   return new Promise(function (resolve, reject) {
-    // const blb    = new Blob(["Lorem ipsum sit"], {type: "text/plain"});
-
     const reader = new FileReader();
 
     // This fires after the blob has been read/loaded.
     reader.addEventListener('loadend', (e) => {
-      const text = e.target.result;// e.srcElement.result;
+      const text = e.target.result;
       resolve(text);
     });
 

@@ -11,16 +11,16 @@ import {scaleEntity} from '../utils/aframe-utils';
  * @param el
  */
 
-export function addControlsToModel (el) {
-  var sceneEl = el.sceneEl;
+export function addControlsToModel(el) {
+    var sceneEl = el.sceneEl;
 
-  el.setAttribute('transformable', true);
+    el.setAttribute('transformable', true);
 
-  sceneEl.setAttribute('transform-controls', {target: el});
+    sceneEl.setAttribute('transform-controls', {target: el});
 
-  getPlayer().setAttribute('player-state', 'edit-model');
+    getPlayer().setAttribute('player-state', 'edit-model');
 
-  notifyModelImported(el);
+    notifyModelImported(el);
 }
 
 /**
@@ -30,11 +30,11 @@ export function addControlsToModel (el) {
  * @param target
  */
 
-function notifyModelImported (el, target = document) {
-  var event = new CustomEvent('model-imported', {detail: {modelEl: el}});
+function notifyModelImported(el, target = document) {
+    var event = new CustomEvent('model-imported', {detail: {modelEl: el}});
 
-  // Dispatch the event.
-  target.dispatchEvent(event);
+    // Dispatch the event.
+    target.dispatchEvent(event);
 }
 
 /**
@@ -44,14 +44,14 @@ function notifyModelImported (el, target = document) {
  * @returns {HTMLElement}
  */
 
-export function createGLTFEntityFromDataURL (dataURL) {
-  var tpl = `<a-entity class="imported-model"
+export function createGLTFEntityFromDataURL(dataURL) {
+    var tpl = `<a-entity class="imported-model"
         scale="1 1 1"
         animation-mixer="clip: *;"
         gltf-model="src: url(${dataURL});"> 
         </a-entity>`;
 
-  return $(tpl).get(0);
+    return $(tpl).get(0);
 }
 
 /**
@@ -60,13 +60,36 @@ export function createGLTFEntityFromDataURL (dataURL) {
  * @returns {HTMLElement}
  */
 
-export function renderGLTFOrGlbURL (rewrittenLinksURL) {
-  var el = createGLTFEntityFromDataURL(rewrittenLinksURL);
-  renderAtPlayer(el);
+export function renderGLTFOrGlbURL(rewrittenLinksURL) {
+    var el = createGLTFEntityFromDataURL(rewrittenLinksURL);
+    renderAtPlayer(el);
 
-  window.mLoadingbar.hide();
+    window.mLoadingbar.hide();
 
-  return el;
+    return el;
+}
+
+
+/**
+ *  Creates an image plane and adds it to the scene.
+ *
+ * FIXME by using domparser and createHTML the entity wont be rendered/initialized
+ *
+ * @param url
+ * @returns {HTMLElement}
+ */
+export function renderImage(url) {
+    // var el = createHTML(`<a-entity geometry="primitive: plane" material="src:url(${url})"></a-entity>`);
+    var id = 'id-' + performance.now();
+
+    var img = $(`<img id="${id}" src="${url}"></img>`);
+    $('body').append(img.hide());
+
+    var el = $(`<a-entity geometry="primitive: plane" material="src:#${id};side:double"></a-entity>`).get(0);
+
+    renderAtPlayer(el);
+
+    return el;
 }
 
 /**
@@ -78,14 +101,14 @@ export function renderGLTFOrGlbURL (rewrittenLinksURL) {
  * @param el
  */
 
-export function renderAtPlayer (el, target = $('a-scene')) {
-  var playerPos = getPlayer().object3D.getWorldPosition();
+export function renderAtPlayer(el, target = document.querySelector('a-scene')) {
+    var playerPos = getPlayer().object3D.getWorldPosition();
 
-  el.setAttribute('position', AFRAME.utils.coordinates.stringify(playerPos));
+    el.setAttribute('position', AFRAME.utils.coordinates.stringify(playerPos));
 
-  target.append(el);
-  // FIXME
-  scaleEntity(el, 1);
+    target.appendChild(el);
+    // FIXME
+    scaleEntity(el, 1);
 }
 
 /**
@@ -94,67 +117,67 @@ export function renderAtPlayer (el, target = $('a-scene')) {
  * @param {String} url - An url of a valid zip file. Should be be in memory already because it relies on secod param.
  * @param {} file - A file object containing additional information.
  */
-export function renderZipFile (url, file = {}) {
-  function onConverted (rewrittenLinksURL) {
-    var modelEl = renderGLTFOrGlbURL(rewrittenLinksURL);
-    addControlsToModel(modelEl);
-  }
+export function renderZipFile(url, file = {}) {
+    function onConverted(rewrittenLinksURL) {
+        var modelEl = renderGLTFOrGlbURL(rewrittenLinksURL);
+        addControlsToModel(modelEl);
+    }
 
-  function onProgress (info) {
-    window.mLoadingbar.show();
-    window.mLoadingbar.set('importing:' + file.name, info.current, info.size);
-  }
+    function onProgress(info) {
+        window.mLoadingbar.show();
+        window.mLoadingbar.set('importing:' + file.name, info.current, info.size);
+    }
 
-  downloadZip(url, file.size, onProgress).then(function (entries) {
-    convertEntriesPromise(entries).then(function (fileUrls) {
-      // -------------------
-      fetch(fileUrls['scene.gltf'].url)
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (sceneFileContent) {
-          var rewrittenLinksURL = rewritePathsOfSceneGLTF(sceneFileContent, fileUrls);
-          onConverted(rewrittenLinksURL);
+    downloadZip(url, file.size, onProgress).then(function (entries) {
+        convertEntriesPromise(entries).then(function (fileUrls) {
+            // -------------------
+            fetch(fileUrls['scene.gltf'].url)
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (sceneFileContent) {
+                    var rewrittenLinksURL = rewritePathsOfSceneGLTF(sceneFileContent, fileUrls);
+                    onConverted(rewrittenLinksURL);
+                });
+
+            // -------------------
         });
-
-      // -------------------
     });
-  });
 }
 
 /**
  *
  */
 
-export function loadSketchfabBrowser () {
-  var dlg = createHTML("<nk-window title='Sketchfab Browser - Import' class='card card-1' style='height:400px;width: 800px;' >");
-  var sf = loadBrowser(function onFileImportStart (result) {
-    console.log('loadSketchfabBrowser result', result);
-    //
-    // TODO little bit redundant as this will query the server again
-    var urlToZipFileInfo = result.model.uri + '/download';
-    console.log('urlToZipFileInfo', urlToZipFileInfo);
-    var el = createNetworkedGLTFEntity(urlToZipFileInfo);
-    renderAtPlayer(el);
+export function loadSketchfabBrowser() {
+    var dlg = createHTML("<nk-window title='Sketchfab Browser - Import' class='card card-1' style='height:400px;width: 800px;' >");
+    var sf = loadBrowser(function onFileImportStart(result) {
+        console.log('loadSketchfabBrowser result', result);
+        //
+        // TODO little bit redundant as this will query the server again
+        var urlToZipFileInfo = result.model.uri + '/download';
+        console.log('urlToZipFileInfo', urlToZipFileInfo);
+        var el = createNetworkedGLTFEntity(urlToZipFileInfo);
+        renderAtPlayer(el);
 
-    /* importResult(result, function (rewrittenLinksURL) {
-          var modelEl = renderGLTFOrGlbURL(rewrittenLinksURL);
-          // var modelEl = importOrLoadFromCache(result.download.gltf.url);
-          addControlsToModel(modelEl);
-        }, function onProgress (info) {
-          window.mLoadingbar.show();
-          window.mLoadingbar.set('importing:' + result.model.name, info.current, info.size);
-        });
-          */
-  });
-  $(dlg).focus();
+        /* importResult(result, function (rewrittenLinksURL) {
+                  var modelEl = renderGLTFOrGlbURL(rewrittenLinksURL);
+                  // var modelEl = importOrLoadFromCache(result.download.gltf.url);
+                  addControlsToModel(modelEl);
+                }, function onProgress (info) {
+                  window.mLoadingbar.show();
+                  window.mLoadingbar.set('importing:' + result.model.name, info.current, info.size);
+                });
+                  */
+    });
+    $(dlg).focus();
 
-  $(sf).css('height', '100%');
+    $(sf).css('height', '100%');
 
-  dlg.appendChild(sf);
-  document.body.appendChild(dlg); // TODO have show method that if no parent is set sets to d.body
+    dlg.appendChild(sf);
+    document.body.appendChild(dlg); // TODO have show method that if no parent is set sets to d.body
 
-  setCenter(dlg);
+    setCenter(dlg);
 }
 
 /**
@@ -163,12 +186,12 @@ export function loadSketchfabBrowser () {
  * @param url
  */
 
-function prepareFrame (url) {
-  var ifrm = document.createElement('iframe');
-  ifrm.setAttribute('src', url);
-  ifrm.style.width = '640px';
-  ifrm.style.height = '480px';
-  return ifrm;
+function prepareFrame(url) {
+    var ifrm = document.createElement('iframe');
+    ifrm.setAttribute('src', url);
+    ifrm.style.width = '640px';
+    ifrm.style.height = '480px';
+    return ifrm;
 }
 
 /**
@@ -177,15 +200,15 @@ function prepareFrame (url) {
  * @deprecated
  * @param url
  */
-export function createSketchfabLoginFrame (url) {
-  var dlg = createHTML("<nk-window title='Sketchfab Login ' class='card card-1' style='height:400px;width: 800px;' >");
+export function createSketchfabLoginFrame(url) {
+    var dlg = createHTML("<nk-window title='Sketchfab Login ' class='card card-1' style='height:400px;width: 800px;' >");
 
-  var ifrm = prepareFrame(url);
+    var ifrm = prepareFrame(url);
 
-  $(ifrm).css('height', '100%');
+    $(ifrm).css('height', '100%');
 
-  dlg.appendChild(ifrm);
-  document.body.appendChild(dlg); // TODO have show method that if no parent is set sets to d.body
+    dlg.appendChild(ifrm);
+    document.body.appendChild(dlg); // TODO have show method that if no parent is set sets to d.body
 
-  setCenter(dlg);
+    setCenter(dlg);
 }

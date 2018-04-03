@@ -31,7 +31,7 @@
 
 ## terrain
 * improve terrain classes 
-* add gras (@see https://github.com/spacejack/terra) non-commerical license though
+* add gras (@see https://github.com/spacejack/terra) non-commercial license though
 
 ## persistence
 * have a db that stores region/owner/contributer information with rudimentary auth and region-admin panel 
@@ -47,6 +47,14 @@
 * networked <del>translate</del> rotate scale of object
 * store region data in local-storage
 * reset store via url param in case something hangs
+* improve downloading entity
+    * have a dialog pop up with details of selection and scenegraph listing so user may change selection
+* make region look like grid (transparent texture might be enough)
+* merge 2 implementations of listviews into one vue-component  
+* remove drag & drop flickering bugs
+* create video-player component from https://github.com/etiennepinchon/aframe-videoplayer
+* if file dropped is texture create 1x1 plane for it
+* if file dropped it is mp4 use video-player component   
 
 ## misc
 * async await

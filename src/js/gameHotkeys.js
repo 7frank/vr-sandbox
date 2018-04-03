@@ -20,6 +20,7 @@ import {attachCodeEditor} from './reafactor.stuff';
 import {enterOrExitVehicle} from './car.refactor';
 import {createEditableNode} from './editing-utils';
 import {loadSketchfabBrowser, renderGLTFOrGlbURL} from './sketchfab/sketchfab-render';
+import {exportElementUnderCursor} from './export/GLTF-exporter-utils';
 
 // import {Hotkeys} from '@nk/core-components/dist/bundle';
 
@@ -151,6 +152,10 @@ function addHotkeys () {
   });
 
   Hotkeys('load sketchfab browser', 'shift+l', loadSketchfabBrowser, {
+    category: 'editing'
+  });
+
+  Hotkeys('export element you look at', 'shift+e', exportElementUnderCursor, {
     category: 'editing'
   });
 

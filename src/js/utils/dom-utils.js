@@ -2,7 +2,7 @@ import $ from 'jquery';
 
 /**
  * simple replacement for jquery("<div>") e.g.
- *
+ * FIXME not working for aframe...
  * @param domstring
  * @returns {*|Node|exports.TreeWalkerImpl.firstChild|null}
  */

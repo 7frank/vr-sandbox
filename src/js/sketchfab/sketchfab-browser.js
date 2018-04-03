@@ -123,8 +123,18 @@ export
 async function downloadZip (url, knownSize = -1, onProgress) {
   var response = await streamIn(url, onProgress, knownSize);
   var blob = await response.blob();
+  return readZip(blob);
+}
 
-  zip.workerScriptsPath = '/lib/zip/';
+/**
+ * Read the content of a blob as zip file.
+ * @param {Blob} blob - The blob that is hopefully a zip.
+ * @param {string} [workerPath] - the path where the zip worker-scripts can be found.
+ * @returns {Promise} - A Entry map of the contained files of the zip.
+ */
+export
+async function readZip (blob, workerPath = '/lib/zip/') {
+  zip.workerScriptsPath = workerPath;
 
   return new Promise(function (resolve, reject) {
     var reader = new zip.BlobReader(blob);
