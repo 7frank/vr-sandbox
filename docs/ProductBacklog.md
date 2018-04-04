@@ -19,6 +19,10 @@
     * user ctrl+c a plane 
         * does he want to copy the texture to alter it or does he want to copy the plane?
     * as an alternative we should/could have a tool bar
+* implement an undo manager right from the start
+    * bind hotkeys
+    * create some convenience functions
+    
 
 ## network
 * disable network via url param to be able to test on your own

@@ -3,6 +3,7 @@ import {setLayersForObject} from '../types/Layers';
 import * as _ from 'lodash';
 import {getPlayer} from '../game-utils';
 import {appendImageToDOM} from '../sketchfab/sketchfab-render';
+import {UndoMgr} from './undo-utils';
 
 /**
  * @deprecated this won't work with elements from different regions TODO getWorldPosition should be used in some way
@@ -375,7 +376,7 @@ export function renderImage (url) {
 }
 
 export function renderText (txt) {
-  var el = $(`<a-text look-at="src:[camera]" color="#ccc" width=50 align="center" position="0 3 0" value="'${txt}'"></a-text>`).get(0);
+  var el = $(`<a-text look-at="src:[camera]" color="#ccc" width=20 align="center" position="0 0 0" value="${txt}"></a-text>`).get(0);
 
   renderAtPlayer(el);
 
@@ -407,7 +408,9 @@ export function renderAtPlayer (el, target = document.querySelector('a-scene')) 
 
   el.setAttribute('position', AFRAME.utils.coordinates.stringify(playerPos.sub(playerDir)));
 
-  target.appendChild(el);
+  // target.appendChild(el);
+  UndoMgr.addHTMLElementToTarget(el, target);
+
   // FIXME
   scaleEntity(el, 1);
 }

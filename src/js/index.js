@@ -312,7 +312,9 @@ function addListeners () {
     retrieveImageOrTextFromClipboardAsBlob(e, function (data, type) {
       // If there's an image, display it in the canvas
 
-      if (data.type == 'image') {
+      if (!data) return;
+
+      if (type == 'image') {
         var imageBlob = data;
         var url = window.URL.createObjectURL(imageBlob);
 
@@ -330,11 +332,11 @@ function addListeners () {
           addControlsToModel(el);
         }
       } else
-      if (data.type == 'text') {
+      if (type == 'text') {
         var str = data;
-        var url = window.URL.createObjectURL(imageBlob);
 
-        var el = renderText(url);
+        var el = renderText(str);
+
         addControlsToModel(el);
       }
     });

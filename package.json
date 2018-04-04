@@ -173,6 +173,7 @@
     "three-vrcontrols": "^1.0.0",
     "three.terrain.js": "^1.5.0",
     "ts-loader": "^3.3.0",
+    "undo-manager": "^1.0.5",
     "url-loader": "^0.5.9",
     "vue": "^2.5.16",
     "webpack": "^3.11.0",

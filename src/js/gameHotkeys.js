@@ -21,6 +21,7 @@ import {enterOrExitVehicle} from './car.refactor';
 import {createEditableNode} from './editing-utils';
 import {loadSketchfabBrowser, renderGLTFOrGlbURL} from './sketchfab/sketchfab-render';
 import {exportElementUnderCursor} from './export/GLTF-exporter-utils';
+import {UndoMgr} from './utils/undo-utils';
 
 // import {Hotkeys} from '@nk/core-components/dist/bundle';
 
@@ -156,6 +157,18 @@ function addHotkeys () {
   });
 
   Hotkeys('export element you look at', 'shift+e', exportElementUnderCursor, {
+    category: 'editing'
+  });
+
+  Hotkeys('undo action', 'ctrl+z', function () {
+    UndoMgr.undo();
+  }, {
+    category: 'editing'
+  });
+
+  Hotkeys('redo action', 'ctrl+y', function () {
+    UndoMgr.redo();
+  }, {
     category: 'editing'
   });
 
