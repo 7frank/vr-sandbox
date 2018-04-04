@@ -42,7 +42,9 @@ AFRAME.registerComponent('transform-controls', {
     function onControlChange () {
       // console.log(that.data.target.getAttribute('position'));
       // console.log(that.data.target.object3D.position);
-      console.log(this, arguments);
+
+      if (!that.data.target) return; // TODO target not yet set
+
       that.data.target.setAttribute('position', this.position);// TODO works with bugs
       that.data.target.setAttribute('rotation', this.rotation);// FIXME doesn't work
       that.data.target.setAttribute('scale', this.scale);// same here, not working
@@ -60,6 +62,8 @@ AFRAME.registerComponent('transform-controls', {
   update: function () {
     if (this.data.target) {
       // TODO check out where exactly to add the controls and what settings for setSpace are correct.
+
+      console.log('transform-controls', this.data.target, this.data.target.object3D);
       this.mControl.attach(this.data.target.object3D);
       //  this.el.object3D.add(this.mControl);
 

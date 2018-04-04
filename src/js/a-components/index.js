@@ -19,3 +19,4 @@ import './transform-controls';
 import './player-state';
 import './hotkey-controls';
 import './networked-imported-model';
+import './a-simple-videoplayer/simple-video-player';

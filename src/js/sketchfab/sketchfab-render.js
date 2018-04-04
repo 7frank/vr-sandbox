@@ -3,7 +3,7 @@ import {convertEntriesPromise, downloadZip, loadBrowser, rewritePathsOfSceneGLTF
 import $ from 'jquery';
 import {getPlayer} from '../game-utils';
 import {createNetworkedGLTFEntity} from './sketchfab-import';
-import {scaleEntity} from '../utils/aframe-utils';
+import {renderAtPlayer, scaleEntity} from '../utils/aframe-utils';
 
 /**
  * Adds transformable controls (translate rotate scale) to the entity
@@ -70,24 +70,6 @@ export function renderGLTFOrGlbURL (rewrittenLinksURL) {
 }
 
 /**
- *  Creates an image plane and adds it to the scene.
- *
- * FIXME by using domparser and createHTML the entity wont be rendered/initialized
- * TODO refactor package
- * @param url
- * @returns {HTMLElement}
- */
-export function renderImage (url) {
-  // var el = createHTML(`<a-entity geometry="primitive: plane" material="src:url(${url})"></a-entity>`);
-  var id = appendImageToDOM(url);
-  var el = $(`<a-entity geometry="primitive: plane" material="src:#${id};side:double"></a-entity>`).get(0);
-
-  renderAtPlayer(el);
-
-  return el;
-}
-
-/**
  *   TODO refactor package
  *
  */
@@ -97,26 +79,7 @@ function appendImageToDOM (url) {
 
   var img = $(`<img id="${id}" src="${url}"></img>`);
   $('body').append(img.hide());
-  return id;
-}
-
-/**
- * TODO render imported elements within editable-region not scene
- *
- * @deprecated
- *
- *
- * @param el
- */
-
-export function renderAtPlayer (el, target = document.querySelector('a-scene')) {
-  var playerPos = getPlayer().object3D.getWorldPosition();
-
-  el.setAttribute('position', AFRAME.utils.coordinates.stringify(playerPos));
-
-  target.appendChild(el);
-  // FIXME
-  scaleEntity(el, 1);
+  return img.get(0);
 }
 
 /**

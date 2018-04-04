@@ -1,6 +1,8 @@
 import $ from 'jquery';
 import {setLayersForObject} from '../types/Layers';
 import * as _ from 'lodash';
+import {getPlayer} from '../game-utils';
+import {appendImageToDOM} from '../sketchfab/sketchfab-render';
 
 /**
  * @deprecated this won't work with elements from different regions TODO getWorldPosition should be used in some way
@@ -352,4 +354,60 @@ export function scaleEntity (el, size) {
 
     console.log(el.object3D.position);
   }
+}
+
+/**
+ *  Creates an image plane and adds it to the scene.
+ *
+ * FIXME by using domparser and createHTML the entity wont be rendered/initialized
+ * TODO refactor package
+ * @param url
+ * @returns {HTMLElement}
+ */
+export function renderImage (url) {
+  // var el = createHTML(`<a-entity geometry="primitive: plane" material="src:url(${url})"></a-entity>`);
+  var id = appendImageToDOM(url).id;
+  var el = $(`<a-entity geometry="primitive: plane" material="src:#${id};side:double"></a-entity>`).get(0);
+
+  renderAtPlayer(el);
+
+  return el;
+}
+
+export function renderText (txt) {
+  var el = $(`<a-text look-at="src:[camera]" color="#ccc" width=50 align="center" position="0 3 0" value="'${txt}'"></a-text>`).get(0);
+
+  renderAtPlayer(el);
+
+  return el;
+}
+
+export function renderVideo (url) {
+  // var el = createHTML(`<a-entity geometry="primitive: plane" material="src:url(${url})"></a-entity>`);
+  var id = appendImageToDOM(url).od;
+  var el = $(`<a-entity position="0 0 -10"  simple-video-player="src:${url}" ></a-entity>`).get(0);
+
+  renderAtPlayer(el);
+
+  return el;
+}
+
+/**
+ * TODO render imported elements within editable-region not scene
+ *
+ * @deprecated
+ *
+ *
+ * @param el
+ */
+
+export function renderAtPlayer (el, target = document.querySelector('a-scene')) {
+  var playerPos = getPlayer().object3D.getWorldPosition();
+  var playerDir = getPlayer().object3D.getWorldDirection().normalize().multiplyScalar(3);
+
+  el.setAttribute('position', AFRAME.utils.coordinates.stringify(playerPos.sub(playerDir)));
+
+  target.appendChild(el);
+  // FIXME
+  scaleEntity(el, 1);
 }

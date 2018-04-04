@@ -9,6 +9,7 @@ position: fixed;
     font-size: 70vh;
     text-shadow: 0px 0px 10vh #6a5acdf5;
     color: rgba(255,255,255,0.9);
+    pointer-events:none;
 `;
 
 /**
@@ -26,8 +27,7 @@ position: fixed;
  * @param {HTMLElement} el - An element that will have the drop zone functionality.
  * @param {DropZoneCallback} onBlobCreated - A callback which returns a data object containing file info and a corresponding blob.
  */
-export
-function createDropZone (el, onBlobCreated) {
+export function createDropZone (el, onBlobCreated) {
   function onFileDrop (files, pos) {
     console.log('Here are the dropped files', files, pos);
 
@@ -56,21 +56,28 @@ function createDropZone (el, onBlobCreated) {
     });
   }
 
+  function showHelper (e) {
+    if (e.dataTransfer) {
+      // TODO drop hint is not showing up.. something with font-awesome?
+      if (!dropHelper) dropHelper = createHTML(`<i class="fa fa-cloud-upload fa-4x" style="${styleTpl}" aria-hidden="true">!</i>`);
+      el.parentElement.append(dropHelper);
+    }
+  }
+
   var dropHelper;
   console.log('dropzone', el);
   dragDrop(el, {
     onDrop: onFileDrop,
-    onDragEnter: function () {
-      // TODO drop hint is not showing up.. something with font-awesome?
-
-      if (!dropHelper) dropHelper = createHTML(`<i class="fa fa-cloud-upload fa-4x" style="${styleTpl}" aria-hidden="true">!</i>`);
-      el.parentElement.append(dropHelper);
+    onDragEnter: function (e) {
+      showHelper(e);
     },
-    onDragOver: function () {
-      console.log(arguments);
+    onDragOver: function (e) {
+      showHelper(e);
     },
-    onDragLeave: function () {
-      el.parentElement.removeChild(dropHelper);
+    onDragLeave: function (e) {
+      if (e.dataTransfer) {
+        el.parentElement.removeChild(dropHelper);
+      }
     }
   });
 }

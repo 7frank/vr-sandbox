@@ -1,3 +1,9 @@
+
+export
+function getFileExt (file) {
+  return file.name.split('.').pop();
+}
+
 export function addScript (src, load) {
   return new Promise(function (resolve, reject) {
     var s = document.createElement('script');
