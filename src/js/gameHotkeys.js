@@ -22,6 +22,8 @@ import {createEditableNode} from './editing-utils';
 import {loadSketchfabBrowser, renderGLTFOrGlbURL} from './sketchfab/sketchfab-render';
 import {exportElementUnderCursor} from './export/GLTF-exporter-utils';
 import {UndoMgr} from './utils/undo-utils';
+import {streamIn} from './utils/stream-utils';
+import {connectToServer, getSomeSampleData} from './database-utils';
 
 // import {Hotkeys} from '@nk/core-components/dist/bundle';
 
@@ -188,6 +190,28 @@ function addHotkeys () {
   Hotkeys('show layers dialog', 'l', () => openOptionsDialog('layers'), {
     category: 'debug',
     description: 'The layers dialog provides the option to show or hide specific layers of objects within the scene'
+  });
+
+  // ------------------------------------
+  Hotkeys('test server connectivity', 'shift+1', function () {
+    connectToServer().then(function () {
+      toast('connected to database');
+    }).catch(function (e) {
+      console.error(e);
+      toast('no database connection');
+    });
+  }, {
+    category: 'debug'
+  });
+  // FIXME no data in json
+  Hotkeys('test load from server', 'shift+2', function () {
+    getSomeSampleData().then(function (json) {
+      console.log('json', arguments);
+    }).catch(function (e) {
+      console.error(e);
+    });
+  }, {
+    category: 'debug'
   });
 
   // ------------------------------------

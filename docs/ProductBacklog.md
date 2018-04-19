@@ -5,6 +5,10 @@
 * even better hotkeys
     * action + binding
         * intersect, mouseover, focus, document, visible
+    * dis/enable hotkeys per category 
+        * to be able to switch between modi for transform controls
+        * to disable hotkeys when mouse leaves browser region
+    
     
 ## work flow
 * drag & drop between browser windows
@@ -19,9 +23,9 @@
     * user ctrl+c a plane 
         * does he want to copy the texture to alter it or does he want to copy the plane?
     * as an alternative we should/could have a tool bar
-* implement an undo manager right from the start
-    * bind hotkeys
-    * create some convenience functions
+* <del>implement an undo manager right from the start</del>
+    * <del>bind hotkeys</del>
+    * <del>create some convenience functions</del>
     
 
 ## network
@@ -96,8 +100,8 @@
         
 # Sprint 2 (16.04. - 2.05.)
 * terrain and physics
-    * have one terrian that the user interacts with
-    * add gras
+    * have one terrain that the user interacts with
+    * add grass
     * water
     * sky
 * have basic auth and ownership for regions

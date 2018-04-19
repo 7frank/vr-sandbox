@@ -145,7 +145,7 @@ AFRAME.registerComponent('editable-region', {
     this.el.setAttribute('static-body', true);
     this.el.setAttribute('shadow', 'cast: false; receive: true');
     this.el.setAttribute('bb', true);
-    this.el.setAttribute('material', 'opacity: 0.5; transparent: true;color: white;src:#grid-colorized');
+    this.el.setAttribute('material', 'opacity: 1; transparent: true;color: white;src:#grid-colorized;repeat:10 10');
 
     //  this.el.setAttribute('physics', 'debug: true');
 
