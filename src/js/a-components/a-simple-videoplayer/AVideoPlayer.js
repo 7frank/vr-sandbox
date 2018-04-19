@@ -31,16 +31,16 @@ export var AVideoPlayer = function (target, videoEl) {
   };
 
   /* this._determinateProgressWidth = function() {
-      this.progressWidth = this.elProgressBar.getAttribute('geometry').width;
-    } */
+                this.progressWidth = this.elProgressBar.getAttribute('geometry').width;
+              } */
 
   /**
      * PROGRESS
      */
   this.setProgress = function (progress) {
     /* if (this.progressWidth == undefined) {
-          this.progressWidth == 4;
-        } */
+                              this.progressWidth == 4;
+                            } */
     var new_progress = this.progressWidth * progress;
     this._setProgressWidth(new_progress);
     var progress_coord = this._getProgressCoord();
@@ -63,8 +63,8 @@ export var AVideoPlayer = function (target, videoEl) {
   };
 
   /*
-    * UI SETTERS
-    */
+              * UI SETTERS
+              */
   this.isProgressBarVisible = function (isVisible) {
     this.elProgressTrack.setAttribute('visible', isVisible);
     this.elProgressFill.setAttribute('visible', isVisible);
@@ -75,8 +75,8 @@ export var AVideoPlayer = function (target, videoEl) {
   };
 
   /*
-    * EVENTS
-    */
+     * EVENTS
+     */
   this._addPlayerEvents = function () {
     var that = this;
     this.elVideo.pause();
@@ -89,6 +89,18 @@ export var AVideoPlayer = function (target, videoEl) {
       }
       that.setProgress(that.current_progress);
     };
+  };
+
+  this._forwardMediaEvents = function () {
+    'abort canplay canplaythrough durationchange emptied ended error interruptbegin interruptend loadeddata loadstart pause play progress ratechange seeked seeking stalled suspend timeupdate volumechange waiting'.split(' ').forEach(evtName => {
+      // console.log('player events create', evtName);
+      this.elVideo.addEventListener(evtName, function (e) {
+        // var event = new Event('build');
+        //  console.log('player events', e);
+        var eventClone = new event.constructor(event.type, event);
+        target.dispatchEvent(eventClone);
+      }, false);
+    });
   };
 
   this._addControlsEvent = function () {
@@ -134,7 +146,14 @@ export var AVideoPlayer = function (target, videoEl) {
       if (e.detail == undefined || e.detail.intersection == undefined || that.duration === 0) {
         return;
       }
-      let seekedPosition = (e.detail.intersection.point.x + (that.progressWidth / 2)) / that.progressWidth;
+
+      var point = e.detail.intersection.point;
+      var intersectedObject = e.detail.intersection.object;
+      point = intersectedObject.worldToLocal(point);
+
+      console.log(point, e.detail);
+      let seekedPosition = (point.x + (that.progressWidth / 2)) / that.progressWidth;
+      console.log(seekedPosition);
       try {
         let seekedTime = seekedPosition * that.duration;
         that.elVideo.currentTime = seekedTime;
@@ -172,6 +191,7 @@ export var AVideoPlayer = function (target, videoEl) {
     // this._determinateProgressWidth();
     this.setProgress(this.current_progress);
     this._addPlayerEvents();
+    this._forwardMediaEvents();
     this._addControlsEvent();
     this._addProgressEvent();
     this._mobileFriendly();
