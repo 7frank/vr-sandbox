@@ -103,6 +103,9 @@
     * have one terrain that the user interacts with
     * add grass
     * water
+        * http://madebyevan.com/webgl-water/
+        * https://github.com/dli/fluid
+        
     * sky
 * have basic auth and ownership for regions
     * only owner may edit environment

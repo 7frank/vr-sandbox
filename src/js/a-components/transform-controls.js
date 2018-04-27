@@ -57,7 +57,7 @@ AFRAME.registerComponent('transform-controls', {
 
     this.el.setObject3D('control', this.mControl);
 
-    this.update();
+    // this.update();
   },
   update: function () {
     if (this.data.target) {
@@ -79,7 +79,6 @@ AFRAME.registerComponent('transform-controls', {
     var control = this.mControl;
 
     /*
-      TODO should be able to dis/enable hotkeys per category to be able to switch between modi
 
       window.addEventListener('model-edit-translate',function(){})
       window.addEventListener('model-edit-rotate',function(){})

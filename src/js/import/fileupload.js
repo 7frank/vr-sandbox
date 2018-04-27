@@ -1,5 +1,8 @@
 import dragDrop from 'drag-drop';
 import {createHTML} from '../utils/dom-utils';
+import {Logger} from '../utils/Logger';
+
+var console = Logger.getLogger('fileupload');
 
 var styleTpl = `
 position: fixed;
@@ -23,7 +26,7 @@ position: fixed;
  */
 
 /**
- *
+ * TODO refactor into async/promise return file iterator
  * @param {HTMLElement} el - An element that will have the drop zone functionality.
  * @param {DropZoneCallback} onBlobCreated - A callback which returns a data object containing file info and a corresponding blob.
  */
@@ -72,6 +75,7 @@ export function createDropZone (el, onBlobCreated) {
       showHelper(e);
     },
     onDragOver: function (e) {
+      console.log('is this visible when error occures?', arguments);
       showHelper(e);
     },
     onDragLeave: function (e) {

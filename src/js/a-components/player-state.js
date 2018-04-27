@@ -7,7 +7,7 @@ AFRAME.registerComponent('player-state', {
   init: function () {
     this.mStates = new PlayerStates(this.el);
 
-    this.update();
+    // this.update();
   },
   update: function () {
     this.mStates.setState(this.data);

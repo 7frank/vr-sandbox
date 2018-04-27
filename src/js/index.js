@@ -9,6 +9,7 @@ import 'aframe-mouse-cursor-component';
 // import 'aframe-extras/dist/aframe-extras.controls';
 import 'aframe-extras/dist/aframe-extras';
 import 'aframe-environment-component/dist/aframe-environment-component.min.js';
+import 'aframe-animation-component';
 // TODO track down error to be able to test kinematic-body for player element
 // import 'aframe-extras/dist/aframe-extras.misc';
 // project entry
@@ -58,7 +59,7 @@ import {isShiftDown, onDropZoneDrop} from './utils/file-drag-drop-utils';
 import {retrieveImageOrTextFromClipboardAsBlob} from './utils/paste-utils';
 import {renderImage, renderText} from './utils/aframe-utils';
 
-// TODO per instance of global active inactive
+// TODO log per instance of global active inactive
 // Logger.setState(true);
 
 // if we really want to have a partially global object for debugging this should go into a separate file then..
