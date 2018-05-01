@@ -145,7 +145,7 @@
     "karma-webpack": "^2.0.13",
     "keen-ui": "^1.0.1",
     "lod-terrain": "0.0.1",
-    "lodash": "latest",
+    "lodash": "^4.17.10",
     "lodash.assignin": "^4.2.0",
     "lodash.debounce": "^4.0.8",
     "lodash.trim": "^4.5.1",
