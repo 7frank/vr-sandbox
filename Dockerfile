@@ -10,6 +10,9 @@ COPY . .
 RUN npm install
 RUN npm run build
 
+RUN npm prune --production
+
+
 EXPOSE 9000
 
 CMD ["npm","run","dev"]
