@@ -381,7 +381,7 @@ module.exports = {
             {from: 'assets', to: 'assets'},
             {from: '../node_modules/aframe-material-snickell/assets', to: 'assets'},
             {from: '../node_modules/beta-dev-zip/lib', to: 'lib/zip'},
-            {from: '../node_modules/@nk/core-components/dist/assets', to: 'assets'},
+            {from: '../node_modules/@nk11/core-components/dist/assets', to: 'assets'},
         ]),
 
         new Webpack.NamedModulesPlugin(),

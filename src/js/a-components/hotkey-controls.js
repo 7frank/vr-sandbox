@@ -7,7 +7,7 @@ AFRAME.registerComponent('hotkey-controls', {
   },
   init: function () {
 
-    //  var CustomComponents = require('@nk/core-components/dist/bundle');
+    //  var CustomComponents = require('@nk11/core-components/dist/bundle');
     // var  Hotkeys = CustomComponents.Hotkeys;
 
     //   Hotkeys.enableCategorys(this.data.activeCategories)
