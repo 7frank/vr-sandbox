@@ -14,6 +14,8 @@ const helper = require('../devel/utils/helpers');
 const argv = helper.parseArguments(process.argv.slice(2));
 const isDevel = process.env.NODE_ENV !== 'production' && !argv['env.production'];
 const isProduction = !isDevel;
+
+
 const isHot = argv['hot'] || false;
 const src = path.resolve(process.cwd(), 'src');
 const dist = path.resolve(process.cwd(), 'dist');
@@ -103,8 +105,8 @@ const prodPlugins = isProduction ? [
         debug: false,
         quiet: true
     }),
-
-    new Webpack.optimize.UglifyJsPlugin({
+//FIXME
+  /*  new Webpack.optimize.UglifyJsPlugin({
         compress: {
             warnings: false,
             screw_ie8: true,
@@ -121,7 +123,7 @@ const prodPlugins = isProduction ? [
             comments: false
         },
         sourceMap: true
-    }),
+    }),*/
 ] : [];
 
 
@@ -228,8 +230,8 @@ module.exports = {
     }),
 
     output: {
-        filename: path.join('js', (isProduction ? '[name].[chunkhash].js' : '[name].js')),
-        chunkFilename: isProduction ? '[name].[chunkhash].chunk.js' : '[name].chunk.js',
+        filename: path.join('js', (isProduction ? '[name].[hash].js' : '[name].js')),
+        chunkFilename: isProduction ? '[name].[hash].chunk.js' : '[name].chunk.js',
         path: dist,
         publicPath: publicPath,
         pathinfo: !isProduction,

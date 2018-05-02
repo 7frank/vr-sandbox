@@ -25,6 +25,7 @@ const host = '0.0.0.0';
 const port = process.env.PORT || argv.port || 9000;
 const app = express();
 
+
 if(isHot) {
   const webpackDevMiddleware = require('webpack-dev-middleware');
   const webpackHotMiddleware = require('webpack-hot-middleware');
@@ -51,6 +52,26 @@ if(isHot) {
 else {
   const compression = require('compression');
   app.use(compression());
+
+    //TODO evaluate how to start using static to reduce memory consumption
+    const webpackDevMiddleware = require('webpack-dev-middleware');
+    const compiler = webpack(config);
+
+    app.use(webpackDevMiddleware(compiler, {
+        noInfo: true,
+        publicPath: publicPath,
+        contentBase: config.context,
+        stats: 'errors-only',
+        hot: false,
+        inline: true,
+        lazy: false,
+        historyApiFallback: true,
+        headers: {'Access-Control-Allow-Origin': '*'},
+    }));
+
+
+
+
 }
 
 app.use(bodyParser.urlencoded({extended: true}));
@@ -66,7 +87,7 @@ app.use(publicPath,function(req, res,next) {
     var query = require('url').parse(req.headers.referer,true).query;
 
     if (query.error=="access_denied")
-    res.send('401 Unauthorized', 401);
+    res.status(401).send('401 Unauthorized');
     else next()
 
 
@@ -94,13 +115,13 @@ app.use(history({
 //have a 404 response
 app.use(function(req, res) {
 
-       res.send('404: Page not Found', 404);
+       res.status(404).send('404: Page not Found');
 
 });
 
 // Handle 500
 app.use(function(error, req, res, next) {
-    res.send('500: Internal Server Error', 500);
+    res.status(500).send('500: Internal Server Error');
 });
 
 

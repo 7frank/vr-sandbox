@@ -10,12 +10,12 @@ COPY . .
 RUN npm install
 RUN npm run build
 
-RUN npm prune --production
+#RUN npm prune --production # TODO remove dev dependencies and stuff (before: create production config)
 
 
 EXPOSE 9000
-
-CMD ["npm","run","dev"]
+#TODO compile dist instead of relying on babel-node
+CMD ["npm","run","dist"]
 
 
 # cheatsheet https://gist.github.com/bahmutov/1003fa86980dda147ff6
