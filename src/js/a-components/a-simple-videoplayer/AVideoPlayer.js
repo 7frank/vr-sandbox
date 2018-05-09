@@ -92,7 +92,8 @@ export var AVideoPlayer = function (target, videoEl) {
   };
 
   this._forwardMediaEvents = function () {
-    'abort canplay canplaythrough durationchange emptied ended error interruptbegin interruptend loadeddata loadstart pause play progress ratechange seeked seeking stalled suspend timeupdate volumechange waiting'.split(' ').forEach(evtName => {
+    // don't forward pause play
+    'abort canplay canplaythrough durationchange emptied ended error interruptbegin interruptend loadeddata loadstart progress ratechange seeked seeking stalled suspend timeupdate volumechange waiting'.split(' ').forEach(evtName => {
       // console.log('player events create', evtName);
       this.elVideo.addEventListener(evtName, function (e) {
         // var event = new Event('build');
@@ -106,20 +107,32 @@ export var AVideoPlayer = function (target, videoEl) {
   this._addControlsEvent = function () {
     var that = this;
 
-    this.elControlPlay.addEventListener('click', function () {
-      that._playAudioAlert();
+    target.addEventListener('play', function (e) {
       if (that.elVideo.paused) {
         this.setAttribute('src', '#pause');
         that.elVideo.play();
         that.paused = false;
         that.isProgressBarVisible(true);
         that.isControlVisible(true);
-      } else {
+      }
+    });
+
+    target.addEventListener('pause', function (e) {
+      if (!that.elVideo.paused) {
         this.setAttribute('src', '#play');
         that.elVideo.pause();
         that.paused = true;
         that.isProgressBarVisible(false);
         that.isControlVisible(false);
+      }
+    });
+
+    this.elControlPlay.addEventListener('click', function () {
+      that._playAudioAlert();
+      if (that.elVideo.paused) {
+        target.dispatchEvent(new Event('play'));
+      } else {
+        target.dispatchEvent(new Event('pause'));
       }
     });
 

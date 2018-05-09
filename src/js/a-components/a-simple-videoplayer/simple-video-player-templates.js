@@ -54,7 +54,7 @@ var playerAndControlsTemplate = `
       <a-video id="video-screen" width="8" height="4.5"></a-video>
       <!-- END MEDIAS HOLDER -->
 
-    <a-entity id="controls">
+    <a-entity id="controls" position="0 0.5 0">
       <!-- CONTROLS -->
       <a-image id="control-back" width="0.4" height="0.4" src="#seek-back" position="-0.8 0.6 0" visible="false" scale="0.85 0.85 0.85"></a-image>
       <a-image id="control-play" width="0.4" height="0.4" src="#play" position="0 0.6 0"></a-image>

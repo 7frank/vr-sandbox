@@ -414,3 +414,15 @@ export function renderAtPlayer (el, target = document.querySelector('a-scene')) 
   // FIXME
   scaleEntity(el, 1);
 }
+
+/**
+ * returns vector relative to player
+ * @param theEl
+ */
+export function getVectorRelativeToPlayer (theEl) {
+  var a = theEl.object3D.getWorldPosition();
+
+  var b = theEl.sceneEl.camera.el.object3D.getWorldPosition();
+
+  return b.sub(a);
+}

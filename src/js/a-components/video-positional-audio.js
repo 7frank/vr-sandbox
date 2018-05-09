@@ -2,6 +2,7 @@ import {getVectorRelativeToPlayer} from '../utils/aframe-utils';
 import {FPSCtrl} from '../utils/fps-utils';
 
 /**
+ * A helper that tracks the distance between camera and video player and reduces the volume based on the distance.s
  * TODO better damping function also calculate a min-distance from where the maximum volume is used based on plane height/width.
  */
 AFRAME.registerComponent('video-positional-audio', {
