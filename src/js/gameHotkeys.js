@@ -48,7 +48,16 @@ window.addEventListener('load', function () {
 });
 
 /**
- * the hotkeys might need some option (or additional flag handler) for 3d mode
+ * TODO the hotkeys might need some option (or additional flag handler) for 3d mode
+ * Hotkeys.setState("main-menu")
+ * Hotkeys.unsetState("main-menu")
+ *
+ * Hotkeys.pushState("main-menu")
+ * main-menu ... close (default esc) Hotkeys.popState()
+ *
+ *
+ *
+ *
  *  onKeyComboTriggered() => distance(camera,menu3d|selector)<value => useKeyCombo()
  * TODO normally an event would be bound to the selector directly which would not be the case in 3d (or would it?)
  * TODO disable hotkeys when textarea is focused
@@ -68,6 +77,15 @@ function addHotkeys () {
       worldMap.removeAttribute('world-map');
     } else worldMap.setAttribute('world-map', true);
   }, {
+    category: 'HUD'
+  });
+
+  // FIXME menu is working suboptimally
+  var mRingMenu = $(`<a-entity ring-menu position="0 0 0"></a-entity>`);
+  Hotkeys('toggle ring menu', 'shift+3', function (...args) {
+    var player = getPlayer();
+    $(player).append(mRingMenu).toggle();
+  }, function () {}, {
     category: 'HUD'
   });
 
@@ -92,6 +110,8 @@ function addHotkeys () {
   }, {category: 'player', description: 'Rotates the player.'});
 
   // TODO this should be more like a "interact with object" button where the object determines what will happen
+  // TODO bind this directly to the vehicle and only have one global handler that notifies the user if nothing was selected
+  // action name player-interact
   Hotkeys('enter-vehicle', 'r', enterOrExitVehicle, {
     category: 'car',
     description: 'Lets player enter the vehicle and switches from player camera to car camera.'

@@ -106,6 +106,8 @@ AFRAME.registerComponent('ring-menu', {
       var subMenu = $("<a-entity ring-menu='isRoot:false'   position='0 1 0'></a-entity>");
       subMenu.get(0).setAttribute('ring-menu', {menu: subMenuData});
 
+      // el or menuEl
+
       $(this.el).append(subMenu);
       this.el.setAttribute('animation__moveOneLayer', `property: position;  to: 0 -1 0; dur: 300; easing: easeInOutCubic;`);
     });
@@ -128,6 +130,10 @@ AFRAME.registerComponent('ring-menu', {
 
       // this.data.isActive = false;
     });
+  },
+  remove () {
+    console.log('remove', this.menuEl);
+    this.el.removeChild(this.menuEl);
   },
 
   update: function () {

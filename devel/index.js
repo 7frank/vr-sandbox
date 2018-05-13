@@ -53,7 +53,8 @@ else {
   const compression = require('compression');
   app.use(compression());
 
-    //TODO evaluate how to start using static to reduce memory consumption
+
+  //TODO evaluate how to start using static to reduce memory consumption
     const webpackDevMiddleware = require('webpack-dev-middleware');
     const compiler = webpack(config);
 
