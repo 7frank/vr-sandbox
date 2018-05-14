@@ -63,175 +63,253 @@ window.addEventListener('load', function () {
  * TODO disable hotkeys when textarea is focused
  */
 function addHotkeys () {
-  Hotkeys('show help', 'o', function () {
+  var ACTIONS = {
+    undo: 'undo',
+    redo: 'redo'
+  };
+
+  Hotkeys.register('show help', 'o');
+  Hotkeys().on('show help', function () {
     openOptionsDialog('general');
   });
 
-  Hotkeys('change controls', 'c', function () {
+  Hotkeys.register('change controls', 'c');
+  Hotkeys().on('change controls', function () {
     openOptionsDialog('controls');
   });
 
-  Hotkeys('toggle world map', 'Tab', function () {
+  Hotkeys.register('toggle world map', 'Tab', {
+    category: 'HUD'
+  });
+
+  Hotkeys().on('toggle world map', function () {
     var worldMap = $('.the-world-map:first').get(0);
     if (worldMap.hasAttribute('world-map')) {
       worldMap.removeAttribute('world-map');
     } else worldMap.setAttribute('world-map', true);
-  }, {
-    category: 'HUD'
   });
 
   // FIXME menu is working suboptimally
   var mRingMenu = $(`<a-entity ring-menu position="0 0 0"></a-entity>`);
-  Hotkeys('toggle ring menu', 'shift+3', function (...args) {
-    var player = getPlayer();
-    $(player).append(mRingMenu).toggle();
-  }, function () {}, {
+
+  Hotkeys.register('toggle ring menu', 'shift+3', {
     category: 'HUD'
+  });
+  Hotkeys().on('toggle ring menu', function (...args) {
+    var player = getPlayer();
+    $(player).append(mRingMenu);
+
+    $(mRingMenu).toggle();
+  }, function () {
+    $(mRingMenu).toggle();
   });
 
   // ----------------------------------------------
-  Hotkeys('player-move-forward', ['w', 'touch'], () => {
+  // FIXME controls are overloaded and will work despite these wasd controls below not being active
+  Hotkeys.register('player-move-forward', ['w', 'touch'], {
+    category: 'player',
+    description: 'Moves the player in the forward direction.',
+    stopPropagation: false
+  });
+  Hotkeys.register('player-move-backward', ['s'], {
+    category: 'player',
+    description: 'Moves the player in the backward direction.',
+    stopPropagation: false
+  });
+  Hotkeys.register('player-strafe-left', ['a'], {
+    category: 'player',
+    description: 'Moves the player  sideways.',
+    stopPropagation: false
+  });
+
+  Hotkeys.register('player-strafe-right', ['d'], {
+    category: 'player',
+    description: 'Moves the player  sideways.',
+    stopPropagation: false
+  });
+
+  Hotkeys.register('player-rotate-left', ['q'], {
+    category: 'player',
+    description: 'Rotates the player.',
+    stopPropagation: false
+  });
+  Hotkeys.register('player-rotate-right', ['e'], {
+    category: 'player',
+    description: 'Rotates the player.',
+    stopPropagation: false
+  });
+
+  Hotkeys().on('player-move-forward', () => {
   }, () => {
-  }, {category: 'player', description: 'Moves the player in the forward direction.'});
-  Hotkeys('player-move-backward', 's', () => {
+  });
+  Hotkeys().on('player-move-backward', () => {
   }, () => {
-  }, {category: 'player', description: 'Moves the player in the backward direction.'});
-  Hotkeys('player-strafe-left', 'a', () => {
+  });
+  Hotkeys().on('player-strafe-left', () => {
   }, () => {
-  }, {category: 'player', description: 'Moves the player  sideways.'});
-  Hotkeys('player-strafe-right', 'd', () => {
+  });
+  Hotkeys().on('player-strafe-right', () => {
   }, () => {
-  }, {category: 'player', description: 'Moves the player  sideways.'});
-  Hotkeys('player-rotate-left', 'q', () => {
+  });
+
+  Hotkeys().on('player-rotate-left', () => {
   }, () => {
-  }, {category: 'player', description: 'Rotates the player.'});
-  Hotkeys('player-rotate-right', 'e', () => {
+  });
+  Hotkeys().on('player-rotate-right', () => {
   }, () => {
-  }, {category: 'player', description: 'Rotates the player.'});
+  });
 
   // TODO this should be more like a "interact with object" button where the object determines what will happen
   // TODO bind this directly to the vehicle and only have one global handler that notifies the user if nothing was selected
   // action name player-interact
-  Hotkeys('enter-vehicle', 'r', enterOrExitVehicle, {
+  Hotkeys.register('enter-vehicle', 'r', {
     category: 'car',
     description: 'Lets player enter the vehicle and switches from player camera to car camera.'
   });
 
+  Hotkeys().on('enter-vehicle', enterOrExitVehicle);
+
   /**
      * @deprecated not the whole scene should be edited but only smaller parts of it (actors and regions within the world)
      */
-  Hotkeys('toggle overlay editor', '#', function () {
+  Hotkeys.register('toggle overlay editor', '#', {description: 'Opens an overlay editor where the current scene can be edited in.'});
+  Hotkeys().on('toggle overlay editor', function () {
     $('.overlay-editor').toggle();
-  }, {description: 'Opens an overlay editor where the current scene can be edited in.'});
+  });
 
-  Hotkeys('kick ball', 'c', playerKickBall, {
+  Hotkeys.register('kick ball', 'c', {
     category: 'game play',
     description: 'Will kick the ball a small bit when the player is close enough.'
   });
+  Hotkeys().on('kick ball', playerKickBall);
 
-  Hotkeys('activate jetpack', 'space', activateJetpack, {
+  Hotkeys.register('activate jetpack', 'space', {
     category: 'game play',
     description: 'will elevate the player by a small margin'
   });
+  Hotkeys().on('activate jetpack', activateJetpack);
 
   // scene editing
 
-  Hotkeys('create editable node', 'b', () => createEditableNode(hotkeyDialog), {
+  Hotkeys.register('create editable node', 'b', {
     category: 'editing',
     description: 'generates an editable node at player position/target '
   });
 
-  Hotkeys('start editing nearest  node', 'n', startEditingTextarea, {
+  Hotkeys().on('create editable node', () => createEditableNode(hotkeyDialog));
+
+  Hotkeys.register('start editing nearest  node', 'n', {
     category: 'editing',
     description: 'selects an editable node and opens a textarea to edit the content. Leave with the mousecursor to disable the textarea or enter again to resume editing.'
   });
 
+  Hotkeys().on('start editing nearest  node', startEditingTextarea);
+
   // TODO "live bind" this via "esc or ctrl+s or similar" to aframe-textarea-component > textarea and disable mouetrap while editing
   // Hotkeys('stop editing ', 'm', stopEditingTextarea, {category: 'editing', description: 're-enables navigation of scene'});
 
-  Hotkeys('increase size of textarea', '+', function () {
+  Hotkeys.register('increase size of textarea', '+', {
+    category: 'editing'
+  });
+  Hotkeys().on('increase size of textarea', function () {
     var textarea = getTextEditorInstance().get(0);
     var oldScale = textarea.getAttribute('scale');
     textarea.setAttribute('scale', '' + oldScale.x * 1.2 + ' ' + oldScale.y * 1.2 + ' ' + 1);
-  }, {
+  });
+
+  Hotkeys.register('increase size of textarea', '+', {
     category: 'editing'
   });
 
-  Hotkeys('increase size of textarea', '+', function () {
+  Hotkeys().on('increase size of textarea', function () {
     var textarea = getTextEditorInstance().get(0);
     var oldScale = textarea.getAttribute('scale');
     textarea.setAttribute('scale', '' + oldScale.x * 0.8 + ' ' + oldScale.y * 0.8 + ' ' + 1);
-  }, {
+  });
+
+  // FIXME not working ..
+  Hotkeys.register('teleport to next region', 'shift+t', {
     category: 'editing'
   });
-  // FIXME not working ..
-  Hotkeys('teleport to next region', 'shift+t', function () {
+
+  Hotkeys().on('teleport to next region', function () {
     var el = $('[editable-region]')[2];
     var targetLocation = el.object3D.position;
     targetLocation.y += 20;
     setPosition(getPlayer(), targetLocation.x + ' ' + targetLocation.y + ' ' + targetLocation.z);
-  }, {
+  });
+
+  Hotkeys.register('load sketchfab browser', 'shift+l', {
     category: 'editing'
   });
 
-  Hotkeys('load sketchfab browser', 'shift+l', loadSketchfabBrowser, {
+  Hotkeys().on('load sketchfab browser', loadSketchfabBrowser);
+
+  Hotkeys.register('export element you look at', 'shift+e', {
     category: 'editing'
   });
+  Hotkeys().on('export element you look at', exportElementUnderCursor);
 
-  Hotkeys('export element you look at', 'shift+e', exportElementUnderCursor, {
+  Hotkeys.register(ACTIONS.undo, 'ctrl+z', {
     category: 'editing'
   });
-
-  Hotkeys('undo action', 'ctrl+z', function () {
+  Hotkeys().on(ACTIONS.undo, function () {
     UndoMgr.undo();
-  }, {
-    category: 'editing'
   });
 
-  Hotkeys('redo action', 'ctrl+y', function () {
-    UndoMgr.redo();
-  }, {
+  Hotkeys.register(ACTIONS.redo, 'ctrl+y', {
     category: 'editing'
+  });
+  Hotkeys().on(ACTIONS.redo, function () {
+    UndoMgr.redo();
   });
 
   // debugging
 
-  Hotkeys('show region performance', 'i', function () {
-    document.querySelectorAll('[editable-region]').forEach(r => console.log(r.showPerfInfo()));
-  }, {
+  Hotkeys.register('show region performance', 'i', {
     category: 'debug'
   });
+  Hotkeys().on('show region performance', function () {
+    document.querySelectorAll('[editable-region]').forEach(r => console.log(r.showPerfInfo()));
+  });
 
-  Hotkeys('show scripts performance', 'p', () => openOptionsDialog('performance'), {
+  Hotkeys.register('show scripts performance', 'p', {
     category: 'debug',
     description: ''
   });
+  Hotkeys().on('show scripts performance', () => openOptionsDialog('performance'));
 
-  Hotkeys('show layers dialog', 'l', () => openOptionsDialog('layers'), {
+  Hotkeys.register('show layers dialog', 'l', {
     category: 'debug',
     description: 'The layers dialog provides the option to show or hide specific layers of objects within the scene'
   });
+  Hotkeys().on('show layers dialog', () => openOptionsDialog('layers'));
 
   // ------------------------------------
-  Hotkeys('test server connectivity', 'shift+1', function () {
+  Hotkeys.register('test server connectivity', 'shift+1', {
+    category: 'debug'
+  });
+
+  Hotkeys().on('test server connectivity', function () {
     connectToServer().then(function () {
       toast('connected to database');
     }).catch(function (e) {
       console.error(e);
       toast('no database connection');
     });
-  }, {
+  });
+
+  // FIXME no data in json
+  Hotkeys.register('test load from server', 'shift+2', {
     category: 'debug'
   });
-  // FIXME no data in json
-  Hotkeys('test load from server', 'shift+2', function () {
+
+  Hotkeys().on('test load from server', function () {
     getSomeSampleData().then(function (json) {
       console.log('json', arguments);
     }).catch(function (e) {
       console.error(e);
     });
-  }, {
-    category: 'debug'
   });
 
   // ------------------------------------
