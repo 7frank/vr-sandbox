@@ -1,6 +1,6 @@
 'use strict';
 // Dependencies we load from vendor.js
-
+import './prototypes';
 import 'aframe';
 
 import 'three-vrcontrols'; // currently missing from (aframe 0.8.1) for aframe-extras(3.1.3)
