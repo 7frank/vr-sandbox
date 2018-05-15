@@ -2,16 +2,24 @@ import $ from 'jquery';
 
 /**
  * simple replacement for jquery("<div>") e.g.
- * FIXME not working for aframe...
+ * TODO only jquery does create the entity as expected. every other implementation doesnt initialise the components
  * @param domstring
  * @returns {*|Node|exports.TreeWalkerImpl.firstChild|null}
  */
+
+export
+function createHTML (html) {
+  return $(html).get(0);
+}
+/*
 export
 const createHTML = (domstring) => {
   if (domstring == null) throw new Error('needs param');
   let html = new DOMParser().parseFromString(domstring, 'text/html');
   return html.body.firstChild;
 };
+*/
+
 // Access-Control-Expose-Headers:Content-Length, X-My-Custom-Header, X-Another-Custom-Header
 // TODO refactor into nk-window class and wait for appendCallback
 export
