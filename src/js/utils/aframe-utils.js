@@ -194,7 +194,6 @@ export function toast (msg, action) {
     actionParam = `action="${action}"`;
   }
   var t = `<a-entity class="toast-wrapper"><a-toast message="${msg}" ${actionParam}></a-toast></a-entity>`;
-  console.log(t);
   el.insertAdjacentHTML('beforeend', t);
 
   var wrappers = [...el.querySelectorAll('.toast-wrapper')];

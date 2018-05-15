@@ -31,11 +31,9 @@ function attachGameLogic () {
     var targetEl = e.detail.body.el;
 
     if ($(targetEl).hasClass('goal')) {
-      console.log('GOAL!!!!');
-
-      // $('.sound-cheer').get(0).components.sound.playSound();
-
+      toast('GOAL!!!!');
       playSound('.sound-cheer', 3000);
+
       $('.goal-info-text').fadeIn(300).fadeOut(300).fadeIn(300).fadeOut(300);
       setPosition($('.ball').get(0), '0 15 0');
       // FIXME not working for .player
@@ -75,6 +73,8 @@ function attachGameLogic () {
   });
 
   $('.ball').on('interaction-pick', function (e) {
+    // FIXME not calling stopPropagation will result in n+1 handlers being called everytime the action is triggered
+    e.stopPropagation();
     toast('TODO add [pickable] to ball');
   });
 

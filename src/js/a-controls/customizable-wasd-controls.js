@@ -237,6 +237,8 @@ module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls'
           return;
         }
 
+        // console.log('keyHandler', [that.keys, that.el, event]);
+
         if (KEYS.indexOf(code) !== -1) {
           if (event.detail.first) {
             that.keys[code] = true;
