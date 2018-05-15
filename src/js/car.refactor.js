@@ -1,4 +1,3 @@
-// ---------------------------------------------------
 import CarCameraControls from './a-car/car/CarCameraControls';
 import {findClosestEntity, getPosition, playSound, setPosition, toast} from './utils/aframe-utils';
 import {getPlayer} from './game-utils';
@@ -36,7 +35,7 @@ var drivingVehicle = false;
 var whichVehicle = null;
 
 export
-function enterOrExitVehicle () {
+function enterOrExitVehicle (event) {
   var player = getPlayer();
   if (!drivingVehicle) {
     var target = findClosestEntity('a-simple-car', getPlayer(), 5);
@@ -45,6 +44,9 @@ function enterOrExitVehicle () {
       toast('Get closer to a vehicle to enter it.', 'Got it.');
       // console.warn('no vehicle close enough ', 'a-simple-car');
       playSound('.command-error');
+
+      event.stopPropagation();
+
       return;
     }
     whichVehicle = target;
