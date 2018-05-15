@@ -74,6 +74,7 @@ export default class Car {
 
       this._car.enableShadows(true);
 
+      this._opts.el.emit('model-loaded', {format: 'obj', model: this.model});
       // this.trigger('load');
     }.bind(this);
 

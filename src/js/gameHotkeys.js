@@ -104,6 +104,13 @@ function addHotkeys () {
     $(mRingMenu).toggle();
   });
 
+  /* alert("we can 'R' but not move");
+
+  $('a-scene').setAttribute('cursor-focus', true);
+  sphere = document.activeElement;
+  sphere.addEventListener('keyup', (...args) => console.log('key', args, args[0].which));
+  */
+
   // ----------------------------------------------
   // FIXME controls are overloaded and will work despite these wasd controls below not being active
   Hotkeys.register('player-move-forward', ['w', 'touch'], {
@@ -118,25 +125,21 @@ function addHotkeys () {
   });
   Hotkeys.register('player-strafe-left', ['a'], {
     category: 'player',
-    description: 'Moves the player  sideways.',
-    stopPropagation: false
+    description: 'Moves the player  sideways.'
   });
 
   Hotkeys.register('player-strafe-right', ['d'], {
     category: 'player',
-    description: 'Moves the player  sideways.',
-    stopPropagation: false
+    description: 'Moves the player  sideways.'
   });
 
   Hotkeys.register('player-rotate-left', ['q'], {
     category: 'player',
-    description: 'Rotates the player.',
-    stopPropagation: false
+    description: 'Rotates the player.'
   });
   Hotkeys.register('player-rotate-right', ['e'], {
     category: 'player',
-    description: 'Rotates the player.',
-    stopPropagation: false
+    description: 'Rotates the player.'
   });
 
   Hotkeys().on('player-move-forward', () => {
@@ -162,12 +165,19 @@ function addHotkeys () {
   // TODO this should be more like a "interact with object" button where the object determines what will happen
   // TODO bind this directly to the vehicle and only have one global handler that notifies the user if nothing was selected
   // action name player-interact
-  Hotkeys.register('enter-vehicle', 'r', {
-    category: 'car',
+  Hotkeys.register('interaction-pick', 'r', {
+    category: 'interaction',
+    description: 'Will try to interact with the entity in front of the player. '
+  });
+
+  Hotkeys().on('interaction-pick', () => { toast('nothing to pick up'); }); // enterOrExitVehicle);
+
+  Hotkeys.register('interaction-talk', 't', {
+    category: 'interaction',
     description: 'Lets player enter the vehicle and switches from player camera to car camera.'
   });
 
-  Hotkeys().on('enter-vehicle', enterOrExitVehicle);
+  Hotkeys().on('interaction-talk', () => {});
 
   /**
      * @deprecated not the whole scene should be edited but only smaller parts of it (actors and regions within the world)

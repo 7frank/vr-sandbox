@@ -1,7 +1,8 @@
 
 import $ from 'jquery';
-import {playSound, setPosition} from './utils/aframe-utils';
+import {playSound, setPosition, toast} from './utils/aframe-utils';
 import CANNON from 'cannon';
+import {getBall} from './game-utils';
 
 // TODO make it work with dynamic loadable regions
 
@@ -15,7 +16,7 @@ function attachGameLogic () {
     if ($(targetEl).hasClass('ball')) {
       //  targetEl.body.applyImpulse(
       //  e.detail.contact.ni.negate().scale(5),  //impulse
-      new CANNON.Vec3().copy(targetEl.getComputedAttribute('position'));//   world position
+      new CANNON.Vec3().copy(targetEl.object3D.position);//   world position
       //   );
     }
   });
@@ -38,7 +39,7 @@ function attachGameLogic () {
       $('.goal-info-text').fadeIn(300).fadeOut(300).fadeIn(300).fadeOut(300);
       setPosition($('.ball').get(0), '0 15 0');
       // FIXME not working for .player
-      // TODO also nmight not alsways be working if player is following vehicle
+      // TODO also might not always be working if player is following vehicle
       // setPosition($('.player').get(0), '-5 1 0');
       $('.player').attr('position', '0 1 0');
     }
@@ -72,6 +73,12 @@ function attachGameLogic () {
     //  e.detail.contact; // Stats about the collision (CANNON.ContactEquation).
     //  e.detail.contact.ni; // Normal (direction) of the collision (CANNON.Vec3).
   });
+
+  $('.ball').on('interaction-pick', function (e) {
+    toast('TODO add [pickable] to ball');
+  });
+
+  // Hotkeys(getBall()).on('interaction-pick', () => { alert('TODO pickable'); }); // enterOrExitVehicle);
 
   // wait for some mseconds after the last collision to revert to the original color
   /*  playerEl.addEventListener('collide', debounce(function (e) {

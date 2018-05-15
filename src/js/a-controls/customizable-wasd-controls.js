@@ -1,3 +1,5 @@
+import {shouldCaptureKeyEvent} from '../utils/dom-utils';
+
 var KEYCODE_TO_CODE = {
   '38': 'ArrowUp',
   '37': 'ArrowLeft',
@@ -12,7 +14,6 @@ var KEYCODE_TO_CODE = {
 var utils = AFRAME.utils;
 
 var bind = utils.bind;
-var shouldCaptureKeyEvent = utils.shouldCaptureKeyEvent;
 
 var CLAMP_VELOCITY = 0.00001;
 var MAX_DELTA = 0.2;
@@ -231,7 +232,8 @@ module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls'
          */
     function keyHandler (code, bVal) {
       return function (event) {
-        if (!shouldCaptureKeyEvent(event)) {
+      // TODO check if event target is child* of a-scene
+        if (!shouldCaptureKeyEvent(that.el, event)) {
           return;
         }
 

@@ -38,3 +38,19 @@ export function appendStyle (css) {
 
   head.appendChild(style);
 }
+
+/**
+ * An alternative version of AFRAME.utils.shouldCaptureKeyEvent which ckecks if an element is contained within the scene element.
+ * This check works better when using hotkeys and the keyboard input library.
+ *
+ * @param {HTMLElement} el
+ * @param {Event} event
+ * @returns {boolean}
+ */
+
+export function shouldCaptureKeyEvent (el, event) {
+  // FIXME fix keyboardinput library currentTarget
+  if (event.currentTarget == window) return true;
+
+  return el.sceneEl.contains(event.currentTarget);
+}
