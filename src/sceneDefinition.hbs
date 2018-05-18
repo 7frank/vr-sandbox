@@ -13,14 +13,18 @@
     </a-assets>
 
 
-    <!-- a first 3d form integration test-->
-
-    {{> form1}}
     {{> player1}}
 
+    <!-- a first 3d form integration test-->
+    <a-entity  position="2 .5 4"  rotation="0 180 0">
+    {{> form1}}
+    </a-entity>
 
 
-    <a-entity gui-list-view position="0 5 4" scale="1 1 1" rotation="0 180 0"></a-entity>
+    <a-entity gui-model-preview position="-2 5 4" scale="1 1 1" rotation="0 180 0"></a-entity>
+
+
+
 
 
     <!-- TODO keep distance to player -->

@@ -1,4 +1,28 @@
 
+# mai 14.-16.
+## todo
+* [x]fix raycaster for simple-car to be able to interact
+    * had to add model(setObject3D) after it was fully loaded(emitted model-loaded)
+* [x] fix mem leak when picking ball
+    * not calling stopPropagation will result in n+1 handlers being called everytime the action is triggered
+* fix rebind not working in hk library
+* fix controls, in they general will not be as stable with the 1.0.2 hotkey implementation
+    * occures if waiting for some time and maybe leaving window
+    * maybe the same problem with stopPropagation 
+    * moving sometimes get stuck resulting in autowalk(focus change maybe?)
+        * stops of window blur so "custom-wasd-controls" 
+* fix HOTKEYS keyup should be handled differently because it is not always true that the action was sent from a key event
+* [/] have a region with a helmet/car
+    * create some controls
+        * a menu with some specific sub-nodes
+            * [x] color control
+            * material control
+            * mesh control to replace with a primitive for simplicity
+        * use "createTemplateListView" to create a more versatile/stable listview
+
+
+
+
 # backlog
 ## GUI
 * have more complex 3d components for listviews, tables 
@@ -6,7 +30,7 @@
     * action + binding
         * intersect, mouseover, focus, document, visible
     * dis/enable hotkeys per category 
-        * to be able to switch between modi for transform controls
+        * to be able to switch between modes for transform controls
         * to disable hotkeys when mouse leaves browser region
     
     

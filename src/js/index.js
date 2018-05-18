@@ -58,12 +58,15 @@ import {getAuth} from './sketchfab/sketchfab-browser';
 import {isShiftDown, onDropZoneDrop} from './utils/file-drag-drop-utils';
 import {retrieveImageOrTextFromClipboardAsBlob} from './utils/paste-utils';
 import {renderImage, renderText} from './utils/aframe-utils';
+import {createHTML as parseHTML} from './utils/dom-utils';
+
+import Vue from 'vue/dist/vue.esm';
 
 // TODO log per instance of global active inactive
 // Logger.setState(true);
 
 // if we really want to have a partially global object for debugging this should go into a separate file then..
-AFRAME.nk = {querySelectorAll, ZoomUtils, Layers, streamIn};
+AFRAME.nk = {querySelectorAll, ZoomUtils, Layers, streamIn, parseHTML, Vue};
 
 // ------------------
 

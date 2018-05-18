@@ -14,6 +14,7 @@ import Vue from 'vue/dist/vue.esm';
 
 var console = Logger.getLogger('template-library');
 
+/*
 var templates = [
   {name: 'helloTemplate', template: '<a-box></a-box>'},
   {name: 'helloText', template: '<a-text value="{{text:string}}"></a-text>'},
@@ -27,35 +28,21 @@ var templates = [
     </a-entity>`
   },
   {
-    name: 'animatedBox', template: `<a-box src="#boxTexture" 
-        position="0 0.5 0" 
-        rotation="0 45 45" 
-        scale="1 1 1" 
+    name: 'animatedBox', template: `<a-box src="#boxTexture"
+        position="0 0.5 0"
+        rotation="0 45 45"
+        scale="1 1 1"
         material="color:red">
         <a-animation attribute="position" to="0 2 -1" direction="alternate" dur="2000"
             repeat="indefinite"></a-animation>
    </a-box>`
   }
 ];
-
+*/
 var behaviourTemplates = {
   flee: 'behaviour-attraction="speed:-1.5"',
   engage: 'behaviour-attraction="speed:0.5"'
 };
-
-var instances = [];
-
-AFRAME.registerComponent('template-library', {
-  schema: {
-    selected: {type: 'number', default: 0},
-    templates: {type: 'array', default: templates}
-  },
-
-  init: function () {
-
-  }
-
-});
 
 AFRAME.registerComponent('wireframe', {
   dependencies: ['material'],
@@ -70,7 +57,7 @@ AFRAME.registerComponent('wireframe', {
 
 // -----------------------------------------
 
-AFRAME.registerComponent('gui-list-view', {
+AFRAME.registerComponent('gui-model-preview', {
   schema: {
     items: {type: 'array', default: []},
     itemFactory: {
@@ -89,14 +76,13 @@ AFRAME.registerComponent('gui-list-view', {
         component-padding="0.1"
         opacity="0.7"
         width="3.5"
-        --height="4.5"
-        position="0 0 0"
-         rotation="0 0 0">
+        height="4"
+        >
          
          <a-gui-label  width="3.2" height="0.5" value="Click to select then"></a-gui-label>
          <a-gui-label  width="3.2" height="0.5" value="click on region to"></a-gui-label>
          <a-gui-label  width="3.2" height="0.5" value="place element."></a-gui-label>
-         
+         <a-entity gui-item gui-list-view></a-entity>
          
     </a-gui-flex-container>
     `;
@@ -112,12 +98,14 @@ AFRAME.registerComponent('gui-list-view', {
     var previewWrapper = $(`<a-entity position="3 0 0" ></a-entity>`);
     previewWrapper.append(preview);
     var container = $(containerTemplate);
+
     wrapper.append(container, previewWrapper);
 
-    _.each(templates, function (tpl, key) {
-      var key = tpl.name;
-      tpl = tpl.template;
+    // _.each(templates, function (tpl, key) {
+    //  var key = tpl.name;
+    // tpl = tpl.template;
 
+    /*
       function onRegionClick (event, tpl) {
         var targetEl = event.detail.intersectedEl;
         if (targetEl.components['editable-region']) {
@@ -135,67 +123,41 @@ AFRAME.registerComponent('gui-list-view', {
       function regionClickWrapper (e) {
         onRegionClick(e, tpl);
       }
+     */
 
-      function getButtonEntity (btn) {
-        btn = document.querySelectorAll('a-gui-button')[0].components['gui-button'];
-        return btn.buttonEntity;
-      }
+    // TODO remove droppable on second change
+    container.find('[gui-list-view]').on('change', function (e) {
+      console.log('gui-list-view.change', e);
+      preview.html('');
 
-      function highlightSingleButton (btn) {
-        var parentEl = btn.parentEl;
-        var btns = $(parentEl).children('a-gui-button');
+      var tplData = e.detail.value;
+      var tplInstance = $(tplData);
 
-        _.each(btns, function (_btn) {
-          console.log('highlighting', _btn);
-          var __button = _btn.components['gui-button'];
+      tplInstance.attr('wireframe', true);
 
-          var btnActive = (btn == _btn);
+      tplInstance.attr('material', 'transparent:true;opacity:0.3');
+      preview.append(tplInstance);
 
-          /**
-                     * in case the button is selected highlight and blur others if selected twice blur too
-                     */
-          if (btnActive) {
-            __button.toggleState = !__button.toggleState;
-            getButtonEntity(_btn).setAttribute('material', 'color', __button.data.activeColor);
-          } else {
-            getButtonEntity(_btn).setAttribute('material', 'color', __button.data.backgroundColor);
-            __button.toggleState = false;
-          }
-        });
-      }
+      // enable region clicking and placing of tpl at position
+      //  $('[cursor]').off('click', regionClickWrapper);
+      //  $('[cursor]').on('click', regionClickWrapper);
 
-      var btn = $(`<a-gui-button toggle="true" width="2.5" height="0.75" font-family="Arial" margin="0 0 0.05 0" value="${key}"></a-gui-button>`);
-
-      // FIXME hover/mouseenter does neither work on container nor button
-      btn.on('touch click', function () {
-        preview.html('');
-        var tplInstance = $(tpl);
-        tplInstance.attr('material', 'transparent:true;opacity:0.3');
-        preview.append(tplInstance);
-
-        highlightSingleButton(btn.get(0));
-
-        // enable region clicking and placing of tpl at position
-        //  $('[cursor]').off('click', regionClickWrapper);
-        //  $('[cursor]').on('click', regionClickWrapper);
-
-        var regions = $('[editable-region]');
-        _.each(regions, function (region) {
-          region.setAttribute('template-droppable', true);
-          // we need to inject data directly because it is in html notationand can't be added via setAttribute
-          // TODO having something like region.setAttribute('template-droppable.template', tpl); would be nice
-          region.components['template-droppable'].data.template = tpl;
-        });
+      var regions = $('[editable-region]');
+      _.each(regions, function (region) {
+        region.setAttribute('template-droppable', true);
+        // we need to inject data directly because it is in html notationand can't be added via setAttribute
+        // TODO having something like region.setAttribute('template-droppable.template', tpl); would be nice
+        region.components['template-droppable'].data.template = tplData;
       });
-      container.append(btn);
     });
+    // });
 
     // note: wait to append otherwise items wont be aligned as component only aligns on init
     $(this.el).append(wrapper);
 
-    var listView = createTemplateListView(templates);
+    // var listView = createTemplateListView(templates);
 
-    $(this.el).append(listView.$el);
+    // $(this.el).append(listView.$el);
 
     // onmouseenter => focus
     // onmouseleave => blur
@@ -205,79 +167,7 @@ AFRAME.registerComponent('gui-list-view', {
 });
 
 // -----------------------------------------
-
-/**
- * items need to have a .name and .template string property
- * @param items
- */
-function createTemplateListView (items) {
-  // template -------------------------------------
-  var el = createHTML(`
-    <a-entity ref="wrapper">
-      <a-entity ref="previewWrapper" position="3 0 0">
-          <a-entity ref="preview"><a-box></a-box></a-entity>
-      </a-entity>
-      
-       <a-gui-flex-container 
-        ref="listView"
-        align-items="normal"
-        flex-direction="column"  
-        component-padding="0.1"
-        opacity="0.7"
-        width="3.5"
-        position="0 0 0"
-        rotation="0 0 0">
-         <a-gui-button  
-              v-for="(item, index) in items"
-              v-bind:value="item.name"
-              
-              toggle="true"
-              width="2.5" 
-              height="0.75" 
-              font-family="Arial" 
-              margin="0 0 0.05 0" 
-              @click="onButtonClicked(item)" 
-              
-              ></a-gui-button>
-          </a-gui-flex-container>
-    
-    </a-entity>
-  `);
-
-    // vue -------------------------------------
-  var app = new Vue({
-    el: el,
-    data: {
-      items: items
-    },
-    methods: {
-      onButtonClicked: function (item) {
-        console.log(item);
-      }
-    },
-    watch: {
-      items: {
-        handler: function (val, oldVal) {
-          this.$refs.listView.components['gui-flex-container'].init();
-        },
-        deep: true
-      }
-    }
-  });
-
-  // TODO refactor :>
-  document.addEventListener('model-imported', function (e) {
-    var str = e.detail.modelEl.getAttribute('gltf-model');
-
-    app.$el.setAttribute('position', '0 0 3');
-    app.$data.items.push({name: str});
-  });
-
-  return app;
-}
-
-// -----------------------------------------
-
+/*
 AFRAME.registerComponent('template-preview', {
   schema: {
     template: {type: 'string'}
@@ -290,7 +180,7 @@ AFRAME.registerComponent('template-preview', {
   }
 
 });
-
+*/
 /**
  * the next click on the entity this component is bound it will create the template at the intersection point.
  *
