@@ -1,20 +1,24 @@
 import _ from 'lodash';
+import {createListView} from './gui-list-view';
+
 /**
  * Simple color select with accent colors.
  * Note: default selection of color is triggered by action: "interaction-pick" not click event
+ *
+ *
  */
 
 AFRAME.registerComponent('gui-color-list', {
   schema: {
-    caption: {type: 'string', default: 'color-select'}
+    items: {type: 'array', default: []}
   },
 
   tick: function () {
-    // this.el.object3D.rotation.setFromRotationMatrix(document.querySelector('[camera]').object3D.matrix);
-    this.el.object3D.setRotationFromQuaternion(document.querySelector('[camera]').object3D.quaternion);
+    // TODO billboard stays not 100% in place when moving
+    // this.el.object3D.setRotationFromQuaternion(document.querySelector('[camera]').object3D.quaternion);
   },
   init: function () {
-    var accents = {
+    var demoColors = {
       'Magenta': '255,0,151',
       'Purple': '162,0,255',
       'Teal': '0,171,169',
@@ -28,43 +32,41 @@ AFRAME.registerComponent('gui-color-list', {
 
     };
 
-    var colorButtons = _(accents)
-      .map((v, k) => ` <a-gui-button  width="2" height="0.5" gui-button="backgroundColor:rgb(${v})" value="${k}"></a-gui-button>`)
-      .value()
-      .join('');
+    // --------------------
+    var items;
 
-    this.el.innerHTML = `
+    if (this.data.items.length <= 0) {
+      items = _(demoColors)
+        .map((value, key) => ({
+          key: key, value: `rgb(${value})`
+        }))
+        .value();
+    } else {
+      items = _(this.data.items)
+        .map((value, key) => ({
+          key: key, value: new THREE.Color(value).toJSON().toString(16)
+        }))
+        .value();
+    }
+    // --------------------
 
-   
-  <a-gui-flex-container 
-        align-items="normal"
-        flex-direction="column"
-        component-padding="0.1"
-        opacity="0"
-        width="2"      
-   
->
+    var app = createListView(items, `<a-gui-button  
+              v-for="(item, index) in items"
+              value=" "      
+              :background-color="item.value"
+              width=".5" 
+              height=".5" 
+              font-family="Arial" 
+              margin="0 0 0 0" 
+              @interaction-pick.stop="onItemClicked(item)"         
+              ></a-gui-button>`);
 
-            <a-gui-label  width="2" height="0.5" value="${this.data.caption}"></a-gui-label>
-            ${colorButtons}
+    this.el.append(app.$el);
 
-
-   </a-gui-flex-container>
-                
-
-
-`;
-
-    // -----------------------------------------
-
-    var colorButtons = this.el.querySelectorAll('a-gui-button').toArray();
-
-    colorButtons.forEach((btn) => btn.addEventListener('interaction-pick', e => {
-      var selectedColor = btn.getAttribute('gui-button').backgroundColor;
-
+    app.$el.addEventListener('change', (e) => {
       e.stopPropagation();
-      this.el.emit('change', {color: selectedColor});
-    }));
+      this.el.emit('change', {color: e.detail.value});
+    });
   }
 
 });

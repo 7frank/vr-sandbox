@@ -9,34 +9,38 @@ import {suppressedThrottle} from '../../utils/misc-utils';
 var console = Logger.getLogger('gui-list-view');
 
 /**
- *  TODO improve and then replace  gui-list-view
+ *  TODO efficient rendering by reusing buttons/elements and clipping planes
+ *   see https://threejs.org/examples/webgl_clipping_advanced.html
+ *   https://stackoverflow.com/questions/36557486/three-js-object-clipping
+ *  TODO also create a component with  additional items recursion (most simple treeview)
+ *
  *
  *
  *  $("a-scene").append(AFRAME.nk.parseHTML(`<a-entity position="5 5 5" gui-list-view></a-entity>`))
- *
- *
  */
 
 AFRAME.registerComponent('gui-list-view', {
   schema: {
-    items: {type: 'array', default: []},
-    itemFactory: {
-      default: function (item) {
-        return item;
-      }
-    }
+    items: {type: 'array', default: []}
+    /* itemFactory: {
+           default: function (item) {
+             return item;
+           }
+         } */
   },
   init: function () {
-    var app = createImportedModelsListView();// createListView();//
-    window.ooo = app;
+    // TODO code only for testing
+    var app;
+    if (this.data.items.length > 0) { app = createListView(this.data.items); } else { app = createImportedModelsListView(); }
+
     this.el.appendChild(app.$el);
   }
 
 });
 
 // ----------------------------------
-// FIXME view not updating on model changes
-function createListView (items, vueFactoryString) {
+export
+function createListView (items, vueFactoryString, direction = 'column') {
   if (!items) items = ['hello', 'world', 'test', 'asdf', '1234'];
 
   // template -------------------------------------
@@ -59,7 +63,7 @@ function createListView (items, vueFactoryString) {
        <a-gui-flex-container 
         ref="listView"
         align-items="normal"
-        flex-direction="column"  
+        flex-direction="${direction}"  
         component-padding="0.1"
         opacity="0"
         width="3.5"
@@ -107,7 +111,9 @@ function createListView (items, vueFactoryString) {
           if (_old) _old.emit('mouseleave');
           if (_new) _new.emit('mouseenter');
 
-          if (val > -1) { this.onItemClicked(); }
+          if (val > -1) {
+            this.onItemClicked();
+          }
         }
 
       }
@@ -117,7 +123,7 @@ function createListView (items, vueFactoryString) {
 
     // -----------------------------------------
 
-  app.$el.addEventListener('player-move-forward', suppressedThrottle(function (e) {
+  app.$el.addEventListener(direction == 'column' ? 'player-move-forward' : 'player-strafe-left', suppressedThrottle(function (e) {
     e.stopPropagation();
 
     if (e.detail.second) return;
@@ -127,7 +133,7 @@ function createListView (items, vueFactoryString) {
     if (app.$data.selectedIndex < 0) app.$data.selectedIndex = 0;
   }, 50));
 
-  app.$el.addEventListener('player-move-backward', suppressedThrottle(function (e) {
+  app.$el.addEventListener(direction == 'column' ? 'player-move-backward' : 'player-strafe-right', suppressedThrottle(function (e) {
     e.stopPropagation();
     if (e.detail.second) return;
 
@@ -144,6 +150,9 @@ function createTemplateListView (templates) {
   if (!templates) {
     templates = [
       {key: 'box', value: '<a-box></a-box>'},
+      {key: 'sphere', value: '<a-sphere></a-sphere>'},
+      {key: 'torus', value: '<a-torus color="#43A367" arc="270" radius="5" radius-tubular="0.1"></a-torus>'},
+      {key: 'torus knot', value: '<a-torus-knot color="#B84A39" arc="180" p="2" q="4" radius="1" radius-tubular="0.1"></a-torus-knot>'},
       {key: 'text', value: '<a-text value="{{text:string}}"></a-text>'},
       {
         key: 'izzy', value: `<a-entity
