@@ -40,7 +40,7 @@ import trim from 'lodash.trim';
 import DiffDOM from 'diff-dom';
 
 import {onTagChanged} from './network-sync';
-import {attachGameLogic} from './ballGameLogic';
+
 import * as _ from 'lodash';
 import {addLoadingListenersToScene} from './utils/loadingBarUtils';
 import ZoomUtils from './utils/ZoomUtils';
@@ -61,12 +61,13 @@ import {renderImage, renderText} from './utils/aframe-utils';
 import {createHTML as parseHTML} from './utils/dom-utils';
 
 import Vue from 'vue/dist/vue.esm';
+import {UndoMgr} from './utils/undo-utils';
 
 // TODO log per instance of global active inactive
 // Logger.setState(true);
 
 // if we really want to have a partially global object for debugging this should go into a separate file then..
-AFRAME.nk = {querySelectorAll, ZoomUtils, Layers, streamIn, parseHTML, Vue};
+AFRAME.nk = {querySelectorAll, ZoomUtils, Layers, streamIn, parseHTML, Vue, UndoMgr};
 
 // ------------------
 
@@ -131,7 +132,6 @@ onTagChanged('a-scene', function (elementsInfo) {
 
     addLoadingListenersToScene(elementsInfo.added[0], function () {
       scene.setAttribute('visible', true);
-      attachGameLogic();
     });
   }
 

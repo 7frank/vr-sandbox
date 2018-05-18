@@ -1,4 +1,6 @@
 // Require all of your custom components
+import './simple-ball';
+import './game-object-limbo';
 import './example-scale';
 import './bounding-box';
 import './aframe-look-at-billboard-component';

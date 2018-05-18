@@ -7,6 +7,7 @@ import {toast} from '../../utils/aframe-utils';
 import {Logger} from '../../utils/Logger';
 import {createHTML} from '../../utils/dom-utils';
 import Vue from 'vue/dist/vue.esm';
+import {UndoMgr} from '../../utils/undo-utils';
 // a list that contains template-containers to select them
 // first lets have a simple select like in fallout 4
 // goal is to select and place
@@ -14,31 +15,23 @@ import Vue from 'vue/dist/vue.esm';
 
 var console = Logger.getLogger('template-library');
 
-/*
-var templates = [
-  {name: 'helloTemplate', template: '<a-box></a-box>'},
-  {name: 'helloText', template: '<a-text value="{{text:string}}"></a-text>'},
-  {
-    name: 'izzy', template: `<a-entity
-          shadow="cast: true; receive: false"
-          scale="0.008 0.008 0.008"
-          --behaviour-attraction="speed:0.5"
-          animation-mixer="clip: *;"
-          gltf-model="src: url(assets/models/Izzy/scene.gltf);">
-    </a-entity>`
-  },
-  {
-    name: 'animatedBox', template: `<a-box src="#boxTexture"
-        position="0 0.5 0"
-        rotation="0 45 45"
-        scale="1 1 1"
-        material="color:red">
-        <a-animation attribute="position" to="0 2 -1" direction="alternate" dur="2000"
-            repeat="indefinite"></a-animation>
-   </a-box>`
-  }
-];
-*/
+const addRegionInteractions_createEntity = (selector, tplData) => {
+  var regions = $(selector);
+  _.each(regions, function (region) {
+    region.setAttribute('template-droppable', true);
+    // we need to inject data directly because it is in html notationand can't be added via setAttribute
+    // TODO having something like region.setAttribute('template-droppable.template', tpl); would be nice
+    region.components['template-droppable'].data.template = tplData;
+  });
+};
+
+const removeRegionInteractions_createEntity = (selector) => {
+  var regions = $(selector);
+  _.each(regions, function (region) {
+    if (region.hasAttribute('template-droppable')) { region.removeAttribute('template-droppable'); }
+  });
+};
+
 var behaviourTemplates = {
   flee: 'behaviour-attraction="speed:-1.5"',
   engage: 'behaviour-attraction="speed:0.5"'
@@ -101,31 +94,10 @@ AFRAME.registerComponent('gui-model-preview', {
 
     wrapper.append(container, previewWrapper);
 
-    // _.each(templates, function (tpl, key) {
-    //  var key = tpl.name;
-    // tpl = tpl.template;
+    // TODO remove droppable on second change to prevent infinite drop
+    // TODO ctrl+click== multiple times an element may be dropped no ctrl pressed= only once
+    // TODO maybe introduce actions chain-start chain-end?
 
-    /*
-      function onRegionClick (event, tpl) {
-        var targetEl = event.detail.intersectedEl;
-        if (targetEl.components['editable-region']) {
-          var targetPos = event.detail.intersection.point;
-          targetPos.y += 1;
-          var tplInstance = $(tpl);
-          tplInstance.attr('position', AFRAME.utils.coordinates.stringify(targetPos));
-          $(targetEl).append(tplInstance);
-        } else {
-          console.log('click a region to position the template. clicked:', targetEl);
-          toast('Click a region to place the template.');
-        }
-      }
-
-      function regionClickWrapper (e) {
-        onRegionClick(e, tpl);
-      }
-     */
-
-    // TODO remove droppable on second change
     container.find('[gui-list-view]').on('change', function (e) {
       console.log('gui-list-view.change', e);
       preview.html('');
@@ -142,26 +114,12 @@ AFRAME.registerComponent('gui-model-preview', {
       //  $('[cursor]').off('click', regionClickWrapper);
       //  $('[cursor]').on('click', regionClickWrapper);
 
-      var regions = $('[editable-region]');
-      _.each(regions, function (region) {
-        region.setAttribute('template-droppable', true);
-        // we need to inject data directly because it is in html notationand can't be added via setAttribute
-        // TODO having something like region.setAttribute('template-droppable.template', tpl); would be nice
-        region.components['template-droppable'].data.template = tplData;
-      });
+      addRegionInteractions_createEntity('[editable-region]', tplData);
     });
     // });
 
-    // note: wait to append otherwise items wont be aligned as component only aligns on init
+    // Note: don't append to early otherwise items wont be aligned as component only aligns on init
     $(this.el).append(wrapper);
-
-    // var listView = createTemplateListView(templates);
-
-    // $(this.el).append(listView.$el);
-
-    // onmouseenter => focus
-    // onmouseleave => blur
-    // on player-move forward && hasFocus selected-=1
   }
 
 });
@@ -196,11 +154,14 @@ AFRAME.registerComponent('template-droppable', {
   },
 
   init: function () {
-    this.el.addEventListener('click', this.onClickTestAccept.bind(this));
+    this._someClick = this.onClickTestAccept.bind(this);
+
+    this.el.addEventListener('click', this._someClick);
   },
   remove: function () {
-    this.el.removeEventListener('click', this.onClickTestAccept.bind(this));
+    this.el.removeEventListener('click', this._someClick);
   },
+  // TODO use interaction-pick but before that add a convenient alternative function to access intersection data as keyevents don't have such
   onClickTestAccept: function (event) {
     var targetEl = this.el;
 
@@ -227,8 +188,13 @@ AFRAME.registerComponent('template-droppable', {
       tplInstance.attr('template-removable', true);
     }
 
+    // update position and write to DOM
     tplInstance.attr('position', AFRAME.utils.coordinates.stringify(targetPos));
-    $(targetEl).append(tplInstance);
+    tplInstance.get(0).flushToDOM();
+
+    UndoMgr.addHTMLElementToTarget(tplInstance.get(0), targetEl);
+
+    removeRegionInteractions_createEntity('[editable-region]');
   }
 
 });
@@ -247,10 +213,10 @@ AFRAME.registerComponent('template-removable', {
   onRemoveEvent: function (event) {
     event.stopPropagation();
 
-    console.log('template-removable', arguments, this.data, event.detail.intersection);
+    // console.log('template-removable', arguments, this.data, event.detail.intersection);
     toast('template-removable');
 
-    $(this.el).remove();
+    UndoMgr.removeHTMLElement(this.el);
   }
 
 });
