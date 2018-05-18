@@ -71,6 +71,12 @@ module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls'
   },
 
   tick: function (time, delta) {
+    // fix autowalk bug when focus changes
+    if (this.lastActiveElement != document.activeElement) {
+      this.keys = {};
+      this.lastActiveElement = document.activeElement;
+    }
+
     var currentPosition;
     var data = this.data;
     var el = this.el;

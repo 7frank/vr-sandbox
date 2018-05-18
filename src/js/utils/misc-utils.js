@@ -60,3 +60,21 @@ function preg_quote (str, delimiter) {
   // *     returns 3: '\\\.\+\*\?\[\^\]\$\(\)\{\}\=\!\<\>\|\:'
   return (str + '').replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + (delimiter || '') + '-]', 'g'), '\\$&');
 }
+
+/**
+ * Like throttle but suppresses propagation.
+ * @param fn
+ * @param wait
+ * @returns {Function}
+ */
+export
+function suppressedThrottle (fn, wait) {
+  var time = Date.now();
+
+  return function (e) {
+    if ((time + wait - Date.now()) < 0) {
+      fn.apply(this, arguments);
+      time = Date.now();
+    } else { e.stopPropagation(); }
+  };
+}

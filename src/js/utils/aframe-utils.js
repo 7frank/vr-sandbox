@@ -425,3 +425,19 @@ export function getVectorRelativeToPlayer (theEl) {
 
   return b.sub(a);
 }
+
+/**
+ * Determines if the mesh faces in the direction of the camera or away from it.
+ *
+ * @param planeMesh - the mesh
+ * @param cameraObject - A threejs object that is the parent for the THREE.Camera
+ * @returns {string}
+ */
+export
+function checkSide (planeMesh, cameraObject) {
+  let A = planeMesh;
+  let B = cameraObject;
+
+  let distance = new THREE.Plane((new THREE.Vector3(0, 0, 1)).applyQuaternion(A.quaternion)).distanceToPoint(B.getWorldPosition().sub(A.getWorldPosition()));
+  return distance >= 0 ? 'front' : 'back';
+}
