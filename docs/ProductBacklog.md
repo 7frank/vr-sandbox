@@ -1,13 +1,13 @@
 
 # mai 14.-16.
 ## todo
-* [x]fix raycaster for simple-car to be able to interact
-    * had to add model(setObject3D) after it was fully loaded(emitted model-loaded)
-* [x] fix mem leak when picking ball
-    * not calling stopPropagation will result in n+1 handlers being called everytime the action is triggered
+* <del>fix raycaster for simple-car to be able to interact</del>
+    * Note:had to add model(setObject3D) after it was fully loaded(emitted model-loaded) 
+* <del>fix mem leak when picking ball</del>
+    * Note:not calling stopPropagation will result in n+1 handlers being called everytime the action is triggered
 * fix rebind not working in hk library
 * fix controls, in they general will not be as stable with the 1.0.2 hotkey implementation
-    * occures if waiting for some time and maybe leaving window
+    * occurs if waiting for some time and maybe leaving window
     * maybe the same problem with stopPropagation 
     * moving sometimes get stuck resulting in autowalk(focus change maybe?)
         * stops of window blur so "custom-wasd-controls" 
@@ -15,10 +15,21 @@
 * [/] have a region with a helmet/car
     * create some controls
         * a menu with some specific sub-nodes
-            * [x] color control
-            * material control
+            * <del> color control </del>
+            * [/] material control
             * mesh control to replace with a primitive for simplicity
-        * use "createTemplateListView" to create a more versatile/stable listview
+        * <del> use "createTemplateListView" to create a more versatile/stable listview </del>
+    * animationPath component based on 
+        * http://ngokevin.com/blog/aframe-component/#line-component-schema
+        * and zoom-utils of previous work with zoom component and tweenjs
+* create some different billboard components
+* add undo manager to template-list-view and color select
+        
+        
+        
+* improve components 
+    * http://ngokevin.com/blog/aframe-component/#line-component-schema
+    * and see other implementations like gui-button for building/extending other components 
 
 
 
@@ -105,6 +116,10 @@
 * async await
 * provide correct logger line numbers 
 * evaluate: it might be better to have a external map for the registration of components, to prevent naming conflicts in src.. but on the other hand how would the changes reflect in the html portions
+*  web worker & transferable objects to improve streaing of regions and models
+    * https://github.com/mrdoob/three.js/issues/11746 
+    * imp for obj https://kaisalmen.de/proto/test/meshspray/main.src.html
+
 
 # Sprint (0) (-Infinty - 01.04.)
 * <del>store auth in session-storage</del>
