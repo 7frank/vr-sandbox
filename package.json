@@ -52,7 +52,7 @@
     "heroku-docker-open": "heroku open --app rocky-fjord-67773"
   },
   "dependencies": {
-    "@nk11/core-components": "^0.1.6",
+    "@nk11/core-components": "^0.1.8",
     "babel-cli": "^6.24.1",
     "babel-core": "^6.26.3",
     "babel-eslint": "^7.2.3",

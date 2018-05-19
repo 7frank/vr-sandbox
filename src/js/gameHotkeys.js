@@ -42,6 +42,8 @@ window.addEventListener('load', function () {
   var CustomComponents = require('@nk11/core-components/dist/bundle');
   Hotkeys = CustomComponents.Hotkeys;
 
+  // TODO for testing
+  AFRAME.nk.Hotkeys = Hotkeys;
   hotkeyDialog = createHTML("<nk-hotkey-dialog title='Input Configuration' class='card card-1' style='z-index: 1;top:50px;left:50%;position:absolute;width:600px;height:300px;display:none' ></nk-hotkey-dialog>");
   document.body.appendChild(hotkeyDialog);
   addHotkeys();

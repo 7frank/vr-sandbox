@@ -33,8 +33,8 @@ function createEditableNode (hkDialog) {
 
 // TODO refactor
 // FIXME clicking button not working on mobile
+console.error(' TODO to use or not to use');
 $('#editACEButton').on('click', focusAce);
-$('#editableActorBtn').on('change', createEditableNode);
 
 function focusAce () {
   console.warn('focus not working in mixed mode FIXME'); // the standalone demo seems to be working
