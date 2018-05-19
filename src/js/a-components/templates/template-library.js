@@ -8,6 +8,7 @@ import {Logger} from '../../utils/Logger';
 import {createHTML} from '../../utils/dom-utils';
 import Vue from 'vue/dist/vue.esm';
 import {UndoMgr} from '../../utils/undo-utils';
+import {getDescriptiveTextForAction} from '../../utils/hotkey-utils';
 // a list that contains template-containers to select them
 // first lets have a simple select like in fallout 4
 // goal is to select and place
@@ -63,25 +64,24 @@ AFRAME.registerComponent('gui-model-preview', {
   init: function (HALPP = false) {
     // FIXME justify-content="center" breaks component
     // FIXME also  items are not aligned
+
     var containerTemplate = `
     <a-gui-flex-container align-items="normal"
        flex-direction="column"  
         component-padding="0.1"
-        opacity="0.7"
+        opacity="0"
         width="3.5"
         height="4"
         >
-         
-         <a-gui-label  width="3.2" height="0.5" value="Click to select then"></a-gui-label>
-         <a-gui-label  width="3.2" height="0.5" value="click on region to"></a-gui-label>
-         <a-gui-label  width="3.2" height="0.5" value="place element."></a-gui-label>
+         <a-entity scale=".5 .5 .5" position="-3.5 -4.3 0" 
+         simple-dialog="caption:Trigger ${getDescriptiveTextForAction('interaction-pick')} , ${getDescriptiveTextForAction('player-move-forward')} or ${getDescriptiveTextForAction('player-move-backward')} to select an element that is shown to the right as preview. Then click on a region below your feet to place one such instance."></a-entity>
          <a-entity gui-item gui-list-view></a-entity>
          
     </a-gui-flex-container>
     `;
 
     var wrapper = $(`<a-entity></a-entity>`);
-    var preview = $(`<a-entity><a-box></a-box></a-entity>`);
+    var preview = $(`<a-entity><a-box wireframe></a-box></a-entity>`);
 
     new FPSCtrl(30, function () {
       if (!this.object3D) return;
@@ -174,7 +174,7 @@ AFRAME.registerComponent('template-droppable', {
         return;
       }
     }
-    toast('dropping template');
+    toast('creating template');
 
     console.log('dropping', event.detail, this);
     var targetPos = event.detail.intersection.point;
@@ -205,16 +205,23 @@ AFRAME.registerComponent('template-removable', {
   schema: {},
 
   init: function () {
-    this.el.addEventListener('click', this.onRemoveEvent.bind(this));
+    this.closeEl = createHTML(`<a-entity look-at="src:[camera]" position="0 1 0"><a-circle  material="side: double; color: red; transparent: true; opacity: 0.7"  radius=".1"></a-circle><a-text position="-.0775 .025 0" value="x"></a-text></a-entity>`);
+    this.el.append(this.closeEl);
+
+    this.closeEl.addEventListener('click', this.onRemoveEvent.bind(this));
+
+    // TODO
+    this.el.addEventListener('focus', () => this.closeEl.setAttribute('material', 'opacity:0.9'));
+    this.el.addEventListener('blur', () => this.closeEl.setAttribute('material', 'opacity:0.3'));
   },
   remove: function () {
-    this.el.removeEventListener('click', this.onRemoveEvent.bind(this));
+    this.closeEl.removeEventListener('click', this.onRemoveEvent.bind(this));
   },
   onRemoveEvent: function (event) {
     event.stopPropagation();
 
     // console.log('template-removable', arguments, this.data, event.detail.intersection);
-    toast('template-removable');
+    toast('removed entity');
 
     UndoMgr.removeHTMLElement(this.el);
   }

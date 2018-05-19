@@ -1,5 +1,6 @@
 // Require all of your custom components
 import './simple-ball';
+import './simple-dialog';
 import './game-object-limbo';
 import './example-scale';
 import './bounding-box';

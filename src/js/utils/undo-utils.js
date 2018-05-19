@@ -33,7 +33,23 @@ export var UndoMgr = {
   },
 
   removeHTMLElement: function (el) {
-    throw new Error('TODO implementation');
+    var oldParentEL;
+
+    function removeElement () {
+      oldParentEL = el.parentElement;
+      el.parentElement.remove(el);
+    }
+
+    undoManager.add({
+      undo: function () {
+        if (oldParentEL) {
+          oldParentEL.appendChild(el);
+        }
+      },
+      redo: removeElement
+    });
+
+    removeElement();
   },
   addHTMLAttributes: function (el, attributes) {
     var oldAttributes = _.mapValues(attributes, (attr, key) => el.getAttribute(key));
