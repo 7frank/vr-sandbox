@@ -26,3 +26,4 @@ import './a-simple-videoplayer/simple-video-player';
 import './ring-menu';
 import './cursor-focus';
 import './a-configurator';
+import './billboard/simple-billboard';

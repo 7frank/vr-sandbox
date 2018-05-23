@@ -6,6 +6,8 @@ import Vue from 'vue/dist/vue.esm';
 import {throttle} from 'lodash';
 import {suppressedThrottle} from '../../utils/misc-utils';
 
+import combinedSample from './combinedSample.html';
+
 var console = Logger.getLogger('gui-list-view');
 
 /**
@@ -23,15 +25,19 @@ AFRAME.registerComponent('gui-list-view', {
   schema: {
     items: {type: 'array', default: []}
     /* itemFactory: {
-           default: function (item) {
-             return item;
-           }
-         } */
+               default: function (item) {
+                 return item;
+               }
+             } */
   },
   init: function () {
     // TODO code only for testing
     var app;
-    if (this.data.items.length > 0) { app = createListView(this.data.items); } else { app = createImportedModelsListView(); }
+    if (this.data.items.length > 0) {
+      app = createListView(this.data.items);
+    } else {
+      app = createImportedModelsListView();
+    }
 
     this.el.appendChild(app.$el);
   }
@@ -39,8 +45,7 @@ AFRAME.registerComponent('gui-list-view', {
 });
 
 // ----------------------------------
-export
-function createListView (items, vueFactoryString, direction = 'column') {
+export function createListView (items, vueFactoryString, direction = 'column') {
   if (!items) items = ['hello', 'world', 'test', 'asdf', '1234'];
 
   // template -------------------------------------
@@ -99,7 +104,7 @@ function createListView (items, vueFactoryString, direction = 'column') {
         handler: function (val, oldVal) {
           this.$refs.listView.components['gui-flex-container'].init();
         },
-        deep: true
+        deep: false // TODO might interfere with recursive objects
       },
       selectedIndex: {
         handler: function (val, oldVal) {
@@ -151,18 +156,12 @@ function createTemplateListView (templates) {
     templates = [
       {key: 'box', value: '<a-box></a-box>'},
       {key: 'sphere', value: '<a-sphere></a-sphere>'},
-      {key: 'torus', value: '<a-torus color="#43A367" arc="270" radius="5" radius-tubular="0.1"></a-torus>'},
-      {key: 'torus knot', value: '<a-torus-knot color="#B84A39" arc="180" p="2" q="4" radius="1" radius-tubular="0.1"></a-torus-knot>'},
-      {key: 'text', value: '<a-text value="{{text:string}}"></a-text>'},
+      {key: 'torus', value: '<a-torus color="#43A367" arc="350" radius="2" radius-tubular="0.1"></a-torus>'},
       {
-        key: 'izzy', value: `<a-entity
-          shadow="cast: true; receive: false"
-          scale="0.008 0.008 0.008"
-          --behaviour-attraction="speed:0.5"
-          animation-mixer="clip: *;"
-          gltf-model="src: url(assets/models/Izzy/scene.gltf);">
-    </a-entity>`
+        key: 'torus knot',
+        value: '<a-torus-knot color="#B84A39" arc="180" p="2" q="4" radius="1" radius-tubular="0.1"></a-torus-knot>'
       },
+      {key: 'text', value: '<a-text value="{{text:string}}"></a-text>'},
       {
         key: 'animatedBox', value: `<a-box src="#boxTexture" 
         position="0 0.5 0" 
@@ -172,6 +171,16 @@ function createTemplateListView (templates) {
         <a-animation attribute="position" to="0 2 -1" direction="alternate" dur="2000"
             repeat="indefinite"></a-animation>
    </a-box>`
+      }, {
+        key: 'combined', value: combinedSample
+      }, {
+        key: 'izzy', value: `<a-entity
+          shadow="cast: true; receive: false"
+          scale="0.008 0.008 0.008"
+          --behaviour-attraction="speed:0.5"
+          animation-mixer="clip: *;"
+          gltf-model="src: url(assets/models/Izzy/scene.gltf);">
+    </a-entity>`
       }
     ];
   }

@@ -1,6 +1,9 @@
 
 <!--wasd-controls universal-controls="rotationSensitivity:0.2" wasd-controls look-controls  dynamic-body="shape:box;mass:50" -->
-<a-entity customizable-wasd-controls universal-controls="rotationSensitivity:0.2" class="player"
+
+
+<!-- FIXME universal-controls="rotationSensitivity:0.2" are necessary for physics but interfere with customisation -->
+<a-entity customizable-wasd-controls look-controls  class="player"
           static-body="shape:sphere;sphereRadius:1"
           networked="template:#avatar-template;showLocalTemplate:false;" camera="far:20000"
           spawn-in-circle="radius:3;"
