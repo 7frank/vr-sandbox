@@ -7,20 +7,22 @@
  **/
 
 import {updateHotComponent} from '../utils/aframe-debug-utils';
+import * as _ from 'lodash';
+import {UndoMgr} from '../utils/undo-utils';
 
 var TransformControls = require('three-transform-controls')(THREE);
 
 /**
  * Helper for the transform controls. Any entity that has this attached will spawn the controls on click.
+ *
+ * TODO look into inconsistencies with interaction-pick, click and interaction-talk
+ *
  */
 
-// alert('Next sync objects when moving them and when creating');
 AFRAME.registerComponent('transformable', {
   init: function () {
     this.el.addEventListener('click', function () {
-      var FIXME = this.el.parentEl.parentEl;// .querySelector('.content'); //null atm
-
-      this.el.sceneEl.setAttribute('transform-controls', {target: FIXME}); // FIXME the target is the child of the networked somewhat
+      this.el.sceneEl.setAttribute('transform-controls', {target: this.el}); // FIXME the target is the child of the networked somewhat
     }.bind(this));
   }
 });
@@ -28,9 +30,14 @@ AFRAME.registerComponent('transformable', {
 /**
  *  A wrapper for the THREE.TransformControl.
  *
+ *  Listens for 'interaction-pick' to rotate through transofrm control modes (translate,rotate,scale).
+ *  Listens for 'action-increase', 'action-decrease' to alter the size of the tranform control.
+ *  Pressing 'ctrl' will enable snap to grid for transform and rotate modes.
+ *
  */
 updateHotComponent('transform-controls');
 AFRAME.registerComponent('transform-controls', {
+  dependencies: ['position', 'rotation', 'scale'],
   schema: {
     target: {
       default: null
@@ -39,85 +46,93 @@ AFRAME.registerComponent('transform-controls', {
   },
   init: function () {
     var that = this;
-    function onControlChange () {
-      // console.log(that.data.target.getAttribute('position'));
-      // console.log(that.data.target.object3D.position);
+
+    var oldValues;
+
+    function onControlMouseDown (e) {
+      var object = e.target.object;
+
+      oldValues = {
+        position: object.position.clone(),
+        rotation: object.rotation.clone(),
+        scale: object.scale.clone()
+      };
+    }
+    // store defaults
+
+    function onControlledObjectChange (e) {
+      console.log('objectChange', e);
 
       if (!that.data.target) return; // TODO target not yet set
+      var object = e.target.object;
 
-      that.data.target.setAttribute('position', this.position);// TODO works with bugs
-      that.data.target.setAttribute('rotation', this.rotation);// FIXME doesn't work
-      that.data.target.setAttribute('scale', this.scale);// same here, not working
+      var newValues = {
+        position: object.position.clone(),
+        rotation: object.rotation.clone(),
+        scale: object.scale.clone()
+      };
+      UndoMgr.addHTMLAttributes(that.data.target, newValues, oldValues);
+      oldValues = newValues;
     }
 
     var scene = this.el.sceneEl;
     this.mControl = new TransformControls(scene.camera, scene.renderer.domElement);
-    this.mControl.addEventListener('change', onControlChange);
+
+    this.mControl.addEventListener('objectChange', _.debounce(onControlledObjectChange, 1000));
+    this.mControl.addEventListener('mouseDown', onControlMouseDown);
+
     this.addEventListeners();
-
-    this.el.setObject3D('control', this.mControl);
-
-    // this.update();
   },
   update: function () {
     if (this.data.target) {
-      // TODO check out where exactly to add the controls and what settings for setSpace are correct.
-
-      console.log('transform-controls', this.data.target, this.data.target.object3D);
       this.mControl.attach(this.data.target.object3D);
-      //  this.el.object3D.add(this.mControl);
-
+      // this.el.object3D.add(this.mControl);
       // this.data.target.object3D.parent.add(this.mControl);
-
       this.el.sceneEl.object3D.add(this.mControl);
+    } else {
+      this.mControl.detach();
     }
   },
   remove: function () {
-    this.el.removeObject3D('control');
+    this.mControl.dispose();
+    if (this.mControl.parent) {
+      this.mControl.parent.remove(this.mControl);
+    }
   },
   addEventListeners: function () {
     var control = this.mControl;
 
     /*
+                      window.addEventListener('model-edit-translate',function(){})
+                      window.addEventListener('model-edit-rotate',function(){})
+                      window.addEventListener('model-edit-scale',function(){})
+                      window.addEventListener('model-edit-translate',function(){})
 
-      window.addEventListener('model-edit-translate',function(){})
-      window.addEventListener('model-edit-rotate',function(){})
-      window.addEventListener('model-edit-scale',function(){})
-      window.addEventListener('model-edit-translate',function(){})
+                  */
 
-  */
-    // TODO use keymap + remove keys
+    var modes = ['translate', 'rotate', 'scale'], currMode = -1;
+
+    this.el.addEventListener('interaction-pick', (e) => {
+      e.stopPropagation();
+      currMode = (currMode + 1) % modes.length;
+      control.setMode(modes[currMode]);
+    });
+
+    this.el.addEventListener('action-increase', (e) => {
+      e.stopPropagation();
+      control.setSize(control.size + 0.1);
+    });
+
+    this.el.addEventListener('action-decrease', (e) => {
+      e.stopPropagation();
+      control.setSize(Math.max(control.size - 0.1, 0.1));
+    });
+    // -------------------------
     window.addEventListener('keydown', function (event) {
       switch (event.keyCode) {
-        case 81: // Q
-          control.setSpace(control.space === 'local' ? 'world' : 'local');
-          break;
-
         case 17: // Ctrl
-          control.setTranslationSnap(1);
+          control.setTranslationSnap(0.5);
           control.setRotationSnap(THREE.Math.degToRad(15));
-          break;
-
-        case 87: // W
-          control.setMode('translate');
-          break;
-
-        case 69: // E
-          control.setMode('rotate');
-          break;
-
-        case 82: // R
-          control.setMode('scale');
-          break;
-
-        case 187:
-        case 107: // +, =, num+
-          control.setSize(control.size + 0.1);
-          break;
-
-        case 189:
-        case 109: // -, _, num-
-          control.setSize(Math.max(control.size - 0.1, 0.1));
           break;
       }
     });

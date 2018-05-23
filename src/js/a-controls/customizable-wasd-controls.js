@@ -1,4 +1,5 @@
 import {shouldCaptureKeyEvent} from '../utils/dom-utils';
+import * as _ from 'lodash';
 
 var KEYCODE_TO_CODE = {
   '38': 'ArrowUp',
@@ -64,19 +65,27 @@ module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls'
     // Bind methods and add event listeners.
     this.onBlur = bind(this.onBlur, this);
     this.onFocus = bind(this.onFocus, this);
-    // this.onKeyDown = bind(this.onKeyDown, this);
-    // this.onKeyUp = bind(this.onKeyUp, this);
+
     this.onVisibilityChange = bind(this.onVisibilityChange, this);
     this.attachVisibilityEventListeners();
+
+    // --------------------------
+    // mostly fixes autowalk bug when focus changes
+    // still there needs to be a higher delay (500ms currently) the not trigger to early
+    //  and thus solve the  problem with damping the movement
+
+    const fixAutoWalk = (key) => _.debounce((e) => {
+      /* console.log('stopping key', key, e); */
+      this.keys[key] = false;
+    }, 500);
+
+    window.addEventListener('player-move-forward', fixAutoWalk('KeyW'));
+    window.addEventListener('player-move-backward', fixAutoWalk('KeyS'));
+    window.addEventListener('player-strafe-left', fixAutoWalk('KeyA'));
+    window.addEventListener('player-strafe-right', fixAutoWalk('KeyD'));
   },
 
   tick: function (time, delta) {
-    // fix autowalk bug when focus changes
-    if (this.lastActiveElement != document.activeElement) {
-      this.keys = {};
-      this.lastActiveElement = document.activeElement;
-    }
-
     var currentPosition;
     var data = this.data;
     var el = this.el;
@@ -238,19 +247,15 @@ module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls'
          */
     function keyHandler (code, bVal) {
       return function (event) {
-      // TODO check if event target is child* of a-scene
+        // TODO check if event target is child* of current a-scene
         if (!shouldCaptureKeyEvent(that.el, event)) {
           return;
         }
-
         // console.log('keyHandler', [that.keys, that.el, event]);
-
-        if (KEYS.indexOf(code) !== -1) {
-          if (event.detail.first) {
-            that.keys[code] = true;
-          } else {
-            delete that.keys[code];
-          }
+        if (event.detail.first) {
+          that.keys[code] = true;
+        } else {
+          delete that.keys[code];
         }
       };
     }
@@ -267,9 +272,6 @@ module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls'
   },
 
   removeKeyEventListeners: function () {
-    //  window.removeEventListener('keydown', this.onKeyDown);
-    // window.removeEventListener('keyup', this.onKeyUp);
-
     window.removeEventListener('player-move-forward', this.khw);
     window.removeEventListener('player-move-backward', this.khs);
     window.removeEventListener('player-strafe-left', this.kha);
