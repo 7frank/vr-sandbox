@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import _ from 'lodash';
 import {AVideoPlayer} from './AVideoPlayer';
 import {
   assetsTemplate, permissionTemplate, playerAndControlsTemplate,
@@ -6,10 +7,9 @@ import {
 } from './simple-video-player-templates';
 
 import './video-player-environment';
-
 import '../video-positional-audio';
 
-import {getVectorRelativeToPlayer} from '../../utils/aframe-utils';
+import {checkSide, getVectorRelativeToPlayer} from '../../utils/aframe-utils';
 import {FPSCtrl} from '../../utils/fps-utils';
 
 // used to only load certain elements once
@@ -107,10 +107,38 @@ AFRAME.registerComponent('simple-video-player', {
 
 });
 
-function checkSide (planeMesh, cameraObject) {
-  let A = planeMesh;
-  let B = cameraObject;
+/**
+ * shows the selected side
+ * TODO not working as of now
+ */
 
-  let distance = new THREE.Plane((new THREE.Vector3(0, 0, 1)).applyQuaternion(A.quaternion)).distanceToPoint(B.getWorldPosition().sub(A.getWorldPosition()));
-  return distance >= 0 ? 'front' : 'back';
-}
+AFRAME.registerComponent('show-side', {
+  schema: {
+    side: {type: 'string', default: 'front'},
+    selectors: {type: 'array', default: []}
+  },
+  init: function () {
+    if (this.data.selectors.length == 0) this.data.selectors.push(this.el);
+  },
+  tick: function () {
+    // ----------------------------
+
+    var side = checkSide(this.el.object3D, this.el.sceneEl.camera.el.object3D);
+
+    _(this.data.selectors)
+      .map(s => (typeof s == 'string') ? this.el.querySelectorAll(s) : s)
+      .flatten()
+      .value()
+      .each(function (el) {
+        var side = this.data.side;
+
+        if (side == 'front') {
+          // el.getAttribute('position').z = 0.5;
+          el.setAttribute('rotation', '0 0 0');
+        } else {
+          // el.getAttribute('position').z = -0.5;
+          el.setAttribute('rotation', '0 180 0');
+        }
+      });
+  }
+});

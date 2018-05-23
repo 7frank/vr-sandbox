@@ -441,3 +441,25 @@ function checkSide (planeMesh, cameraObject) {
   let distance = new THREE.Plane((new THREE.Vector3(0, 0, 1)).applyQuaternion(A.quaternion)).distanceToPoint(B.getWorldPosition().sub(A.getWorldPosition()));
   return distance >= 0 ? 'front' : 'back';
 }
+
+/**
+ * sorts an array of entity based on their distance from closest to farthest
+ *
+ *
+ * @param entityArray
+ */
+export function sortEntitiesByDistance (entityArray) {
+  var nodes = document.querySelectorAll('[editable-region]').toArray();
+  var distances = nodes.map((el, id) => ({id, el, distance: el.object3D.position.clone().sub(el.sceneEl.camera.el.object3D.position).length()}));
+  return _.sortBy(distances, item => item.distance)
+    .map(item => item.el);
+}
+
+/**
+ * returns the closest editable region within the sceneEl
+ *
+ */
+export function getClosestEditableRegion (sceneEl) {
+  var nodes = sceneEl.querySelectorAll('[editable-region]').toArray();
+  return sortEntitiesByDistance()[0];
+}

@@ -1,5 +1,6 @@
 import Car from './car/tquery.car';
 import {enterOrExitVehicle} from '../car.refactor';
+import {createHTML} from '../utils/dom-utils';
 
 function getCompoundBoundingBox (object3D) {
   var box = new THREE.Box3();
@@ -80,23 +81,27 @@ AFRAME.registerComponent('simple-car', {
 
     el.addEventListener('interaction-pick', enterOrExitVehicle);
 
-    // TODO toggle not working
-    el.addEventListener('interaction-talk', () => this.el.hasAttribute('product-configurator') ? this.el.removeAttribute('product-configurator') : this.el.setAttribute('product-configurator', true));
+    // FIXME using menu wrapper will break ability to do the editing
+    // var menu = createHTML(`<a-entity class="menu-placeholder">`);
+    // el.append(menu);
+    // el.addEventListener('interaction-talk', () => menu.hasAttribute('product-configurator') ? menu.removeAttribute('product-configurator') : menu.setAttribute('product-configurator', true));
+
+    el.setAttribute('configurable', true);
 
     // el.emit('model-loaded', {format: 'obj', model: this.model});
 
     /*      this.model = null;
-                    /*  this.objLoader = new THREE.OBJLoader();
-                        this.mtlLoader = new THREE.MTLLoader(this.objLoader.manager);
-                        // Allow cross-origin images to be loaded.
-                        this.mtlLoader.crossOrigin = ''; */
+                        /*  this.objLoader = new THREE.OBJLoader();
+                            this.mtlLoader = new THREE.MTLLoader(this.objLoader.manager);
+                            // Allow cross-origin images to be loaded.
+                            this.mtlLoader.crossOrigin = ''; */
   },
 
   update: function () {
     /*    var data = this.data;
-                    if (!data.obj) { return; }
-                    this.remove();
-                    this.loadObj(data.obj, data.mtl);**/
+                        if (!data.obj) { return; }
+                        this.remove();
+                        this.loadObj(data.obj, data.mtl);**/
   },
 
   remove: function () {
@@ -108,47 +113,47 @@ AFRAME.registerComponent('simple-car', {
 
   /*,
 
-    loadObj: function (objUrl, mtlUrl) {
-      var self = this;
-      var el = this.el;
-      var mtlLoader = this.mtlLoader;
-      var objLoader = this.objLoader;
+      loadObj: function (objUrl, mtlUrl) {
+        var self = this;
+        var el = this.el;
+        var mtlLoader = this.mtlLoader;
+        var objLoader = this.objLoader;
 
-      if (mtlUrl) {
-        // .OBJ with an .MTL.
-        if (el.hasAttribute('material')) {
-          console.warn('Material component properties are ignored when a .MTL is provided');
-        }
-        mtlLoader.setTexturePath(mtlUrl.substr(0, mtlUrl.lastIndexOf('/') + 1));
-        mtlLoader.load(mtlUrl, function (materials) {
-          materials.preload();
-          objLoader.setMaterials(materials);
-          objLoader.load(objUrl, function (objModel) {
-            self.model = objModel;
-            el.setObject3D('mesh', objModel);
-            el.emit('model-loaded', {format: 'obj', model: objModel});
+        if (mtlUrl) {
+          // .OBJ with an .MTL.
+          if (el.hasAttribute('material')) {
+            console.warn('Material component properties are ignored when a .MTL is provided');
+          }
+          mtlLoader.setTexturePath(mtlUrl.substr(0, mtlUrl.lastIndexOf('/') + 1));
+          mtlLoader.load(mtlUrl, function (materials) {
+            materials.preload();
+            objLoader.setMaterials(materials);
+            objLoader.load(objUrl, function (objModel) {
+              self.model = objModel;
+              el.setObject3D('mesh', objModel);
+              el.emit('model-loaded', {format: 'obj', model: objModel});
+            });
           });
+          return;
+        }
+
+        // .OBJ only.
+        objLoader.load(objUrl, function loadObjOnly (objModel) {
+          // Apply material.
+          var material = el.components.material;
+          if (material) {
+            objModel.traverse(function (child) {
+              if (child instanceof THREE.Mesh) {
+                child.material = material.material;
+              }
+            });
+          }
+
+          self.model = objModel;
+          el.setObject3D('mesh', objModel);
+          el.emit('model-loaded', {format: 'obj', model: objModel});
         });
-        return;
-      }
-
-      // .OBJ only.
-      objLoader.load(objUrl, function loadObjOnly (objModel) {
-        // Apply material.
-        var material = el.components.material;
-        if (material) {
-          objModel.traverse(function (child) {
-            if (child instanceof THREE.Mesh) {
-              child.material = material.material;
-            }
-          });
-        }
-
-        self.model = objModel;
-        el.setObject3D('mesh', objModel);
-        el.emit('model-loaded', {format: 'obj', model: objModel});
-      });
-    } */
+      } */
 });
 
 var meshMixin = AFRAME.primitives.getMeshMixin();

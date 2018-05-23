@@ -1,35 +1,76 @@
 
 # mai 14.-16.
-## todo
-* <del>fix raycaster for simple-car to be able to interact</del>
-    * Note:had to add model(setObject3D) after it was fully loaded(emitted model-loaded) 
-* <del>fix mem leak when picking ball</del>
-    * Note:not calling stopPropagation will result in n+1 handlers being called everytime the action is triggered
+## fixme & bug tracking  
 * fix rebind not working in hk library
 * fix controls, in they general will not be as stable with the 1.0.2 hotkey implementation
     * occurs if waiting for some time and maybe leaving window
-    * maybe the same problem with stopPropagation 
-    * moving sometimes get stuck resulting in autowalk(focus change maybe?)
+        * maybe due to visibility-change event triggering focus/blur
+    * <del>moving sometimes get stuck resulting in autowalk(focus change maybe?)</del>
         * stops of window blur so "custom-wasd-controls" 
+            * also when start moving and then quickly changing focus by hovering over object a small speed damping occurs
+                    * could have to do how custom-wasd-controls handle movement and interfering with the current hotkey implementation
+        * Note: adding "debounce keydown 100 => key disabled" will mostly solve the problem 
+    * Note: partial solution is removing universal-controls and adding look-controls again
+        * this on the other hand creates trouble with pointer lock
+        * still it seems that sometimes autowalk occurs with jumping as if 2 or more listeners are accessing the position data of the player
+            * or maybe due to physics?   
+     
 * fix HOTKEYS keyup should be handled differently because it is not always true that the action was sent from a key event
+* fix up vector of billboard
+* fix direction vector of glowMaterial 
+* fix keyboardinput library currentTarget, see shouldCaptureKeyEvent 
+* <del>fix raycaster for simple-car to be able to interact</del>
+    * Note:had to add model(setObject3D) after it was fully loaded(emitted model-loaded) 
+* <del>fix mem leak when picking ball</del>
+    * Note: not calling stopPropagation will result in n+1 handlers being called everytime the action is triggered
+* fix create configurable from template => press 't' to open menu => ctrl-z => ctrl+y will recreate the element and all gui elements and will freeze browser 
+
+
+## todo & features
 * [/] have a region with a helmet/car
     * create some controls
         * a menu with some specific sub-nodes
             * <del> color control </del>
-            * [/] material control
-            * mesh control to replace with a primitive for simplicity
+            * <del> material control </del>
+            * <del>mesh control to select parts of the el or mesh</del>
+            * mesh control to replace a part with some other like a primitive for simplicity
         * <del> use "createTemplateListView" to create a more versatile/stable listview </del>
     * animationPath component based on 
         * http://ngokevin.com/blog/aframe-component/#line-component-schema
         * and zoom-utils of previous work with zoom component and tweenjs
 * create some different billboard components
-* add undo manager to template-list-view and color select
-        
-        
-        
+    * http://www.opengl-tutorial.org/intermediate-tutorials/billboards-particles/billboards/
+* add undo manager to template-list-view and color select  
 * improve components 
     * http://ngokevin.com/blog/aframe-component/#line-component-schema
     * and see other implementations like gui-button for building/extending other components 
+* be able to jump on created templates and boxes via jump-component
+* create wireframe preview for specific selected partial mesh within object as overlay
+    * then use material and color select lists to alter 
+* have different options to alter an element
+    * group 'editable' handles all other editing components    
+        * eg 
+            * configurable (mesh/material/color)
+            * transformable (translate/scale/rotate)
+        * if one component gets set the previous/others are cached and hidden
+        
+* have dedicated actions 'action-mod-1' 'action-mod-2' action-mod-3' bound to ctrl/shift/ctrl+shift by default 
+    
+    
+# feature outline
+## hotkeys
+* the hotkeys plugin shouldn't solely work with keyboard but with other arbitary events
+    * meaning if I bind an action to a list of events and combos they all will trigger the action
+    * problems occur if we rely on data passed by the event like if the first or second handler where triggered
+        * so how to handle such cases?    
+        
+    * also further abstraction  should exist in the form of actions
+        * example: an action "move-forward"
+            * bound to "keyboard:w" and "mouse:down" and "deviceX:buttonY"
+        * menu-up/down  or next prev + child/parent menu 
+            * ....  
+           
+    
 
 
 
