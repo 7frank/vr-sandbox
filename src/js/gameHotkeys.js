@@ -70,7 +70,7 @@ function addHotkeys () {
     redo: 'redo'
   };
 
-  Hotkeys.register('show help', 'o');
+  Hotkeys.register('show help', 'h');
   Hotkeys().on('show help', function () {
     openOptionsDialog('general');
   });
@@ -220,20 +220,22 @@ function addHotkeys () {
   // TODO "live bind" this via "esc or ctrl+s or similar" to aframe-textarea-component > textarea and disable mouetrap while editing
   // Hotkeys('stop editing ', 'm', stopEditingTextarea, {category: 'editing', description: 're-enables navigation of scene'});
 
-  Hotkeys.register('increase size of textarea', '+', {
-    category: 'editing'
+  Hotkeys.register('action-increase', '+', {
+    category: 'editing',
+    description: 'increase size of an element (like textarea)'
   });
-  Hotkeys().on('increase size of textarea', function () {
+  Hotkeys().on('action-increase', function () {
     var textarea = getTextEditorInstance().get(0);
     var oldScale = textarea.getAttribute('scale');
     textarea.setAttribute('scale', '' + oldScale.x * 1.2 + ' ' + oldScale.y * 1.2 + ' ' + 1);
   });
 
-  Hotkeys.register('increase size of textarea', '+', {
-    category: 'editing'
+  Hotkeys.register('action-decrease', '-', {
+    category: 'editing',
+    description: 'decrease size of an element (like textarea)'
   });
 
-  Hotkeys().on('increase size of textarea', function () {
+  Hotkeys().on('action-decrease', function () {
     var textarea = getTextEditorInstance().get(0);
     var oldScale = textarea.getAttribute('scale');
     textarea.setAttribute('scale', '' + oldScale.x * 0.8 + ' ' + oldScale.y * 0.8 + ' ' + 1);

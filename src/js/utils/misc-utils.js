@@ -1,6 +1,6 @@
+import * as _ from 'lodash';
 
-export
-function getFileExt (file) {
+export function getFileExt (file) {
   return file.name.split('.').pop();
 }
 
@@ -62,19 +62,27 @@ function preg_quote (str, delimiter) {
 }
 
 /**
- * Like throttle but suppresses propagation.
+ * Like throttle but for events as first arguments. suppresses propagation so the event isn't bubbling while no further handling occurs.
+ * This is particularly helpful for 3d menus where the same keys are used like for menu navigation, therefor preventing movement of player while navigating.
  * @param fn
  * @param wait
  * @returns {Function}
  */
-export
-function suppressedThrottle (fn, wait) {
+export function suppressedThrottle (fn, wait) {
   var time = Date.now();
-
+  var res;
   return function (e) {
     if ((time + wait - Date.now()) < 0) {
-      fn.apply(this, arguments);
+      res = fn.apply(this, arguments);
       time = Date.now();
-    } else { e.stopPropagation(); }
+      return res;
+    } else {
+      e.stopPropagation();
+      return res;
+    }
   };
+}
+
+export function roundTo (number, interval) {
+  return (_.round(number / interval) * interval);
 }

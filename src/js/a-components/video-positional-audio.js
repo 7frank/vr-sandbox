@@ -12,7 +12,7 @@ AFRAME.registerComponent('video-positional-audio', {
     volume: {type: 'number', default: '1'}
   },
   init: function () {
-    this.mInterval = new FPSCtrl(10, function () {
+    this.mInterval = new FPSCtrl(5, function () {
       var video = this.el.querySelector('video');
 
       let distanceVector = getVectorRelativeToPlayer(this.el);
@@ -28,5 +28,8 @@ AFRAME.registerComponent('video-positional-audio', {
       }
     }, this)
       .start();
+  },
+  remove: function () {
+    this.mInterval.stop();
   }
 });

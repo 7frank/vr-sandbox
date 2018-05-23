@@ -16,9 +16,7 @@ export function addControlsToModel (el) {
 
   el.setAttribute('transformable', true);
 
-  sceneEl.setAttribute('transform-controls', {target: el});
-
-  getPlayer().setAttribute('player-state', 'edit-model');
+  // getPlayer().setAttribute('player-state', 'edit-model');
 
   notifyModelImported(el);
 }
@@ -47,6 +45,7 @@ function notifyModelImported (el, target = document) {
 export function createGLTFEntityFromDataURL (dataURL) {
   var tpl = `<a-entity class="imported-model"
         scale="1 1 1"
+        configurable
         animation-mixer="clip: *;"
         gltf-model="src: url(${dataURL});"> 
         </a-entity>`;

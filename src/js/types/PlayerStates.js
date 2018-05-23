@@ -20,8 +20,8 @@ class PlayerStates extends HTMLElementStates {
   registerPlayerStates () {
     this.addState('move', {
       'mouse-controls': {enabled: true, pointerlockEnabled: true},
-      'customizable-wasd-controls': true,
-      'universal-controls': 'rotationSensitivity:0.2'
+      'customizable-wasd-controls': true
+      // 'universal-controls': 'rotationSensitivity:0.2'
     });
 
     this.addState('edit-model', {
