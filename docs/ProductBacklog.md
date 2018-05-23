@@ -1,5 +1,11 @@
+# youtube/peatron
+* create videos for new features
+    * import transform
+    * configure
+    
 
-# mai 14.-16.
+
+# mai 14.-16. ongoing
 ## fixme & bug tracking  
 * fix rebind not working in hk library
 * fix controls, in they general will not be as stable with the 1.0.2 hotkey implementation
@@ -24,7 +30,9 @@
 * <del>fix mem leak when picking ball</del>
     * Note: not calling stopPropagation will result in n+1 handlers being called everytime the action is triggered
 * fix create configurable from template => press 't' to open menu => ctrl-z => ctrl+y will recreate the element and all gui elements and will freeze browser 
-
+* test the importer with not working gltf files and make sure something gets rendered
+    * if images are missing a missing-texture placeholder should be enough
+    * if binaries are not existiing or other things a more meaningfull descriptioin would be nice
 
 ## todo & features
 * [/] have a region with a helmet/car
@@ -35,27 +43,33 @@
             * <del>mesh control to select parts of the el or mesh</del>
             * mesh control to replace a part with some other like a primitive for simplicity
         * <del> use "createTemplateListView" to create a more versatile/stable listview </del>
-    * animationPath component based on 
-        * http://ngokevin.com/blog/aframe-component/#line-component-schema
-        * and zoom-utils of previous work with zoom component and tweenjs
-* create some different billboard components
+    * have animation paths when selecting from the mesh list 
+        * also make other elements transparent as they are not the focus of the user   
+        * animationPath component based on 
+            * http://ngokevin.com/blog/aframe-component/#line-component-schema
+            * and zoom-utils of previous work with zoom component and tweenjs
+* [/]create some different billboard components
     * http://www.opengl-tutorial.org/intermediate-tutorials/billboards-particles/billboards/
 * add undo manager to template-list-view and color select  
 * improve components 
     * http://ngokevin.com/blog/aframe-component/#line-component-schema
     * and see other implementations like gui-button for building/extending other components 
 * be able to jump on created templates and boxes via jump-component
-* create wireframe preview for specific selected partial mesh within object as overlay
-    * then use material and color select lists to alter 
+* <del>create wireframe preview for specific selected partial mesh within object as overlay</del>
+    * <del>then use material and color select lists to alter</del> 
 * have different options to alter an element
     * group 'editable' handles all other editing components    
         * eg 
             * configurable (mesh/material/color)
             * transformable (translate/scale/rotate)
-        * if one component gets set the previous/others are cached and hidden
-        
+        * if one component gets set the previous/others are cached and hidden        
 * have dedicated actions 'action-mod-1' 'action-mod-2' action-mod-3' bound to ctrl/shift/ctrl+shift by default 
-    
+* component that places menu items directly on the hud (might interfere with picking if pointerlock is enabled)    
+* multi-page-dialog
+    * every child node is one page
+    * use created videos in demo scene where dialog contains video
+        * https://you-link.herokuapp.com/?url=https://www.youtube.com/watch?v=IwdB-7uNHfk
+
     
 # feature outline
 ## hotkeys

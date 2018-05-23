@@ -86,3 +86,7 @@ export function suppressedThrottle (fn, wait) {
 export function roundTo (number, interval) {
   return (_.round(number / interval) * interval);
 }
+
+export function isURL (str) {
+  return /^(?:\w+:)?\/\/([^\s.]+\.\S{2}|localhost[:?\d]*)\S*$/.test(str);
+}

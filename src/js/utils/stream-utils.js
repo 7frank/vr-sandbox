@@ -34,7 +34,7 @@ export function streamIn (url, onProgress, knownMaxSize = -1) {
               } else {
                 progressSize += value.length;
 
-                if (onProgress) onProgress({current: progressSize, size: knownMaxSize});
+                if (onProgress) onProgress({current: progressSize, size: knownMaxSize, value});
               }
 
               // Bekomme die Daten und sende diese an den Browser durch den Controller weiter

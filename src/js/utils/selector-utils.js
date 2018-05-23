@@ -14,15 +14,19 @@ import {createNamespace, namespaceExists, namespaceInfo} from './namespace';
  *
  *  @example
  *  //find all cameras that are currently invisible
- *  querySelectorAll(".PerspectiveCamera[visible=false]")
+ *  querySelectorAll(el,".PerspectiveCamera[visible=false]")
  *
  *  @example
  *  //find all meshes whose bounding spheres have a smaller radius than 1 (this is working by having non-standard pseudo element 'get' which is parsed in a different manner)
- *  querySelectorAll(".Mesh:where(geometry-boundingSphere-radius<1)")
+ *  querySelectorAll(el,".Mesh:where(geometry-boundingSphere-radius<1)")
  *
  *  @example
  *  //query for elements whose name property is wireframe
- *  querySelectorAll("[name='wireframe']")
+ *  querySelectorAll(el,"[name='wireframe']")
+ *
+ *  @example
+ *  //query for bigger visible objects and turn them invisible
+ *  querySelectorAll(el, '.Mesh:where(geometry-boundingSphere-radius<5) :where(material-visible)').map(mesh=> _.get(mesh,'material')).map( m => m.visible=!m.visible)
  *
  *  @param {THREE.Object3D} object3D - An object of the scene graph that will be the root.
  *  @param {selector} selector - A css selector.

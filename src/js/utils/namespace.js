@@ -4,6 +4,9 @@ import * as _ from 'lodash';
  *  Helper to create a recursive namespace object.
  *  Example: Use a string like "nk.my.ns" or an array like ['nk']['my-other-ns'].
  *  Note: this also will get the namespace if it was previously created.
+ *
+ *  TODO use lodash.set instead
+ *
  * @param {String|String[]} namespace - The string or array containing.
  * @param {object} base - A Object in which the namespace will be created.
  * @returns {object} Returns the last created leaf object of the namespace.
@@ -60,17 +63,7 @@ export function namespaceExists (namespace, base) {
   }
 
   if (namespace == '') return true;
-
-  var splitNs = namespace.split('.');
-  var builtNs = splitNs[0];
-
-  var i;
-  for (i = 0; i < splitNs.length; i++) {
-    if (base[splitNs[i]] == undefined || base[splitNs[i]] == null) return false;
-    base = base[splitNs[i]];
-  }
-
-  return true;
+  return _.get(base, namespace) != undefined;
 }
 
 export function namespaceInfo (namespace) {

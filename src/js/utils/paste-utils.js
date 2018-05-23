@@ -2,7 +2,7 @@
  * @author {@link https://ourcodeworld.com/articles/read/491/how-to-retrieve-images-from-the-clipboard-with-javascript-in-the-browser}
  * This handler retrieves the images from the clipboard as a blob and returns it in a callback.
  *
- * TODO erfactor/extend and support text and other useful formats
+ * TODO refactor/extend and support video audio and other useful formats
  * https://www.lucidchart.com/techblog/2014/12/02/definitive-guide-copying-pasting-javascript/
  *
  *

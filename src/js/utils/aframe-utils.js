@@ -4,6 +4,9 @@ import * as _ from 'lodash';
 import {getPlayer} from '../game-utils';
 import {appendImageToDOM} from '../sketchfab/sketchfab-render';
 import {UndoMgr} from './undo-utils';
+import {streamIn} from './stream-utils';
+import {createHTML} from './dom-utils';
+import {createNamespace, namespaceExists} from './namespace';
 
 /**
  * @deprecated this won't work with elements from different regions TODO getWorldPosition should be used in some way
@@ -186,19 +189,23 @@ export function findClosestEntity (targetSelector, selector = '.player', minDist
  */
 
 export function toast (msg, action) {
-  // TODO get element that owns the current camera, maybe via event or a convention
-  var el = $('.player').get(0);
+  var el = getPlayer();
 
   var actionParam = '';
   if (action) {
     actionParam = `action="${action}"`;
   }
-  var t = `<a-entity class="toast-wrapper"><a-toast message="${msg}" ${actionParam}></a-toast></a-entity>`;
+  var t = `<a-entity class="toast-wrapper" ><a-toast  material="depthTest:false" message="${msg}" ${actionParam}></a-toast></a-entity>`;
   el.insertAdjacentHTML('beforeend', t);
 
   var wrappers = [...el.querySelectorAll('.toast-wrapper')];
 
-  var i = -0.5;
+  function checkToastForDeletion (el) {
+    if (_.get(el, 'components.toast.label.object3D.children[0].material.opacity') == 0) { el.parentNode.removeChild(el); }
+  }
+  el.querySelectorAll('a-toast').forEach(el => checkToastForDeletion(el));
+
+  var i = -0.6;
 
   for (let item of wrappers.reverse()) {
     item.setAttribute('position', `0 ${i} 1`);
@@ -354,6 +361,52 @@ export function scaleEntity (el, size) {
 
     console.log(el.object3D.position);
   }
+}
+
+/**
+ * Use to render a (object) url with some type info.
+ * @param url
+ * @param typeInfo
+ * @param typeInfo.ext
+ * @param typeInfo.mime
+ * @returns {HTMLElement}
+ */
+export function renderURL (url, typeInfo) {
+  var category = typeInfo.mime.split('/')[0];
+
+  switch (category) {
+    case 'image':return renderImage(url);
+    case 'text':return renderAsTextarea(url);// TODO render in text editor
+    case 'video':return renderVideo(url);
+    default:return renderText(url);
+  }
+}
+
+/**
+ *  Creates a text area and adds it to the scene.
+ *
+ * @param url
+ * @returns {HTMLElement}
+ */
+export function renderAsTextarea (url) {
+  var el = createHTML(`<a-entity textarea></a-entity>`);
+  setTimeout(() => el.components.textarea.background.setAttribute('material', 'shader', 'flat'), 1000);
+
+  // http://localhost:9000/socket.io/socket.io.js
+
+  function setText (txt) {
+    // el.setAttribute('textarea', 'text', txt)
+    el.components.textarea.textarea.value = txt;
+  }
+
+  streamIn(url)
+    .then(res => res.text())
+    .then(txt => setText(txt))
+    .catch(e => setText(e.message));
+
+  renderAtPlayer(el);
+
+  return el;
 }
 
 /**

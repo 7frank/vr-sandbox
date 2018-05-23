@@ -57,11 +57,14 @@ import {
 import {getAuth} from './sketchfab/sketchfab-browser';
 import {isShiftDown, onDropZoneDrop} from './utils/file-drag-drop-utils';
 import {retrieveImageOrTextFromClipboardAsBlob} from './utils/paste-utils';
-import {renderImage, renderText} from './utils/aframe-utils';
+import {renderImage, renderText, renderURL, renderVideo, toast} from './utils/aframe-utils';
 import {createHTML as parseHTML} from './utils/dom-utils';
 
 import Vue from 'vue/dist/vue.esm';
 import {UndoMgr} from './utils/undo-utils';
+import {isURL} from './utils/misc-utils';
+
+import fileType from 'file-type';
 
 // TODO log per instance of global active inactive
 // Logger.setState(true);
@@ -166,11 +169,11 @@ function reloadSceneToDOM () {
 
     // FIXME no longer detecting loaded
     /*  copy.get(0).addEventListener('loaded', function () {
-                                                      console.log('scene was loaded');
-                                                      setTimeout(function () {
-                                                        copy.attr('visible', true);
-                                                      }, 500);
-                                                    }); */
+                                                              console.log('scene was loaded');
+                                                              setTimeout(function () {
+                                                                copy.attr('visible', true);
+                                                              }, 500);
+                                                            }); */
 
     $('a-scene').replaceWith(copy);
 
@@ -292,7 +295,8 @@ function reloadSceneToDOM () {
 
 /**
  * for those of us that want to use aframe with desktop
- *
+ * drag&drop functionality
+ * TODO refactor and reuse drag&drop portions and zip + other utils
  */
 function addListeners () {
   var scene = $('a-scene');
@@ -335,13 +339,48 @@ function addListeners () {
           var el = renderImage(url);
           addControlsToModel(el);
         }
-      } else
-      if (type == 'text') {
+      } else if (type == 'text') {
         var str = data;
 
-        var el = renderText(str);
+        if (isURL(str)) {
+          toast('downloading: ' + str.substr(0, 10) + ' ..');
 
-        addControlsToModel(el);
+          var mFileType;
+
+          streamIn(str, _.once(function onProgress (info) {
+            if (!mFileType) {
+              mFileType = fileType(info.value);
+            }
+
+            console.log('paste-download-progress detected filetype:', mFileType, info);
+          })).then(async function (response) {
+            // http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4
+            //  const url = 'http://assets-cdn.github.com/images/spinners/octocat-spinner-32.gif';
+            // => {ext: 'gif', mime: 'image/gif'}
+            var arrayBuffer = await response.arrayBuffer();
+
+            if (!mFileType) {
+              mFileType = fileType(arrayBuffer);
+            }
+            var blob = new Blob([arrayBuffer]);
+            var objectURL = URL.createObjectURL(blob);
+
+            // TODO
+            if (!mFileType) {
+              mFileType = {ext: '*', mime: 'text/*'};
+              console.warn('no mime type detected, creating generic text', mFileType);
+            }
+
+            var el = renderURL(objectURL, mFileType);
+            addControlsToModel(el);
+          }).catch(function (e) {
+            console.error(e);
+            toast(e.message);
+          });
+        } else {
+          var el = renderText(str);
+          addControlsToModel(el);
+        }
       }
     });
   }
