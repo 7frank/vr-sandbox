@@ -51,11 +51,18 @@ export var UndoMgr = {
 
     removeElement();
   },
-  addHTMLAttributes: function (el, attributes) {
-    var oldAttributes = _.mapValues(attributes, (attr, key) => el.getAttribute(key));
+  /**
+     * Puts attribute changes of a HTMLElement onto the undo stack.
+     * @param {HTMLElement} el - The target for the undo/redo.
+     * @param {object} attributes - A map containing attributes that should be changed via setAttribute.
+     * @param {object} [oldAttributes] - A map containing attributes that will be used for the undo step. Note: If left undefined, 'oldAttributes' will be retrieved from the 'attributes' keys.
+     */
+  addHTMLAttributes: function (el, attributes, oldAttributes) {
+    if (!oldAttributes) {
+      oldAttributes = _.mapValues(attributes, (attr, key) => el.getAttribute(key));
+    }
 
     const addAttrs = (attributes) => () => _.each(attributes, (attr, key) => (attr != null) ? el.setAttribute(key, attr) : el.removeAttribute(key));
-
     this.add({
       redo: addAttrs(attributes),
       undo: addAttrs(oldAttributes)
