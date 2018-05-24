@@ -58,6 +58,7 @@ AFRAME.registerComponent('simple-video-player', {
 
     this.patchIDs();
 
+    // --------------------------
     this.mPlayPauseInterval = new FPSCtrl(10, function () {
       var video = this.el.querySelector('.video-src');
 
@@ -68,6 +69,22 @@ AFRAME.registerComponent('simple-video-player', {
       }
       if (distance > this.data['auto-pause'] && !video.paused) {
         this.el.dispatchEvent(new Event('pause'));
+      }
+    }, this)
+      .start();
+
+    // --------------------
+    this.sideCheckScript = new FPSCtrl(5, function () {
+      var side = checkSide(this.el.object3D, this.el.sceneEl.camera.el.object3D);
+
+      if (side == 'back') {
+        this.controlsEl.getAttribute('position').z = -0.5;
+        this.controlsEl.setAttribute('rotation', '0 180 0');
+        this.videoEl.setAttribute('rotation', '0 180 0');
+      } else {
+        this.controlsEl.getAttribute('position').z = 0.5;
+        this.controlsEl.setAttribute('rotation', '0 0 0');
+        this.videoEl.setAttribute('rotation', '0 0 0');
       }
     }, this)
       .start();
@@ -88,21 +105,10 @@ AFRAME.registerComponent('simple-video-player', {
     this.el.querySelector('.video-src').removeAttribute('src');
     this.el.querySelector('.video-src').innerHTML = `<source src="${this.data.src}"/>`;
   },
-  tick: function () {
-    var side = checkSide(this.el.object3D, this.el.sceneEl.camera.el.object3D);
-
-    if (side == 'back') {
-      this.controlsEl.getAttribute('position').z = -0.5;
-      this.controlsEl.setAttribute('rotation', '0 180 0');
-      this.videoEl.setAttribute('rotation', '0 180 0');
-    } else {
-      this.controlsEl.getAttribute('position').z = 0.5;
-      this.controlsEl.setAttribute('rotation', '0 0 0');
-      this.videoEl.setAttribute('rotation', '0 0 0');
-    }
-  },
   remove: function () {
     this.mPlayPauseInterval.stop();
+
+    this.sideCheckScript.stop();
   }
 
 });

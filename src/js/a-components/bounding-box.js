@@ -1,6 +1,7 @@
 import {BoxHelperExt} from '../three/BoxHelperExt';
 import {FPSInfo, FPSCtrl} from '../utils/fps-utils';
 import {setLayersForObject, Layers} from '../types/Layers';
+import {isVisibleTo} from '../utils/aframe-utils';
 
 /**
  * creates a axis aligned bounding box (aabb) for a entity it is attached to
@@ -27,6 +28,9 @@ AFRAME.registerComponent('bb', {
     obj.parent.add(this.mHelper);
 
     this.updateBBoxScript = new FPSCtrl(0.5, function (e) {
+      //  check if the layer of the boxhelper is visible
+      if (!isVisibleTo(this.mHelper, this.el.sceneEl.camera)) return;
+
       // render each frame here
       this.mHelper.update(undefined, obj.parent, true, false);
     }, this);
