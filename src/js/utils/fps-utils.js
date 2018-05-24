@@ -47,7 +47,7 @@ export function FPSCtrl (fps = 30, onFrame, context) {
 
   this.mContext = context;
 
-  function loop (timestamp) {
+  function scriptLoop (timestamp) {
     if (time === null) time = timestamp; // init start time
     var seg = Math.floor((timestamp - time) / delay); // calc frame no.
     if (seg > frame) { // moved to next frame?
@@ -63,7 +63,7 @@ export function FPSCtrl (fps = 30, onFrame, context) {
 
       infoQueue.enqueue(timer.getElapsedTime());
     }
-    tref = requestAnimationFrame(loop);
+    tref = requestAnimationFrame(scriptLoop);
   }
 
   // play status
@@ -86,7 +86,7 @@ export function FPSCtrl (fps = 30, onFrame, context) {
   this.start = function () {
     if (!this.isPlaying) {
       this.isPlaying = true;
-      tref = requestAnimationFrame(loop);
+      tref = requestAnimationFrame(scriptLoop);
     }
     return this;
   };

@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import {getPlayer} from '../game-utils';
+import {getWorldPosition} from '../utils/aframe-utils';
 
 /**
  * create an element that loads the data-url into a second instance on the same device
@@ -13,7 +14,7 @@ export function importOrLoadFromCache (dataURL) {
 
   var el = $(tpl);
 
-  var playerPos = getPlayer().object3D.getWorldPosition();
+  var playerPos = getWorldPosition(getPlayer().object3D);
 
   el.get(0).setAttribute('position', AFRAME.utils.coordinates.stringify(playerPos));
 

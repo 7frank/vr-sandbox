@@ -4,6 +4,7 @@ import {querySelectorAll} from './selector-utils';
 import {BoxHelperExt} from '../three/BoxHelperExt';
 import {FPSCtrl} from './fps-utils';
 import {setLayersForObject, Layers} from '../types/Layers';
+import {getWorldPosition, getWorldQuaternion, getWorldScale} from './aframe-utils';
 
 /**
  * TODO direct fpsctrls are not tracked by performance view. .... how to best track them as well
@@ -72,11 +73,11 @@ export function testCompoundGLTF (modelEl, debug = false, maxSize = 20) {
     // var vPosition = el.position.clone().applyMatrix4(region.object3D.matrix).add(vCenter);
 
     // TODO shouldn't the center be applied Oo?
-    var vPosition = el.getWorldPosition();// .applyMatrix4(region.object3D.matrix)
+    var vPosition = getWorldPosition(el);// .applyMatrix4(region.object3D.matrix)
     // .add(vCenter);
 
-    var vScale = el.getWorldScale();
-    var vQuaternion = el.getWorldQuaternion();
+    var vScale = getWorldScale(el);
+    var vQuaternion = getWorldQuaternion(el);
 
     var testMult = 1;
     size.x *= vScale.x * testMult;

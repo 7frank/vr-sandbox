@@ -1,5 +1,6 @@
 import TWEEN from '@tweenjs/tween.js';
 import {querySelectorAll} from './selector-utils';
+import {getWorldPosition} from './aframe-utils';
 
 /**
  * static helper for smooth navigation within 3D space
@@ -21,7 +22,7 @@ export default class ZoomUtil {
     var lookAtVectorOrig = camera.applyQuaternion(camera.quaternion);
 
     // cameraEl.setAttribute("position",);
-    var targetPosition = targetMesh.getWorldPosition();
+    var targetPosition = getWorldPosition(targetMesh);
     ZoomUtil.moveToMesh(targetMesh, camera, lookAtVectorOrig, 10, function onComplete () {
       rootEl.sceneEl.camera.el.setAttribute('position', targetPosition);
     });

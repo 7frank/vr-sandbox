@@ -1,5 +1,6 @@
 
 import { FPSCtrl} from '../../utils/fps-utils';
+import {getWorldPosition} from '../../utils/aframe-utils';
 
 const vertexShader = `
 uniform vec3 viewVector;
@@ -161,7 +162,7 @@ function createGlowForMesh (origMesh, actorMesh, cameraMesh) {
   if (!glowMaterial) {
     glowMaterial = createCustomGlowMaterial();// createCustomOutlineMaterial(cameraPos);//
     glowMaterialScript = new FPSCtrl(20, function () {
-      glowMaterial.uniforms.viewVector.value = cameraMesh.getWorldPosition().sub(actorMesh.getWorldPosition()).normalize();
+      glowMaterial.uniforms.viewVector.value = getWorldPosition(cameraMesh).sub(getWorldPosition(actorMesh)).normalize();
     }).start();
   }
 

@@ -3,6 +3,7 @@ import {Terrain} from './lod-terrain-index';
 import {ImprovedNoise} from './PerlinNoise';
 import {updateHotComponent} from '../../utils/aframe-debug-utils';
 import {FPSInfo, FPSCtrl} from '../../utils/fps-utils';
+import {getWorldPosition} from '../../utils/aframe-utils';
 
 function toArray2D (vertices, options) {
   var tgt = new Array(options.xSegments),
@@ -110,9 +111,9 @@ AFRAME.registerComponent('cdlod-terrain', {
     var mesh = new Terrain(data, worldWidth, levels, resolution);
 
     this.followCameraScript = new FPSCtrl(30, function () {
-      var camPos = this.el.sceneEl.camera.el.object3D.getWorldPosition();
+      var camPos = getWorldPosition(this.el.sceneEl.camera.el.object3D);
 
-      var mPos = mesh.getWorldPosition();
+      var mPos = getWorldPosition(mesh);
 
       mPos.sub(camPos);
 

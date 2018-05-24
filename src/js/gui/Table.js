@@ -48,5 +48,10 @@ export function createTable (onRowClick = function () {}) {
     this.$data.tableData.push(entry);
   };
 
+  app.clear = function () {
+    this.$data.columns = [];
+    this.$data.tableData = [];
+  };
+
   return app;
 }
