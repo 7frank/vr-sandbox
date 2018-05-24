@@ -9,7 +9,7 @@ import {appendStyle, createHTML, setCenter} from '../../../utils/dom-utils';
 import Vue from 'vue/dist/vue.esm';
 import KeenUI from 'keen-ui';
 import {createCameraConfigGUI} from '../../../types/Layers';
-import {ImpactObject} from '../../../utils/performance-utils';
+import { ScriptImpactObject, RaycasterImpactObject} from '../../../utils/performance-utils';
 import {createTable} from '../../Table';
 import {createOptions} from '../GeneralOptions';
 // import keenCss from 'keen-ui/dist/keen-ui.css';
@@ -138,7 +138,9 @@ export function createGeneralOptionsDialog (camera) {
         </ui-tab>
          <ui-tab id="controls" title="Controls" icon="google_controller"  v-on:select="createOrShowControlsOptions($event)">
         </ui-tab>
-        <ui-tab id="performance" title="Performance"  icon="trending_up" v-on:select="createOrShowPerformanceInfo($event)">
+        <ui-tab id="performance" title="Script-Perf"  icon="trending_up" v-on:select="createOrShowScriptPerformanceInfo($event)">
+        </ui-tab>
+        <ui-tab id="ray-performance" title="Raycast-Perf"  icon="trending_up" v-on:select="createOrShowRaycasterPerformanceInfo($event)">
         </ui-tab>
         <ui-tab  id="layers" title="Layers" icon="visibility_off"  v-on:select="createOrShowLayers($event)" >
         </ui-tab>
@@ -168,10 +170,10 @@ export function createGeneralOptionsDialog (camera) {
         that.innerHTML = '';
         that.append(app.$el);
       },
-      createOrShowPerformanceInfo: function (that) {
+      createOrShowScriptPerformanceInfo: function (that) {
         var that = this.$el.querySelector('#' + that);
 
-        var data = ImpactObject();
+        var data = ScriptImpactObject();
         var vueTable = createTable(function (obj) {
           let details = data.m[obj.row.id];
           window.details = details;
@@ -184,6 +186,30 @@ export function createGeneralOptionsDialog (camera) {
         });
 
         for (var entry of data.vm) { vueTable.addRow(entry); }
+
+        that.append(createHTML('<button>refresh list</button><br>'));
+        that.append(vueTable.$el);
+      },
+      createOrShowRaycasterPerformanceInfo: function (that) {
+        var that = this.$el.querySelector('#' + that);
+
+        var data;
+        var vueTable = createTable(function (obj) {
+          let details = data.m[obj.row.id];
+          window.details = details;
+          console.group(details.context.el.tagName + ' - ' + details.context.attrName);
+
+          console.log(details.context.el);
+          console.log(details.target);
+          console.log("you now can access full 'details' from 'window' scope", details);
+          console.groupEnd();
+        });
+        RaycasterImpactObject(vueTable, function (tree) {
+          data = tree;
+
+          window.table = {vueTable, tree};
+        });
+        // for (var entry of data.vm) { vueTable.addRow(entry); }
 
         that.append(createHTML('<button>refresh list</button><br>'));
         that.append(vueTable.$el);

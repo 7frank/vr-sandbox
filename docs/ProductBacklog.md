@@ -1,4 +1,4 @@
-# youtube/peatron
+# youtube/paetron
 * create videos for new features
     * import transform
     * configure
@@ -33,6 +33,14 @@
 * test the importer with not working gltf files and make sure something gets rendered
     * if images are missing a missing-texture placeholder should be enough
     * if binaries are not existiing or other things a more meaningfull descriptioin would be nice
+## fix performance
+* fixme performance
+    * <del>raycaster intersect object</del>
+        * Note dummy-raycaster component for entities that shall not be interacted with
+    * <del>getWorldPosition rotation scale quaternion all are badly performing when called often</del>
+        * Note: using custom version without updateWorldMatrix(force=true) + foreach children
+    * <del>write a issue report and ask for clarification</del>
+    * FIXME check if the layer of the boxhelper is visible to the camera if not no update is necessary
 
 ## todo & features
 * [/] have a region with a helmet/car
@@ -69,6 +77,11 @@
     * every child node is one page
     * use created videos in demo scene where dialog contains video
         * https://you-link.herokuapp.com/?url=https://www.youtube.com/watch?v=IwdB-7uNHfk
+* draw placeholder images when gltf-zip idoes not contain valid links        
+## todo gui-hud
+* have a second renderer for hud-gui
+    * render gui at first with depthwrite enabled but depth write value == closest
+    * render second time normal but no need for sorting or matrix updates
 
     
 # feature outline
@@ -83,6 +96,11 @@
             * bound to "keyboard:w" and "mouse:down" and "deviceX:buttonY"
         * menu-up/down  or next prev + child/parent menu 
             * ....  
+            
+* cors 
+    * in case the user does have its private storage attached
+        * https://www.npmjs.com/package/cors-anywhere
+        * proxy and/or upload files for easier work flow
            
     
 

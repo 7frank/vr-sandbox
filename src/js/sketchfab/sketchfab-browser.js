@@ -29,6 +29,17 @@ var console = Logger.getLogger('sketchfab-browser');
  *
  */
 
+function createPlaceholderTexture (text) {
+  var canvas = document.createElement('canvas');
+  var ctx = canvas.getContext('2d');
+  ctx.font = '30px Arial';
+  ctx.strokeText(text, 10, 50);
+
+  var blob = canvas.toBlob();
+
+  return URL.createObjectURL(blob);
+}
+
 /**
  * Creates and returns a HTMLElement-Container that renders the asset browser of SketchFab.
  * @param onImport
@@ -173,17 +184,25 @@ export function rewritePathsOfSceneGLTF (sceneFileContent, fileUrls) {
   var json = sceneFileContent;
 
   // Replace original buffers and images by blob URLs
+  console.log('buffers required by model', json.buffers);
   if (json.hasOwnProperty('buffers')) {
     for (var i = 0; i < json.buffers.length; i++) {
-      console.log('buffers before after', json.buffers[i].uri, fileUrls[json.buffers[i].uri]);
+      console.log('buffers: before &  after conversion', json.buffers[i].uri, fileUrls[json.buffers[i].uri]);
       json.buffers[i].uri = fileUrls[json.buffers[i].uri].url;
     }
   }
 
   if (json.hasOwnProperty('images')) {
+    console.log('images required by model', json.images);
     for (var i = 0; i < json.images.length; i++) {
-      console.log('images before after', json.images[i].uri, fileUrls[json.images[i].uri]);
-      json.images[i].uri = fileUrls[json.images[i].uri].url;
+      var src = json.images[i].uri;
+      var target = fileUrls[json.images[i].uri];
+      console.log('images: before &  after conversion', src, target);
+
+      if (target && target.url) { json.images[i].uri = target.url; } else {
+        console.warn('image file not found', json.images[i]);
+        json.images[i].uri = ''; // createPlaceholderTexture(json.images[i].name); //FIXME must be aysnc
+      }
     }
   }
 

@@ -65,6 +65,7 @@ import {UndoMgr} from './utils/undo-utils';
 import {isURL} from './utils/misc-utils';
 
 import fileType from 'file-type';
+import './utils/raycaster-performance-util';
 
 // TODO log per instance of global active inactive
 // Logger.setState(true);
