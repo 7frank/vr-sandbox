@@ -130,11 +130,11 @@ export function getDirectionForEntity (entity) {
   return direction;
 
   /* var pos = o3d.position;
-                var up = o3d.up;
-                var quaternion = o3d.quaternion;
-                var direction = new THREE.Vector3().copy(up);
-                direction.applyQuaternion(quaternion);
-                return direction; */
+                  var up = o3d.up;
+                  var quaternion = o3d.quaternion;
+                  var direction = new THREE.Vector3().copy(up);
+                  direction.applyQuaternion(quaternion);
+                  return direction; */
 }
 
 /**
@@ -150,10 +150,10 @@ export function findClosestEntity (targetSelector, selector = '.player', minDist
 
   if (!targets.length) throw new Error('probably invalid targetSelector');
 
-  var p = player.object3D.getWorldPosition();// .position;
+  var p = getWorldPosition(player.object3D);// .position;
 
   function getDir (ball) {
-    var b = ball.object3D.getWorldPosition();// .position;
+    var b = getWorldPosition(ball.object3D);// .position;
     var direction = p.clone().sub(b);
 
     return direction;
@@ -201,8 +201,11 @@ export function toast (msg, action) {
   var wrappers = [...el.querySelectorAll('.toast-wrapper')];
 
   function checkToastForDeletion (el) {
-    if (_.get(el, 'components.toast.label.object3D.children[0].material.opacity') == 0) { el.parentNode.removeChild(el); }
+    if (_.get(el, 'components.toast.label.object3D.children[0].material.opacity') == 0) {
+      el.parentNode.removeChild(el);
+    }
   }
+
   el.querySelectorAll('a-toast').forEach(el => checkToastForDeletion(el));
 
   var i = -0.6;
@@ -324,7 +327,7 @@ export function getSignedAngle (v1, v2, normalVector) {
 
 export function scaleEntity (el, size) {
   /*
-    */
+      */
   var mesh = el.getObject3D('mesh');
 
   if (mesh) onMeshLoaded();
@@ -351,10 +354,10 @@ export function scaleEntity (el, size) {
 
     // set to about ground level
     /* el.object3D.translate(0, -1 * bb2.min.y,0);
-        console.log(el.object3D.position);
-        console.log(0, sphere.radius * newScale, 0);
+            console.log(el.object3D.position);
+            console.log(0, sphere.radius * newScale, 0);
 
-        */
+            */
     // ToooooOoo late... too stupid *n8* oOoOoo
     // el.object3D.translateY(sphere.radius * newScale / 2);
     el.object3D.position.y = ty * newScale * 2;
@@ -375,10 +378,14 @@ export function renderURL (url, typeInfo) {
   var category = typeInfo.mime.split('/')[0];
 
   switch (category) {
-    case 'image':return renderImage(url);
-    case 'text':return renderAsTextarea(url);// TODO render in text editor
-    case 'video':return renderVideo(url);
-    default:return renderText(url);
+    case 'image':
+      return renderImage(url);
+    case 'text':
+      return renderAsTextarea(url);// TODO render in text editor
+    case 'video':
+      return renderVideo(url);
+    default:
+      return renderText(url);
   }
 }
 
@@ -455,8 +462,8 @@ export function renderVideo (url) {
  */
 
 export function renderAtPlayer (el, target = document.querySelector('a-scene')) {
-  var playerPos = getPlayer().object3D.getWorldPosition();
-  var playerDir = getPlayer().object3D.getWorldDirection().normalize().multiplyScalar(3);
+  var playerPos = getWorldPosition(getPlayer().object3D);
+  var playerDir = getWorldDirection(getPlayer().object3D).normalize().multiplyScalar(3);
 
   el.setAttribute('position', AFRAME.utils.coordinates.stringify(playerPos.sub(playerDir)));
 
@@ -472,11 +479,85 @@ export function renderAtPlayer (el, target = document.querySelector('a-scene')) 
  * @param theEl
  */
 export function getVectorRelativeToPlayer (theEl) {
-  var a = theEl.object3D.getWorldPosition();
+  var a = getWorldPosition(theEl.object3D);
 
-  var b = theEl.sceneEl.camera.el.object3D.getWorldPosition();
+  var b = getWorldPosition(theEl.sceneEl.camera.el.object3D);
 
   return b.sub(a);
+}
+
+/**
+ * Original Object3D.getWorldPosition updates matrix too often.
+ * TODO evaluate whats going on and why it has to be forced to update
+ * This should work as long as the renderer automatically updates
+ * this one does not update matrix
+ * @param {THREE.Object3D} that
+ * @returns {THREE.Vector3}
+ * @private
+ */
+export function getWorldPosition (that, target) {
+  if (!target) {
+    target = new THREE.Vector3();
+  }
+  return target.setFromMatrixPosition(that.matrixWorld);
+}
+
+/**
+ * Original Object3D.getWorldPosition updates matrix too often.
+ * TODO evaluate whats going on and why it has to be forced to update
+ * This should work as long as the renderer automatically updates
+ * this one does not update matrix
+ * @param {THREE.Object3D} that
+ * @returns {THREE.Vector3}
+ * @private
+ */
+export function getWorldQuaternion (that, quaternion) {
+  var position = new THREE.Vector3();
+  var scale = new THREE.Vector3();
+  if (!quaternion) {
+    quaternion = new THREE.Quaternion();
+  }
+  that.matrixWorld.decompose(position, quaternion, scale);
+
+  return quaternion;
+}
+
+/**
+ * Original Object3D.getWorldPosition updates matrix too often.
+ * TODO evaluate whats going on and why it has to be forced to update
+ * This should work as long as the renderer automatically updates
+ * this one does not update matrix
+ * @param {THREE.Object3D} that
+ * @returns {THREE.Vector3}
+ * @private
+ */
+export function getWorldScale (that, scale) {
+  var position = new THREE.Vector3();
+  if (!scale) { scale = new THREE.Vector3(); }
+  var quaternion = new THREE.Quaternion();
+
+  that.matrixWorld.decompose(position, quaternion, scale);
+
+  return quaternion;
+}
+
+/**
+ * Original Object3D.getWorldPosition updates matrix too often.
+ * TODO evaluate whats going on and why it has to be forced to update
+ * This should work as long as the renderer automatically updates
+ * this one does not update matrix
+ * @param {THREE.Object3D} that
+ * @returns {THREE.Vector3}
+ * @private
+ */
+export function getWorldDirection (that, target) {
+  var quaternion = new THREE.Quaternion();
+
+  getWorldQuaternion(that, quaternion);
+  if (!target) {
+    target = new THREE.Vector3();
+  }
+  return target.set(0, 0, 1).applyQuaternion(quaternion);
 }
 
 /**
@@ -486,12 +567,12 @@ export function getVectorRelativeToPlayer (theEl) {
  * @param cameraObject - A threejs object that is the parent for the THREE.Camera
  * @returns {string}
  */
-export
-function checkSide (planeMesh, cameraObject) {
+export function checkSide (planeMesh, cameraObject) {
   let A = planeMesh;
   let B = cameraObject;
 
-  let distance = new THREE.Plane((new THREE.Vector3(0, 0, 1)).applyQuaternion(A.quaternion)).distanceToPoint(B.getWorldPosition().sub(A.getWorldPosition()));
+  let distance = new THREE.Plane((new THREE.Vector3(0, 0, 1)).applyQuaternion(A.quaternion)).distanceToPoint(getWorldPosition(B).sub(getWorldPosition(A)));
+
   return distance >= 0 ? 'front' : 'back';
 }
 
@@ -503,7 +584,11 @@ function checkSide (planeMesh, cameraObject) {
  */
 export function sortEntitiesByDistance (entityArray) {
   var nodes = document.querySelectorAll('[editable-region]').toArray();
-  var distances = nodes.map((el, id) => ({id, el, distance: el.object3D.position.clone().sub(el.sceneEl.camera.el.object3D.position).length()}));
+  var distances = nodes.map((el, id) => ({
+    id,
+    el,
+    distance: el.object3D.position.clone().sub(el.sceneEl.camera.el.object3D.position).length()
+  }));
   return _.sortBy(distances, item => item.distance)
     .map(item => item.el);
 }
@@ -515,4 +600,28 @@ export function sortEntitiesByDistance (entityArray) {
 export function getClosestEditableRegion (sceneEl) {
   var nodes = sceneEl.querySelectorAll('[editable-region]').toArray();
   return sortEntitiesByDistance()[0];
+}
+
+/**
+ * have a isVisible helper function that checks for object.visible material.visible and layers visible
+ */
+export
+const isVisibleTo = (obj3d, obj2) => {
+  return obj3d.visible && (obj3d.material ? obj3d.material.visible : true) && obj3d.layers.test(obj2.layers);
+};
+
+/**
+ * Counts the depth of a THREE.Object3D within a tree structure.
+ * @param {THREE.Object3D} obj
+ * @param parentKey - A key within the obj - obj[key] - that links to the parent object.
+ * @returns {number}
+ */
+export
+function countDepth (obj, parentKey) {
+  var count = 0;
+    while (obj = _.get(obj, parentKey)/* eslint-disable-line */ ) {
+    count++;
+  }
+
+  return count;
 }
