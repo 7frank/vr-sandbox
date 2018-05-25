@@ -80,7 +80,7 @@ export function createDropZone (el, onBlobCreated) {
     },
     onDragLeave: function (e) {
       if (e.dataTransfer) {
-        el.parentElement.removeChild(dropHelper);
+        dropHelper.parentElement.removeChild(dropHelper);
       }
     }
   });
