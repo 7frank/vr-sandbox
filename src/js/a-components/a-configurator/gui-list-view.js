@@ -45,6 +45,8 @@ AFRAME.registerComponent('gui-list-view', {
 });
 
 // ----------------------------------
+// FIXME don't use objects directly but rather use their indexes and return the items when selection changes
+// have a non-intrusive listener for items changes to update vm
 export function createListView (items, vueFactoryString, direction = 'column') {
   if (!items) items = ['hello', 'world', 'test', 'asdf', '1234'];
 

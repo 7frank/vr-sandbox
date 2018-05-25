@@ -22,8 +22,10 @@ AFRAME.registerComponent('gui-material-list', {
     var y = this.data.items.join(',');
     var x = document.querySelectorAll(y)[0]; // FIXME foreach
 
+    // query and clone materials
     var materialObjects = _.uniq(AFRAME.nk.querySelectorAll(x, '[material]').map((mesh) => mesh.material)).slice(0, 15);
-
+    window.mat = materialObjects;
+    materialObjects = _(materialObjects).compact().map((material) => material.clone()).value();
     // --------------------
     var items = _(materialObjects)
       .map((value, key) => ({

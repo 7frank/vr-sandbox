@@ -18,15 +18,7 @@ AFRAME.registerComponent('product-configurator', {
   schema: {
     template: {type: 'string'}
   },
-  tick: function () {
-    // TODO billboard stays not 100% in place when moving
-    // TODO refactor into "billboard-cheap"
-    // FIXME doesn't work as long as the menu is not on a separate nentity instead as of now bound to simple-car
-
-    // el.object3D.setRotationFromQuaternion(camEl.object3D.quaternion);
-    // this.el.object3D.setRotationFromQuaternion(document.querySelector('[camera]').object3D.quaternion);
-  },
-  init: function () {
+  init: function (x) {
     var el = this.el;// document.querySelectorAll('a-simple-car')[1];
 
     // el.setAttribute('simple-billboard', true);
@@ -47,6 +39,7 @@ AFRAME.registerComponent('product-configurator', {
         this.mGlowHelper.mesh.material.visible = vis;
       }
     }, this).start();
+
     // ------------------------------
 
     function createColorListView (parent, caption, handler, options) {
@@ -83,6 +76,15 @@ AFRAME.registerComponent('product-configurator', {
       _.each(options, (v, k) => colorListEl.setAttribute(k, v));
     }
 
+    // --------------------------------------------
+    // TODO refactor listview and references to data
+    function getAllValuesFromListView (el) {
+      var d = el.querySelector('a-gui-flex-container');
+      var meshes = d.__vue__.$data.items.map(v => v.value);
+      return meshes;
+    }
+
+    // --------------------------------------------
     function createMeshListView (parent, caption, handler, options) {
       var template = `<a-entity class="backPlane"  scale='.25 .25 .25'  gui-mesh-list="caption:${caption}"></a-entity>`;
 
@@ -90,7 +92,8 @@ AFRAME.registerComponent('product-configurator', {
 
       parent.appendChild(el);
 
-      el.addEventListener('change', handler);
+      // TODO rely on change event again as soon as list-view is fixed
+      el.addEventListener('change-todo', handler);
 
       _.each(options, (v, k) => el.setAttribute(k, v));
     }
@@ -98,10 +101,32 @@ AFRAME.registerComponent('product-configurator', {
     // ------------------------------
     var that = this;
     var lastEl, lastElWireframe, lastElGlow, lastElGlowTimer;
+    // FIXME meshlistview will break movement (probably problem with vue and reactiveGetter)
     createMeshListView(el, 'meshes', function (e) {
-      console.log('mesh selected', e.detail);
-
       lastEl = e.detail.value;
+
+      // opaopa ------------------------
+      var meshes = getAllValuesFromListView(el.querySelector('[gui-mesh-list]'));
+      console.log('meshes in list', meshes);
+
+      console.log('mesh selected', lastEl);
+
+      // copy orig
+      meshes.forEach(mesh => {
+        if (!_.has(mesh, 'material._op')) _.set(mesh, 'material._op', _.get(mesh, 'material.opacity', 1));
+      });
+
+      // FIXME make all materials transparent
+      meshes.forEach(mesh => {
+        _.set(mesh, 'material.transparent', true);
+      });
+
+      // make other meshes transparent
+      meshes.forEach(function (mesh) {
+        if (lastEl == mesh) { _.set(mesh, 'material.opacity', _.get(mesh, 'material._op')); } else { _.set(mesh, 'material.opacity', _.get(mesh, 'material._op') * 0.5); }
+      });
+
+      // glow ---------------------
 
       // remove prev glow overlay
       if (namespaceExists('mesh.parent', lastElGlow)) {
@@ -110,7 +135,7 @@ AFRAME.registerComponent('product-configurator', {
       // add new glow overlay
       that.mGlowHelper = lastElGlow = createGlowForMesh(lastEl, lastEl.el.object3D, lastEl.el.sceneEl.camera.el.object3D);
 
-      if (lastElGlowTimer)lastElGlowTimer.pause();
+      if (lastElGlowTimer) lastElGlowTimer.pause();
       // update position every now and then (in case mesh is moved)
       lastElGlowTimer = new FPSCtrl(10, function (e) {
         lastElGlow.mesh.position.copy(lastEl.position);
@@ -148,7 +173,8 @@ AFRAME.registerComponent('product-configurator', {
       console.log('material selected', e.detail, tires);
 
       if (lastEl) {
-        lastEl.material.copy(e.detail.material);
+        // lastEl.material.copy(e.detail.material);
+        lastEl.material = e.detail.material;
       } else {
         tires.forEach(function (tireMaterials) {
           // tires[0] emissiveColor=> rim //aber auch karossierie des autos
