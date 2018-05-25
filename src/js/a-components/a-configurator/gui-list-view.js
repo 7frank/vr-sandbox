@@ -32,14 +32,17 @@ AFRAME.registerComponent('gui-list-view', {
   },
   init: function () {
     // TODO code only for testing
-    var app;
+
     if (this.data.items.length > 0) {
-      app = createListView(this.data.items);
+      this.vm = createListView(this.data.items);
     } else {
-      app = createImportedModelsListView();
+      this.vm = createImportedModelsListView();
     }
 
-    this.el.appendChild(app.$el);
+    this.el.appendChild(this.vm.$el);
+  },
+  remove () {
+    this.el.removeChild(this.vm.$el);
   }
 
 });

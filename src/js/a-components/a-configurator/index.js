@@ -7,6 +7,7 @@ import {appendHTML3D, createHTML} from '../../utils/dom-utils';
 import {createGlowForMesh} from './glow-shader';
 import {FPSCtrl} from '../../utils/fps-utils';
 import {namespaceExists} from '../../utils/namespace';
+import {getWorldPosition} from '../../utils/aframe-utils';
 
 /**
  * Prototyping....
@@ -16,12 +17,36 @@ import {namespaceExists} from '../../utils/namespace';
 
 AFRAME.registerComponent('product-configurator', {
   schema: {
-    template: {type: 'string'}
+    target: {type: 'selector'}
   },
-  init: function (x) {
-    var el = this.el;// document.querySelectorAll('a-simple-car')[1];
+  tick () {
+    /*    // attach created stuff to scene
+        var obj = this.el.object3D;
+        var sceneObj = this.el.sceneEl.object3D;
+        if (obj.parent != sceneObj) {
+          sceneObj.add(obj);
+        } else {
+          var pos = getWorldPosition(this.el.parentEl.object3D);
+          obj.position.copy(pos);
+        } */
 
-    // el.setAttribute('simple-billboard', true);
+  },
+  update: function () {
+
+  },
+  resetWidgets: function () {
+    // when recreating the product configurator or when appending somewhere else within the DOM this should be called
+
+    var pc = this.el;
+    pc.innerHTML = '';
+    // pc.querySelectorAll('[gui-item]').forEach(n => n.parentElement.removeChild(n));
+    // $(".center-region").appendChild(pc)
+  },
+  init: function () {
+    var el = this.el;
+
+    // set target to self by default
+    // if (!this.data.target) this.data.target = el;
 
     var mats = AFRAME.nk.querySelectorAll(el, '.Mesh:where(material)');
 
@@ -71,7 +96,7 @@ AFRAME.registerComponent('product-configurator', {
       parent.appendChild(el);
 
       var colorListEl = el.querySelector('[gui-material-list]');
-      colorListEl.addEventListener('change', handler);
+      colorListEl.addEventListener('change-todo', handler);
 
       _.each(options, (v, k) => colorListEl.setAttribute(k, v));
     }
@@ -92,6 +117,8 @@ AFRAME.registerComponent('product-configurator', {
 
       parent.appendChild(el);
 
+      el.setAttribute('gui-mesh-list', 'target', parent.parentEl);
+
       // TODO rely on change event again as soon as list-view is fixed
       el.addEventListener('change-todo', handler);
 
@@ -99,13 +126,18 @@ AFRAME.registerComponent('product-configurator', {
     }
 
     // ------------------------------
+    // ------------------------------
+    // ------------------------------
+    // ------------------------------
+
     var that = this;
     var lastEl, lastElWireframe, lastElGlow, lastElGlowTimer;
-    // FIXME meshlistview will break movement (probably problem with vue and reactiveGetter)
+
     createMeshListView(el, 'meshes', function (e) {
       lastEl = e.detail.value;
 
       // opaopa ------------------------
+
       var meshes = getAllValuesFromListView(el.querySelector('[gui-mesh-list]'));
       console.log('meshes in list', meshes);
 
@@ -116,14 +148,18 @@ AFRAME.registerComponent('product-configurator', {
         if (!_.has(mesh, 'material._op')) _.set(mesh, 'material._op', _.get(mesh, 'material.opacity', 1));
       });
 
-      // FIXME make all materials transparent
+      // TODO have alternative approach to make all materials transparent
       meshes.forEach(mesh => {
         _.set(mesh, 'material.transparent', true);
       });
 
       // make other meshes transparent
       meshes.forEach(function (mesh) {
-        if (lastEl == mesh) { _.set(mesh, 'material.opacity', _.get(mesh, 'material._op')); } else { _.set(mesh, 'material.opacity', _.get(mesh, 'material._op') * 0.5); }
+        if (lastEl == mesh) {
+          _.set(mesh, 'material.opacity', _.get(mesh, 'material._op'));
+        } else {
+          _.set(mesh, 'material.opacity', _.get(mesh, 'material._op') * 0.5);
+        }
       });
 
       // glow ---------------------
@@ -174,11 +210,11 @@ AFRAME.registerComponent('product-configurator', {
 
       if (lastEl) {
         // lastEl.material.copy(e.detail.material);
-        lastEl.material = e.detail.material;
+        lastEl.material = e.detail.value;
       } else {
         tires.forEach(function (tireMaterials) {
-          // tires[0] emissiveColor=> rim //aber auch karossierie des autos
-          tireMaterials[0].copy(e.detail.material);
+          // tires[0] emissiveColor=> rim //aber auch karosserie des autos
+          tireMaterials[0].copy(e.detail.value);
         });
       }
     }, {position: '-5 6 0'});
@@ -187,11 +223,13 @@ AFRAME.registerComponent('product-configurator', {
     var planes = this.el.querySelectorAll('.backPlane');
     planes.forEach(a => a.parentEl.remove(a));
 
-    this.mHelperScript.stop();
+    this.mHelperScript.pause();
 
     if (namespaceExists('mesh.parent', this.mGlowHelper)) {
       this.mGlowHelper.mesh.parent.remove(this.mGlowHelper.mesh);
     }
+
+    this.resetWidgets();
   }
 
 });

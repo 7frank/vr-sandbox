@@ -29,16 +29,16 @@ AFRAME.registerComponent('gui-material-list', {
     // --------------------
     var items = _(materialObjects)
       .map((value, key) => ({
-        key: key, value: value
+        key: key, value: value.color // value
       }))
       .value();
 
     // --------------------
 
-    var app = createListView(items, `<a-gui-button  
+    this.vm = createListView(items, `<a-gui-button  
               v-for="(item, index) in items"
               :value="index"      
-              :background-color="item.value.color"
+              :background-color="item.color"
               width=".5" 
               height=".5" 
               font-family="Arial" 
@@ -46,12 +46,26 @@ AFRAME.registerComponent('gui-material-list', {
               @interaction-pick.stop="onItemClicked(item)"         
               ></a-gui-button>`, 'row');
 
-    this.el.append(app.$el);
+    this.el.append(this.vm.$el);
 
-    app.$el.addEventListener('change', (e) => {
+    /* app.$el.addEventListener('change', (e) => {
       e.stopPropagation();
       this.el.emit('change', {material: e.detail.value});
     });
+
+    */
+
+    this.vm.$el.addEventListener('change', (e) => {
+      e.stopPropagation();
+
+      console.log('gui-material-list', e.detail.key);
+      console.log('gui-material-list', materialObjects[e.detail.key]);
+
+      this.el.emit('change-todo', {value: materialObjects[e.detail.key]});
+    });
+  },
+  remove () {
+    this.el.removeChild(this.vm.$el);
   }
 
 });

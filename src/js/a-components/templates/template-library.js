@@ -357,16 +357,14 @@ AFRAME.registerComponent('configurable', {
   init: function () {
     // TODO data.parameters foreach gui-element
 
-    var configMenu;
-
     // el.addEventListener('interaction-talk', () => this.el.hasAttribute('product-configurator') ? this.el.removeAttribute('product-configurator') : this.el.setAttribute('product-configurator', true));
     this.mHandler1 = () => {
-      if (!configMenu) {
-        configMenu = createHTML(`<a-entity product-configurator simple-billboard></a-entity>`);
-        this.el.append(configMenu);
+      if (!this.configMenu) {
+        this.configMenu = createHTML(`<a-entity product-configurator simple-billboard></a-entity>`);
+        this.el.append(this.configMenu);
       } else {
-        var vis = configMenu.getAttribute('visible');
-        configMenu.setAttribute('visible', !vis);
+        var vis = this.configMenu.getAttribute('visible');
+        this.configMenu.setAttribute('visible', !vis);
       }
     };
 
@@ -374,6 +372,7 @@ AFRAME.registerComponent('configurable', {
   },
   remove: function () {
     this.el.removeEventListener('interaction-talk', this.mHandler1);
+    if (this.configMenu) { this.configMenu.parentElement.remove(this.configMenu); }
   }
 
 });

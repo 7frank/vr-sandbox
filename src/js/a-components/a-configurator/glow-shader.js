@@ -149,7 +149,6 @@ function createCustomOutlineMaterial (cameraPos) {
     });
 }
 
-var glowMaterial, glowMaterialScript;
 /**
  * FIXME glow-shader does not incorporate camera rotation
  * Note only one material instance
@@ -159,15 +158,13 @@ var glowMaterial, glowMaterialScript;
  */
 export
 function createGlowForMesh (origMesh, actorMesh, cameraMesh) {
-  if (!glowMaterial) {
-    glowMaterial = createCustomGlowMaterial();// createCustomOutlineMaterial(cameraPos);//
-    glowMaterialScript = new FPSCtrl(20, function () {
-      glowMaterial.uniforms.viewVector.value = getWorldPosition(cameraMesh).sub(getWorldPosition(actorMesh)).normalize();
-    }).start();
-  }
+  let glowMaterial = createCustomGlowMaterial();// createCustomOutlineMaterial(cameraPos);//
+  let glowMaterialScript = new FPSCtrl(20, function () {
+    glowMaterial.uniforms.viewVector.value = getWorldPosition(cameraMesh).sub(getWorldPosition(actorMesh)).normalize();
+  }).start();
 
   var glowMesh = window.ooo = new THREE.Mesh(origMesh.geometry.clone(), glowMaterial);
 
-  glowMesh.scale.multiplyScalar(1.05);
+  glowMesh.scale.multiplyScalar(1.02);
   return {mesh: glowMesh, material: glowMaterial};
 }

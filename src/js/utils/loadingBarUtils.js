@@ -15,8 +15,8 @@ export function createLoadingbar (html) {
 
   var mustache = template(html);
 
-  var container = $('<div style="border:2px solid white" class="loading-bar"></div>')
-    .css({position: 'fixed', width: 'calc(100% - 2em)', margin: '1em', zIndex: 999, top: '0em'});
+  var container = $('<div class="loading-bar"></div>')
+    .css({position: 'fixed', width: 'calc(100% - 0em)', zIndex: 999, top: '0em'});
     //  .appendTo('body');
 
   return {

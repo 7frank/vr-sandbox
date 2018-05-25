@@ -108,6 +108,10 @@ export function FPSCtrl (fps = 30, onFrame, context) {
     return this;
   };
 
+  this.stop = function () {
+    return this.pause();
+  };
+
   /**
      * Returns the average time(in milliseconds) it took to compute the target function.
      * @returns {{averageTime: number, target: *}}

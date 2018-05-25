@@ -128,9 +128,18 @@
     }
 
     .splash-screen {
-        background-image: url(assets/images/loading/notebook-free.jpeg);
+
         background-repeat: no-repeat;
-        background-size: cover;
+        background-size: contain;
+        background-position-y: 50%;
+
+
+
+        background-image:url(assets/images/loading/Auckland_skyline_2004.jpg), -moz-linear-gradient(left, rgba(226,226,226,1) 0%, rgba(219,219,219,1) 50%, rgba(209,209,209,1) 51%, rgba(254,254,254,1) 100%); /* FF3.6-15 */;
+        background-image:url(assets/images/loading/Auckland_skyline_2004.jpg), -webkit-linear-gradient(left, rgba(226,226,226,1) 0%,rgba(219,219,219,1) 50%,rgba(209,209,209,1) 51%,rgba(254,254,254,1) 100%); /* Chrome10-25,Safari5.1-6 */
+        background-image:url(assets/images/loading/Auckland_skyline_2004.jpg), linear-gradient(to right, rgba(226,226,226,1) 0%,rgba(219,219,219,1) 50%,rgba(209,209,209,1) 51%,rgba(254,254,254,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+
+
     }
 
     .overlay-editor {

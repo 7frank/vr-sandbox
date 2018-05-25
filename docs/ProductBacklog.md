@@ -20,7 +20,7 @@
         * this on the other hand creates trouble with pointer lock
         * still it seems that sometimes autowalk occurs with jumping as if 2 or more listeners are accessing the position data of the player
             * or maybe due to physics?   
-     
+    * occurs when adding a model via d&d like aviatorgoogles and starting editing  
 * fix HOTKEYS keyup should be handled differently because it is not always true that the action was sent from a key event
 * fix up vector of billboard
 * fix direction vector of glowMaterial 
@@ -33,6 +33,12 @@
 * test the importer with not working gltf files and make sure something gets rendered
     * if images are missing a missing-texture placeholder should be enough
     * if binaries are not existiing or other things a more meaningfull descriptioin would be nice
+* product-config
+    * <del>fix mesh selection</del>
+        
+    * <del>make not selected elements opacity=50%</del>
+* <del>drag&drop buggy sometimes showing drop helper and hanging</del>
+* fix: adding configurable entity => ctrl+z => ctrl+y => interact will hang frontend    
 ## fix performance
 * fixme performance
     * <del>raycaster intersect object</del>
@@ -41,7 +47,13 @@
         * Note: using custom version without updateWorldMatrix(force=true) + foreach children
     * <del>write a issue report and ask for clarification</del>
     * FIXME check if the layer of the boxhelper is visible to the camera if not no update is necessary
-
+* <del>performance of gui-list-view</del>
+    * <del>reactive getter and deep are both problematic as they mutate for example the mesh value which in return will slow down significantly</del>
+    * <del><b>definitivly somewhere along the line of meshlistview/vue/reactiveGetter</b></del>
+    * <del>as a side effect the raycaster for the glasses.zip will be significantly slower</del>
+        * <del>raycast glasses.zip will take 40ms every tick but we don't need that precision for the product-configurator</del>
+    * TODO refactor listview   
+        
 ## todo & features
 * [/] have a region with a helmet/car
     * create some controls
@@ -77,12 +89,17 @@
     * every child node is one page
     * use created videos in demo scene where dialog contains video
         * https://you-link.herokuapp.com/?url=https://www.youtube.com/watch?v=IwdB-7uNHfk
-* draw placeholder images when gltf-zip idoes not contain valid links        
+* draw placeholder images when gltf-zip does not contain valid links
+
+
+        
 ## todo gui-hud
 * have a second renderer for hud-gui
     * render gui at first with depthwrite enabled but depth write value == closest
     * render second time normal but no need for sorting or matrix updates
-
+## undo manager
+* use the undo stack to position elements and create a keysequence of that
+    * action-component & action-start-animation and listeners for undoMgr
     
 # feature outline
 ## hotkeys
@@ -101,7 +118,10 @@
     * in case the user does have its private storage attached
         * https://www.npmjs.com/package/cors-anywhere
         * proxy and/or upload files for easier work flow
-           
+* preview-table-component
+    * have a component that goes into menu mode when an item in the world is clicked and preview it
+        * have product configurator work with that one
+    * have a table element where the items lie on top of where the forementioned behaviour will be triggered
     
 
 

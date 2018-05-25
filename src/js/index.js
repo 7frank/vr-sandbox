@@ -153,7 +153,7 @@ function reloadSceneToDOM () {
   console.log('reloadSceneToDOM');
   $('body').addClass('splash-screen');
 
-  var loadingInfoText = createTextSampleCanvas();
+  // var loadingInfoText = createTextSampleCanvas();
 
   var elem = document.querySelector('.overlay-editor .content-area');
 
