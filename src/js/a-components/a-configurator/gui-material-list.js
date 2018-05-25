@@ -20,12 +20,16 @@ AFRAME.registerComponent('gui-material-list', {
   },
   init: function () {
     var y = this.data.items.join(',');
+    var y = this.data.items.join(',');
     var x = document.querySelectorAll(y)[0]; // FIXME foreach
 
     // query and clone materials
-    var materialObjects = _.uniq(AFRAME.nk.querySelectorAll(x, '[material]').map((mesh) => mesh.material)).slice(0, 15);
+    var materialObjects = _.uniq(AFRAME.nk.querySelectorAll(x, '[material]').map((mesh) => mesh.material)).slice(0, 150);
     window.mat = materialObjects;
-    materialObjects = _(materialObjects).compact().map((material) => material.clone()).value();
+    materialObjects = _(materialObjects).compact()
+      .map((material) => material.clone && material.type != 'SpriteMaterial' ? material.clone() : undefined) // TODO support multimaterial
+      .compact()
+      .value().slice(0, 15);
     // --------------------
     var items = _(materialObjects)
       .map((value, key) => ({

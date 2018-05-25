@@ -90,7 +90,8 @@
     * use created videos in demo scene where dialog contains video
         * https://you-link.herokuapp.com/?url=https://www.youtube.com/watch?v=IwdB-7uNHfk
 * draw placeholder images when gltf-zip does not contain valid links
-
+## loading screen
+https://www.npmjs.com/package/loadscreen
 
         
 ## todo gui-hud

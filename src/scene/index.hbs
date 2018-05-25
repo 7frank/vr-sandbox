@@ -1,25 +1,20 @@
-
-
 <!-- scripts for network sample -->
 <head>
 
-<script src="socket.io/socket.io.js"></script>
-<script src="api/node_modules/easyrtc/api/easyrtc.js"></script>
+    <script src="socket.io/socket.io.js"></script>
+    <script src="api/node_modules/easyrtc/api/easyrtc.js"></script>
     <script src="https://unpkg.com/networked-aframe@^0.4.0/dist/networked-aframe.min.js"></script>
-<!--
-<script src="https://unpkg.com/aframe-randomizer-components@^3.0.1/dist/aframe-randomizer-components.min.js"></script>
-<script src="https://unpkg.com/aframe-particle-system-component@1.0.5/dist/aframe-particle-system-component.min.js"></script>
+    <!--
+    <script src="https://unpkg.com/aframe-randomizer-components@^3.0.1/dist/aframe-randomizer-components.min.js"></script>
+    <script src="https://unpkg.com/aframe-particle-system-component@1.0.5/dist/aframe-particle-system-component.min.js"></script>
 
--->
+    -->
 
     <!-- bootstrap for preloader -->
-   <!-- <link rel="stylesheet" href="https://cdn.rawgit.com/thomaspark/bootswatch/gh-pages/slate/bootstrap.min.css" /> -->
+    <!-- <link rel="stylesheet" href="https://cdn.rawgit.com/thomaspark/bootswatch/gh-pages/slate/bootstrap.min.css" /> -->
 
 
-
-<script src="/assets/js/spawn-in-circle.component.js"></script>
-
-
+    <script src="/assets/js/spawn-in-circle.component.js"></script>
 
 
 </head>
@@ -62,7 +57,6 @@
     NAF.schemas.add(ballSchema);
 
 
-
     var importedElementSchema = {
         template: '#imported-element-template',
         components: [
@@ -79,18 +73,17 @@
     NAF.schemas.add(importedElementSchema);
 
 
-
 </script>
 
 <!-- endof scripts for network sample -->
 
 <!--<a-scene id="aframe-project">
   {{> entity/default-sphere}}
-  {{> entity/default-cylinder}}
-  {{> entity/default-plane}}
-  {{> entity/custom-box}}
-  {{> sky/default-sky}}
-  {{> camera/default-camera}}
+    {{> entity/default-cylinder}}
+    {{> entity/default-plane}}
+    {{> entity/custom-box}}
+    {{> sky/default-sky}}
+    {{> camera/default-camera}}
 
 
     <a-sphere position="1 1.25 -1" radius="1.25" color="#ffffff"></a-sphere>
@@ -100,20 +93,21 @@
 
 <!-- default scene which is currently needed to load aframe  LEAVE EMPTY-->
 <!-- TODO reduce redundancy with sceneDefinition.hbs-->
-<a-scene networked-scene="room: basic;debug: true;" light="shadowMapType: basic"
+<!--<a-scene networked-scene="room: basic;debug: true;" light="shadowMapType: basic"
          visible="true"
          id="aframe-project"
          physics="debug: false">
-<!-- <a-entity camera look-controls mouse-cursor>-->
 </a-scene>
+-->
 
+{{> ../sceneDefinition}}
 
 
 
 <style>
+body{background-color:slategrey}
 
-
-    .goal-info-text{
+    .goal-info-text {
 
         position: absolute;
         width: 30%;
@@ -127,38 +121,51 @@
 
     }
 
-    .splash-screen {
-
-        background-repeat: no-repeat;
-        background-size: contain;
-        background-position-y: 50%;
-
-
-
-        background-image:url(assets/images/loading/Auckland_skyline_2004.jpg), -moz-linear-gradient(left, rgba(226,226,226,1) 0%, rgba(219,219,219,1) 50%, rgba(209,209,209,1) 51%, rgba(254,254,254,1) 100%); /* FF3.6-15 */;
-        background-image:url(assets/images/loading/Auckland_skyline_2004.jpg), -webkit-linear-gradient(left, rgba(226,226,226,1) 0%,rgba(219,219,219,1) 50%,rgba(209,209,209,1) 51%,rgba(254,254,254,1) 100%); /* Chrome10-25,Safari5.1-6 */
-        background-image:url(assets/images/loading/Auckland_skyline_2004.jpg), linear-gradient(to right, rgba(226,226,226,1) 0%,rgba(219,219,219,1) 50%,rgba(209,209,209,1) 51%,rgba(254,254,254,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-
+    .splash-screen-position {
+        position: fixed;
+        top: 20%;
+        left: 20%;
+        bottom: 20%;
+        right: 20%;
 
     }
 
+    .splash-screen {
+
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-color: transparent;
+        background-image: url(assets/images/loading/Auckland_skyline_2004.jpg);
+
+    }
+
+
+.splash-screen-text {
+    display: flex;
+    padding-top:0.5em;
+    font-size: 4em;
+    font-family: Roboto, sans-serif;
+    font-weight: 100;
+    align-items: center;
+    justify-content: center;
+}
+
     .overlay-editor {
-        display:none;
+        display: none;
         position: absolute;
-        width:30%;
-        top:10%;
-        left:60%;
-        height:80%;
-        background-color:transparent;
+        width: 30%;
+        top: 10%;
+        left: 60%;
+        height: 80%;
+        background-color: transparent;
     }
 
     .overlay-editor .content-area {
 
-        width:100%;
+        width: 100%;
 
-
-        height:80%;
-        background-color:transparent;
+        height: 80%;
+        background-color: transparent;
     }
 
 
@@ -168,10 +175,7 @@
 <style>
 
 
-
     /* material design card */
-
-
 
     .card {
 
@@ -182,28 +186,28 @@
     }
 
     .card-1 {
-        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-        transition: box-shadow 0.3s cubic-bezier(.25,.8,.25,1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+        transition: box-shadow 0.3s cubic-bezier(.25, .8, .25, 1);
     }
 
     .card-1:hover {
-        box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
     }
 
     .card-2 {
-        box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
     }
 
     .card-3 {
-        box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
     }
 
     .card-4 {
-        box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
     }
 
     .card-5 {
-        box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
+        box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
     }
 
 </style>
@@ -217,9 +221,3 @@
 <div class="goal-info-text">GOAL!!!</div>
 
 
-
-<!-- currently not working because change events for etherpad can't be accessed
-<iframe class="overlay-editor"></iframe>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
--->

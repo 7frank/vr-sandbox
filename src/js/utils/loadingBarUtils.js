@@ -16,13 +16,13 @@ export function createLoadingbar (html) {
   var mustache = template(html);
 
   var container = $('<div class="loading-bar"></div>')
-    .css({position: 'fixed', width: 'calc(100% - 0em)', zIndex: 999, top: '0em'});
-    //  .appendTo('body');
+    .css({position: 'absolute', width: 'calc(100% - 0em)', zIndex: 999, top: '0em'})
+    .appendTo('body');
 
   return {
     set: (name, curr, max) => container.html(mustache({name, curr, max})),
-    show: () => container.appendTo('body'),
-    hide: () => container.remove()
+    show: () => container.fadeIn(100), // container.appendTo('body'),
+    hide: () => container.fadeOut(100)// container.remove()
 
   };
 }
