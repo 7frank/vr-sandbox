@@ -38,7 +38,8 @@
         
     * <del>make not selected elements opacity=50%</del>
 * <del>drag&drop buggy sometimes showing drop helper and hanging</del>
-* fix: adding configurable entity => ctrl+z => ctrl+y => interact will hang frontend    
+* fix: adding configurable entity => ctrl+z => ctrl+y => interact will hang frontend
+* fix car exit    
 ## fix performance
 * fixme performance
     * <del>raycaster intersect object</del>

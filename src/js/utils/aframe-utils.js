@@ -188,7 +188,7 @@ export function findClosestEntity (targetSelector, selector = '.player', minDist
  * @param action
  */
 
-export function toast (msg, action) {
+export function toast (msg, action = 'Ok') {
   var el = getPlayer();
 
   var actionParam = '';

@@ -38,7 +38,7 @@ export default class CarCameraControls {
   }
 
   /**
-     * called to update camera depending on  relativecar position
+     * called to update camera depending on  relative car position
      */
   update () {
     function getDirection (obj) {
