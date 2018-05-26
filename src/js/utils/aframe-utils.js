@@ -560,6 +560,10 @@ export function getWorldDirection (that, target) {
   return target.set(0, 0, 1).applyQuaternion(quaternion);
 }
 
+export function getWorldDistance (that, target) {
+  return getWorldPosition(target).sub(getWorldPosition(that)).length();
+}
+
 /**
  * Determines if the mesh faces in the direction of the camera or away from it.
  *
@@ -624,4 +628,41 @@ function countDepth (obj, parentKey) {
   }
 
   return count;
+}
+
+export
+function getCompoundBoundingBox (object3D) {
+  var box = new THREE.Box3();
+  box.setFromCenterAndSize(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0));
+
+  object3D.traverse(function (obj3D) {
+    var geometry = obj3D.geometry;
+    if (geometry === undefined) return;
+    geometry.computeBoundingBox();
+    if (box === null) {
+      box = geometry.boundingBox;
+    } else {
+      box.union(geometry.boundingBox);
+    }
+  });
+  return box;
+}
+
+/**
+ * restarts physics for an entity
+ * example: restartPhysics($("a-simple-car"), "dynamic-body", "shape: box; mass: 2")
+ * TODO enter/leave vehicle functions also stop car controls on exit vehicle
+ *
+ * @param el
+ * @param bodyType
+ * @param defaultVal
+ * @param overrideVal
+ */
+export
+function restartPhysics (el, bodyType = 'dynamic-body', defaultVal = '', overrideVal = false) {
+  var val;
+  if (!overrideVal) val = el.getAttribute(bodyType);
+  if (val == null) val = defaultVal;
+  el.removeAttribute(bodyType);
+  el.setAttribute(bodyType, val);
 }

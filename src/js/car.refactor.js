@@ -26,36 +26,11 @@ export function createAndAttachCarCameraControls (player, vehicle) {
   };
 }
 
-var drivingVehicle = false;
-var whichVehicle = null;
-
-export function enterOrExitVehicle (event) {
-  event.stopPropagation();
-
-  var player = getPlayer();
-  if (!drivingVehicle) {
-    var target = findClosestEntity('a-simple-car', getPlayer(), 5);
-
-    if (!target) {
-      toast('Get closer to a vehicle to enter it.', 'Got it.');
-      playSound('.command-error');
-
-      return;
-    }
-
-    whichVehicle = target;
-    enterVehicle(player, target);
-    drivingVehicle = !drivingVehicle;
-  } else {
-    exitVehicle(player, whichVehicle);
-    drivingVehicle = !drivingVehicle;
-  }
-}
-
 var carCamControls;
 
+export
 function exitVehicle (player, vehicle) {
-  vehicle.removeAttribute('customizable-wasd-car-controls');
+  // vehicle.removeAttribute('customizable-wasd-car-controls');
   player.setAttribute('customizable-wasd-controls', true);
   player.setAttribute('look-controls', true);
 
@@ -67,9 +42,9 @@ function exitVehicle (player, vehicle) {
   exitPos.y += 1;
   setPosition(player, exitPos);
 }
-
+export
 function enterVehicle (player, vehicle) {
-  vehicle.setAttribute('customizable-wasd-car-controls', true);
+  // vehicle.setAttribute('customizable-wasd-car-controls', true);
   player.removeAttribute('customizable-wasd-controls');
   player.removeAttribute('look-controls');
   if (!carCamControls) { carCamControls = createAndAttachCarCameraControls(player, vehicle); } else carCamControls.start();

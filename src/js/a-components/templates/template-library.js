@@ -11,6 +11,9 @@ import {UndoMgr} from '../../utils/undo-utils';
 import {getDescriptiveTextForAction} from '../../utils/hotkey-utils';
 import {roundTo} from '../../utils/misc-utils';
 import {isShiftDown} from '../../utils/file-drag-drop-utils';
+
+import productConfigSample1 from '../a-configurator/productConfigSample1.html';
+
 // a list that contains template-containers to select them
 // first lets have a simple select like in fallout 4
 // goal is to select and place
@@ -83,7 +86,7 @@ AFRAME.registerComponent('gui-model-preview', {
         >
          <a-entity scale=".5 .5 .5" position="-3.5 -4.3 0" 
          simple-dialog="caption:Trigger ${getDescriptiveTextForAction('interaction-pick')} , ${getDescriptiveTextForAction('player-move-forward')} or ${getDescriptiveTextForAction('player-move-backward')} to select an element that is shown to the right as preview. Then click on a region below your feet to place one such instance."></a-entity>
-         <a-entity gui-item gui-list-view></a-entity>
+         <a-entity gui-item gui-list-view="type:template"></a-entity>
          
     </a-gui-flex-container>
     `;
@@ -360,7 +363,7 @@ AFRAME.registerComponent('configurable', {
     // el.addEventListener('interaction-talk', () => this.el.hasAttribute('product-configurator') ? this.el.removeAttribute('product-configurator') : this.el.setAttribute('product-configurator', true));
     this.mHandler1 = () => {
       if (!this.configMenu) {
-        this.configMenu = createHTML(`<a-entity product-configurator simple-billboard></a-entity>`);
+        this.configMenu = createHTML(productConfigSample1);
         this.el.append(this.configMenu);
       } else {
         var vis = this.configMenu.getAttribute('visible');
