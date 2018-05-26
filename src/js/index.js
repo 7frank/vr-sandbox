@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var splashScreen = $('<div><div class="splash-screen-text">Loading - VR Sandbox</div></div>').addClass('splash-screen-position splash-screen  card-5');
 
   $('body').append(splashScreen);
-  addDefaultListeners();
+  setTimeout(() => addDefaultListeners(), 50);
 
   // reloadSceneToDOM();
 });
@@ -97,13 +97,14 @@ document.addEventListener('DOMContentLoaded', function () {
 // show splash screen while loading
 onTagChanged('a-scene', function (elementsInfo) {
   function initScene (scene) {
-    scene.setAttribute('visible', false);
+    // scene.setAttribute('visible', false);
+    $(scene).hide();
 
     addLoadingListenersToScene(elementsInfo.added[0], function () {
-      scene.setAttribute('visible', true);
+      // scene.setAttribute('visible', true);
 
-      $('.splash-screen').delay(1000).fadeOut(500);
-
+      $('.splash-screen').delay(1200).fadeOut(700);
+      $(scene).delay(1).fadeIn(700);
       var loadingBar = $('.loading-bar').css({position: 'fixed'});
       $('body').append(loadingBar);
     });
@@ -123,19 +124,19 @@ onTagChanged('a-scene', function (elementsInfo) {
  * TODO refactor and reuse drag&drop portions and zip + other utils
  */
 function addDefaultListeners () {
-  var scene = $('a-scene');
-  var cam = scene.camera;
-  scene.on('enter-vr', function () {
-    cam.fov = 80;
-    cam.updateProjectionMatrix();
+  var scene = document.querySelector('a-scene');
+
+  scene.addEventListener('enter-vr', function () {
+    scene.camera.fov = 80;
+    scene.camera.updateProjectionMatrix();
   });
 
-  scene.on('exit-vr', function () {
-    cam.fov = 45;
-    cam.updateProjectionMatrix();
+  scene.addEventListener('exit-vr', function () {
+    scene.camera.fov = 45;
+    scene.camera.updateProjectionMatrix();
   });
 
-  createDropZone(scene.get(0), onDropZoneDrop);
+  createDropZone(scene, onDropZoneDrop);
 
   attachClipboard();
 }
