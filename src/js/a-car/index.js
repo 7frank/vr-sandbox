@@ -1,6 +1,8 @@
 import Car from './car/tquery.car';
 import {enterOrExitVehicle} from '../car.refactor';
 import {createHTML} from '../utils/dom-utils';
+import * as _ from 'lodash';
+import {EventListenerList} from '../utils/event-listener';
 
 function getCompoundBoundingBox (object3D) {
   var box = new THREE.Box3();
@@ -22,6 +24,7 @@ function getCompoundBoundingBox (object3D) {
 /**
  * restarts physics for an entity
  * example: restartPhysics($("a-simple-car"), "dynamic-body", "shape: box; mass: 2")
+ * TODO enter/leave vehicle functions also stop car controls on exit vehicle
  *
  * @param el
  * @param bodyType
@@ -91,17 +94,17 @@ AFRAME.registerComponent('simple-car', {
     // el.emit('model-loaded', {format: 'obj', model: this.model});
 
     /*      this.model = null;
-                        /*  this.objLoader = new THREE.OBJLoader();
-                            this.mtlLoader = new THREE.MTLLoader(this.objLoader.manager);
-                            // Allow cross-origin images to be loaded.
-                            this.mtlLoader.crossOrigin = ''; */
+                                    /*  this.objLoader = new THREE.OBJLoader();
+                                        this.mtlLoader = new THREE.MTLLoader(this.objLoader.manager);
+                                        // Allow cross-origin images to be loaded.
+                                        this.mtlLoader.crossOrigin = ''; */
   },
 
   update: function () {
     /*    var data = this.data;
-                        if (!data.obj) { return; }
-                        this.remove();
-                        this.loadObj(data.obj, data.mtl);**/
+                                    if (!data.obj) { return; }
+                                    this.remove();
+                                    this.loadObj(data.obj, data.mtl);**/
   },
 
   remove: function () {
@@ -113,47 +116,47 @@ AFRAME.registerComponent('simple-car', {
 
   /*,
 
-      loadObj: function (objUrl, mtlUrl) {
-        var self = this;
-        var el = this.el;
-        var mtlLoader = this.mtlLoader;
-        var objLoader = this.objLoader;
+            loadObj: function (objUrl, mtlUrl) {
+              var self = this;
+              var el = this.el;
+              var mtlLoader = this.mtlLoader;
+              var objLoader = this.objLoader;
 
-        if (mtlUrl) {
-          // .OBJ with an .MTL.
-          if (el.hasAttribute('material')) {
-            console.warn('Material component properties are ignored when a .MTL is provided');
-          }
-          mtlLoader.setTexturePath(mtlUrl.substr(0, mtlUrl.lastIndexOf('/') + 1));
-          mtlLoader.load(mtlUrl, function (materials) {
-            materials.preload();
-            objLoader.setMaterials(materials);
-            objLoader.load(objUrl, function (objModel) {
-              self.model = objModel;
-              el.setObject3D('mesh', objModel);
-              el.emit('model-loaded', {format: 'obj', model: objModel});
-            });
-          });
-          return;
-        }
-
-        // .OBJ only.
-        objLoader.load(objUrl, function loadObjOnly (objModel) {
-          // Apply material.
-          var material = el.components.material;
-          if (material) {
-            objModel.traverse(function (child) {
-              if (child instanceof THREE.Mesh) {
-                child.material = material.material;
+              if (mtlUrl) {
+                // .OBJ with an .MTL.
+                if (el.hasAttribute('material')) {
+                  console.warn('Material component properties are ignored when a .MTL is provided');
+                }
+                mtlLoader.setTexturePath(mtlUrl.substr(0, mtlUrl.lastIndexOf('/') + 1));
+                mtlLoader.load(mtlUrl, function (materials) {
+                  materials.preload();
+                  objLoader.setMaterials(materials);
+                  objLoader.load(objUrl, function (objModel) {
+                    self.model = objModel;
+                    el.setObject3D('mesh', objModel);
+                    el.emit('model-loaded', {format: 'obj', model: objModel});
+                  });
+                });
+                return;
               }
-            });
-          }
 
-          self.model = objModel;
-          el.setObject3D('mesh', objModel);
-          el.emit('model-loaded', {format: 'obj', model: objModel});
-        });
-      } */
+              // .OBJ only.
+              objLoader.load(objUrl, function loadObjOnly (objModel) {
+                // Apply material.
+                var material = el.components.material;
+                if (material) {
+                  objModel.traverse(function (child) {
+                    if (child instanceof THREE.Mesh) {
+                      child.material = material.material;
+                    }
+                  });
+                }
+
+                self.model = objModel;
+                el.setObject3D('mesh', objModel);
+                el.emit('model-loaded', {format: 'obj', model: objModel});
+              });
+            } */
 });
 
 var meshMixin = AFRAME.primitives.getMeshMixin();
@@ -196,13 +199,19 @@ AFRAME.registerComponent('customizable-wasd-car-controls', {
     this.onFocus = bind(this.onFocus, this);
 
     this.onVisibilityChange = bind(this.onVisibilityChange, this);
+    // TODO
+    this.createListeners();
     this.attachVisibilityEventListeners();
+
+    // this.autowalkfixEvents.attachAll();
   },
   // update: function () {},
   // tick: function () {},
   remove: function () {
     this.removeKeyEventListeners();
     this.removeVisibilityEventListeners();
+
+    // this.autowalkfixEvents.detachAll();
   },
 
   play: function () {
@@ -213,22 +222,30 @@ AFRAME.registerComponent('customizable-wasd-car-controls', {
     this.keys = {};
     this.removeKeyEventListeners();
   },
-  attachVisibilityEventListeners: function () {
-    window.addEventListener('blur', this.onBlur);
-    window.addEventListener('focus', this.onFocus);
-    document.addEventListener('visibilitychange', this.onVisibilityChange);
-  },
+  createListeners: function () {
+    this.visibilityEvents = new EventListenerList()
+      .add(window, 'blur', this.onBlur)
+      .add(window, 'focus', this.onFocus)
+      .add(window, 'visibilitychange', this.onVisibilityChange);
 
-  removeVisibilityEventListeners: function () {
-    window.removeEventListener('blur', this.onBlur);
-    window.removeEventListener('focus', this.onFocus);
-    document.removeEventListener('visibilitychange', this.onVisibilityChange);
-  },
+    // --------------------------
+    // mostly fixes autowalk bug when focus changes
+    // still there needs to be a higher delay (500ms currently) the not trigger to early
+    //  and thus solve the  problem with damping the movement
+    /*
+        const fixAutoWalk = (action) => _.debounce((e) => {
+          var obj = that.controls();
+          obj[action] = false;
+        }, 500);
 
-  attachKeyEventListeners: function () {
-    //  window.addEventListener('keydown', this.onKeyDown);
-    // window.addEventListener('keyup', this.onKeyUp);
+        this.autowalkfixEvents = new EventListenerList()
+          .add(window, 'player-move-forward', fixAutoWalk('moveForward'))
+          .add(window, 'player-move-backward', fixAutoWalk('moveBackward'))
+          .add(window, 'player-strafe-left', fixAutoWalk('moveLeft'))
+          .add(window, 'player-strafe-right', fixAutoWalk('moveRight'));
+        */
 
+    // -----------------------------
     let simpleCarComponentInstance = this.el.components['simple-car'];
 
     if (!simpleCarComponentInstance) {
@@ -268,22 +285,34 @@ AFRAME.registerComponent('customizable-wasd-car-controls', {
       };
     }
 
-    this.khw = keyHandler('moveForward');
-    this.khs = keyHandler('moveBackward');
-    this.kha = keyHandler('moveLeft');
-    this.khd = keyHandler('moveRight');
+    this.moveEvents = new EventListenerList()
+      .add(window, 'player-move-forward', keyHandler('moveForward'))
+      .add(window, 'player-move-backward', keyHandler('moveBackward'))
+      .add(window, 'player-strafe-left', keyHandler('moveLeft'))
+      .add(window, 'player-strafe-right', keyHandler('moveRight'));
+  },
+  attachVisibilityEventListeners: function () {
+    this.visibilityEvents.attachAll();
+    /* window.addEventListener('blur', this.onBlur);
+                window.addEventListener('focus', this.onFocus);
+                document.addEventListener('visibilitychange', this.onVisibilityChange);
+                */
+  },
 
-    window.addEventListener('player-move-forward', this.khw);
-    window.addEventListener('player-move-backward', this.khs);
-    window.addEventListener('player-strafe-left', this.kha);
-    window.addEventListener('player-strafe-right', this.khd);
+  removeVisibilityEventListeners: function () {
+    this.visibilityEvents.detachAll();
+    /* window.removeEventListener('blur', this.onBlur);
+                window.removeEventListener('focus', this.onFocus);
+                document.removeEventListener('visibilitychange', this.onVisibilityChange);
+                */
+  },
+
+  attachKeyEventListeners: function () {
+    this.moveEvents.attachAll();
   },
 
   removeKeyEventListeners: function () {
-    window.removeEventListener('player-move-forward', this.khw);
-    window.removeEventListener('player-move-backward', this.khs);
-    window.removeEventListener('player-strafe-left', this.kha);
-    window.removeEventListener('player-strafe-right', this.khd);
+    this.moveEvents.detachAll();
   },
 
   onBlur: function () {
