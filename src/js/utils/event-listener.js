@@ -18,8 +18,8 @@ export class EventListenerStateList {
 
   createState (stateName) {
     if (this.mStates[stateName]) throw new Error('state name already defined');
-
-    return this.mStates[stateName] = new EventListenerList();
+    this.mStates[stateName] = new EventListenerList();
+    return this.mStates[stateName];
   }
 
   getActiveStates () {
@@ -30,10 +30,11 @@ export class EventListenerStateList {
      * String containing state names separated by one <space>
      * @param [states] - leave empty to enable all registered
      */
-  enableStates (statesString) {
-    if (!statesString) Object.keys(this.mStates).join(' ');
+  enableStates (...args) {
+    let states;
 
-    let states = statesString.split(/\s+/);
+    if (args.length == 0) { states = Object.keys(this.mStates); } else if (args.length == 1) { states = args[0].split(/\s+/); }
+    if (args.length > 1) { states = args; }
 
     console.log('enableStates', states);
 
@@ -41,14 +42,17 @@ export class EventListenerStateList {
 
     return this;
   }
+
   /**
      * String containing state names separated by one <space>
      * @param [states] - leave empty to disable all registered
      */
-  disableStates (statesString) {
-    if (!statesString) Object.keys(this.mStates).join(' ');
+  disableStates (...args) {
+    let states;
 
-    let states = statesString.split(/\s+/);
+    if (args.length == 0) { states = Object.keys(this.mStates); } else if (args.length == 1) { states = args[0].split(/\s+/); }
+    if (args.length > 1) { states = args; }
+
     console.log('disableStates', states);
     _.each(states, state => this.mStates[state] ? this.mStates[state].detachAll() : console.warn(`state ${state} not defined`));
     return this;
@@ -60,7 +64,11 @@ export class EventListenerList {
     this.mList = [];
     this.attached = false;
   }
-  active () { return this.attached; }
+
+  active () {
+    return this.attached;
+  }
+
   add (target, name, handler) {
     if (!name) console.error('EventListenerList missing name');
     if (!handler) console.error('EventListenerList missing handler for: ', name);

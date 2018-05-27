@@ -121,6 +121,10 @@ export default class Car {
     return this._controlsCar;
   }
 
+  resetControls () {
+    this._controlsCar = {};
+  }
+
   model () {
     return this._car.root;
   }

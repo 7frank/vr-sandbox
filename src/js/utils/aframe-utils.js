@@ -130,11 +130,11 @@ export function getDirectionForEntity (entity) {
   return direction;
 
   /* var pos = o3d.position;
-                  var up = o3d.up;
-                  var quaternion = o3d.quaternion;
-                  var direction = new THREE.Vector3().copy(up);
-                  direction.applyQuaternion(quaternion);
-                  return direction; */
+                    var up = o3d.up;
+                    var quaternion = o3d.quaternion;
+                    var direction = new THREE.Vector3().copy(up);
+                    direction.applyQuaternion(quaternion);
+                    return direction; */
 }
 
 /**
@@ -188,32 +188,36 @@ export function findClosestEntity (targetSelector, selector = '.player', minDist
  * @param action
  */
 
-export function toast (msg, action = 'Ok') {
+export function toast (msg, duration = 2000, action = 'Ok') {
   var el = getPlayer();
 
-  var actionParam = '';
-  if (action) {
-    actionParam = `action="${action}"`;
-  }
-  var t = `<a-entity class="toast-wrapper" ><a-toast  material="depthTest:false" message="${msg}" ${actionParam}></a-toast></a-entity>`;
-  el.insertAdjacentHTML('beforeend', t);
-
-  var wrappers = [...el.querySelectorAll('.toast-wrapper')];
-
-  function checkToastForDeletion (el) {
-    if (_.get(el, 'components.toast.label.object3D.children[0].material.opacity') == 0) {
-      el.parentNode.removeChild(el);
+  const renderToast = () => {
+    var actionParam = '';
+    if (action) {
+      actionParam = `action="${action}"`;
     }
-  }
+    var t = `<a-entity class="toast-wrapper" ><a-toast  material="depthTest:false" message="${msg}" ${actionParam} duration="${duration}"></a-toast></a-entity>`;
+    el.insertAdjacentHTML('beforeend', t);
 
-  el.querySelectorAll('a-toast').forEach(el => checkToastForDeletion(el));
+    var wrappers = [...el.querySelectorAll('.toast-wrapper')];
 
-  var i = -0.6;
+    function checkToastForDeletion (el) {
+      if (_.get(el, 'components.toast.label.object3D.children[0].material.opacity') == 0) {
+        el.parentNode.removeChild(el);
+      }
+    }
 
-  for (let item of wrappers.reverse()) {
-    item.setAttribute('position', `0 ${i} 1`);
-    i += 0.15;
-  }
+    el.querySelectorAll('a-toast').forEach(el => checkToastForDeletion(el));
+
+    var i = -0.6;
+
+    for (let item of wrappers.reverse()) {
+      item.setAttribute('position', `0 ${i} 1`);
+      i += 0.15;
+    }
+  };
+
+  if (el) { renderToast(); } else { setTimeout(() => toast(msg, duration, action), 500); }
 }
 
 /**
@@ -327,7 +331,7 @@ export function getSignedAngle (v1, v2, normalVector) {
 
 export function scaleEntity (el, size) {
   /*
-      */
+        */
   var mesh = el.getObject3D('mesh');
 
   if (mesh) onMeshLoaded();
@@ -354,10 +358,10 @@ export function scaleEntity (el, size) {
 
     // set to about ground level
     /* el.object3D.translate(0, -1 * bb2.min.y,0);
-            console.log(el.object3D.position);
-            console.log(0, sphere.radius * newScale, 0);
+                console.log(el.object3D.position);
+                console.log(0, sphere.radius * newScale, 0);
 
-            */
+                */
     // ToooooOoo late... too stupid *n8* oOoOoo
     // el.object3D.translateY(sphere.radius * newScale / 2);
     el.object3D.position.y = ty * newScale * 2;
@@ -533,7 +537,9 @@ export function getWorldQuaternion (that, quaternion) {
  */
 export function getWorldScale (that, scale) {
   var position = new THREE.Vector3();
-  if (!scale) { scale = new THREE.Vector3(); }
+  if (!scale) {
+    scale = new THREE.Vector3();
+  }
   var quaternion = new THREE.Quaternion();
 
   that.matrixWorld.decompose(position, quaternion, scale);
@@ -609,8 +615,7 @@ export function getClosestEditableRegion (sceneEl) {
 /**
  * have a isVisible helper function that checks for object.visible material.visible and layers visible
  */
-export
-const isVisibleTo = (obj3d, obj2) => {
+export const isVisibleTo = (obj3d, obj2) => {
   return obj3d.visible && (obj3d.material ? obj3d.material.visible : true) && obj3d.layers.test(obj2.layers);
 };
 
@@ -620,18 +625,16 @@ const isVisibleTo = (obj3d, obj2) => {
  * @param parentKey - A key within the obj - obj[key] - that links to the parent object.
  * @returns {number}
  */
-export
-function countDepth (obj, parentKey) {
+export function countDepth (obj, parentKey) {
   var count = 0;
-    while (obj = _.get(obj, parentKey)/* eslint-disable-line */ ) {
+    while (obj = _.get(obj, parentKey)/* eslint-disable-line */) {
     count++;
   }
 
   return count;
 }
 
-export
-function getCompoundBoundingBox (object3D) {
+export function getCompoundBoundingBox (object3D) {
   var box = new THREE.Box3();
   box.setFromCenterAndSize(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0));
 
@@ -658,8 +661,7 @@ function getCompoundBoundingBox (object3D) {
  * @param defaultVal
  * @param overrideVal
  */
-export
-function restartPhysics (el, bodyType = 'dynamic-body', defaultVal = '', overrideVal = false) {
+export function restartPhysics (el, bodyType = 'dynamic-body', defaultVal = '', overrideVal = false) {
   var val;
   if (!overrideVal) val = el.getAttribute(bodyType);
   if (val == null) val = defaultVal;

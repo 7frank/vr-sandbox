@@ -11,6 +11,9 @@ var extendDeep = AFRAME.utils.extendDeep;
  *  - body,wheels,lights,doors,hood,trunk
  *  - load one or multiple meshes
  *  - specify which part of which mesh has what function
+ *
+ *  TODO don't have the car model be rotated but instead the container object to reduce some visual problems when physics is applied
+ *
  */
 
 delete AFRAME.components['simple-car'];
@@ -24,7 +27,9 @@ AFRAME.registerComponent('simple-car', {
       default: 'veyron'
     }
   },
-
+  getCarInstance: function () {
+    return this._car;
+  },
   init: function () {
     var el = this.el;
     var that = this;

@@ -1,27 +1,16 @@
 import {shouldCaptureKeyEvent} from '../utils/dom-utils';
 import * as _ from 'lodash';
+import {toast} from '../utils/aframe-utils';
+import {EventListenerStateList} from '../utils/event-listener';
 
-var KEYCODE_TO_CODE = {
-  '38': 'ArrowUp',
-  '37': 'ArrowLeft',
-  '40': 'ArrowDown',
-  '39': 'ArrowRight',
-  '87': 'KeyW',
-  '65': 'KeyA',
-  '83': 'KeyS',
-  '68': 'KeyD'
+var EVENT_STATES = {
+  move: 'move',
+  fixAutowalk: 'fixAutowalk',
+  visibility: 'visibility'
 };
-
-var utils = AFRAME.utils;
-
-var bind = utils.bind;
 
 var CLAMP_VELOCITY = 0.00001;
 var MAX_DELTA = 0.2;
-var KEYS = [
-  'KeyW', 'KeyA', 'KeyS', 'KeyD',
-  'ArrowUp', 'ArrowLeft', 'ArrowRight', 'ArrowDown'
-];
 
 /**
  *
@@ -41,6 +30,9 @@ var KEYS = [
  *
  *
  */
+
+toast('next custom wasd => eventlist => set enabled vehicle enter set true/false', 20000);
+
 module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls', {
   schema: {
     acceleration: {default: 65},
@@ -62,29 +54,63 @@ module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls'
     this.position = {};
     this.velocity = new THREE.Vector3();
 
-    // Bind methods and add event listeners.
-    this.onBlur = bind(this.onBlur, this);
-    this.onFocus = bind(this.onFocus, this);
+    this.createListeners();
+    this.mStateList.enableStates('visibility-events fix-autowalk');
+  },
+  createListeners: function () {
+    this.mStateList = new EventListenerStateList();
+    this.mStateList.createState('visibility-events')
+      .add(window, 'blur', this.onBlur.bind(this))
+      .add(window, 'focus', this.onFocus.bind(this))
+      .add(window, 'visibilitychange', this.onVisibilityChange.bind(this));
 
-    this.onVisibilityChange = bind(this.onVisibilityChange, this);
-    this.attachVisibilityEventListeners();
+    /**
+         *
+         * @param code - the key code in the internal notation
+         * @param bVal - a value indicating wheather the first or the second handler of an
+         *                action should be handled. An action does have an optional value that is meant to work
+         *                as undo for the first handler so if a click event is sent the action will trigger
+         *                a down and up event for the action if 2 handlers where defined for it.
+         * @returns {Function}
+         */
+
+    var that = this;
+    function keyHandler (code, bVal) {
+      return function (event) {
+        // TODO check if event target is child* of current a-scene
+        if (!shouldCaptureKeyEvent(that.el, event)) {
+          return;
+        }
+        // console.log('keyHandler', [that.keys, that.el, event]);
+        if (event.detail.first) {
+          that.keys[code] = true;
+        } else {
+          delete that.keys[code];
+        }
+      };
+    }
+
+    this.mStateList.createState('move-events')
+      .add(window, 'player-move-forward', keyHandler('KeyW'))
+      .add(window, 'player-move-backward', keyHandler('KeyS'))
+      .add(window, 'player-strafe-left', keyHandler('KeyA'))
+      .add(window, 'player-strafe-right', keyHandler('KeyD'));
 
     // --------------------------
     // mostly fixes autowalk bug when focus changes
     // still there needs to be a higher delay (500ms currently) the not trigger to early
     //  and thus solve the  problem with damping the movement
 
-    const fixAutoWalk = (key) => _.debounce((e) => {
-      /* console.log('stopping key', key, e); */
+    const fixAutoWalk = _.debounce((key) => (e) => {
       this.keys[key] = false;
-    }, 500);
+    }, 200);
 
-    window.addEventListener('player-move-forward', fixAutoWalk('KeyW'));
-    window.addEventListener('player-move-backward', fixAutoWalk('KeyS'));
-    window.addEventListener('player-strafe-left', fixAutoWalk('KeyA'));
-    window.addEventListener('player-strafe-right', fixAutoWalk('KeyD'));
+    this.mStateList.createState('fix-autowalk')
+      .add(window, 'player-move-forward', fixAutoWalk('KeyW'))
+      .add(window, 'player-move-backward', fixAutoWalk('KeyS'))
+      .add(window, 'player-strafe-left', fixAutoWalk('KeyA'))
+      .add(window, 'player-strafe-right', fixAutoWalk('KeyD'));
   },
-
   tick: function (time, delta) {
     var currentPosition;
     var data = this.data;
@@ -96,7 +122,7 @@ module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls'
     var velocity = this.velocity;
 
     if (!velocity[data.adAxis] && !velocity[data.wsAxis] &&
-            isEmptyObject(this.keys)) {
+            _.isEmpty(this.keys)) {
       return;
     }
 
@@ -118,17 +144,16 @@ module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls'
   },
 
   remove: function () {
-    this.removeKeyEventListeners();
-    this.removeVisibilityEventListeners();
+    this.mStateList.disableStates();
   },
 
   play: function () {
-    this.attachKeyEventListeners();
+    this.mStateList.enableStates('move-events');
   },
 
   pause: function () {
     this.keys = {};
-    this.removeKeyEventListeners();
+    this.mStateList.disableStates('move-events');
   },
 
   updateVelocity: function (delta) {
@@ -218,66 +243,6 @@ module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls'
       return directionVector;
     };
   })(),
-
-  attachVisibilityEventListeners: function () {
-    window.addEventListener('blur', this.onBlur);
-    window.addEventListener('focus', this.onFocus);
-    document.addEventListener('visibilitychange', this.onVisibilityChange);
-  },
-
-  removeVisibilityEventListeners: function () {
-    window.removeEventListener('blur', this.onBlur);
-    window.removeEventListener('focus', this.onFocus);
-    document.removeEventListener('visibilitychange', this.onVisibilityChange);
-  },
-
-  attachKeyEventListeners: function () {
-    //  window.addEventListener('keydown', this.onKeyDown);
-    // window.addEventListener('keyup', this.onKeyUp);
-    var that = this;
-
-    /**
-         *
-         * @param code - the key code in the internal notation
-         * @param bVal - a value indicating wheather the first or the second handler of an
-         *                action should be handled. An action does have an optional value that is meant to work
-         *                as undo for the first handler so if a click event is sent the action will trigger
-         *                a down and up event for the action if 2 handlers where defined for it.
-         * @returns {Function}
-         */
-    function keyHandler (code, bVal) {
-      return function (event) {
-        // TODO check if event target is child* of current a-scene
-        if (!shouldCaptureKeyEvent(that.el, event)) {
-          return;
-        }
-        // console.log('keyHandler', [that.keys, that.el, event]);
-        if (event.detail.first) {
-          that.keys[code] = true;
-        } else {
-          delete that.keys[code];
-        }
-      };
-    }
-
-    this.khw = keyHandler('KeyW');
-    this.khs = keyHandler('KeyS');
-    this.kha = keyHandler('KeyA');
-    this.khd = keyHandler('KeyD');
-
-    window.addEventListener('player-move-forward', this.khw);
-    window.addEventListener('player-move-backward', this.khs);
-    window.addEventListener('player-strafe-left', this.kha);
-    window.addEventListener('player-strafe-right', this.khd);
-  },
-
-  removeKeyEventListeners: function () {
-    window.removeEventListener('player-move-forward', this.khw);
-    window.removeEventListener('player-move-backward', this.khs);
-    window.removeEventListener('player-strafe-left', this.kha);
-    window.removeEventListener('player-strafe-right', this.khd);
-  },
-
   onBlur: function () {
     this.pause();
   },
@@ -295,11 +260,3 @@ module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls'
   }
 
 });
-
-function isEmptyObject (keys) {
-  var key;
-  for (key in keys) {
-    return false;
-  }
-  return true;
-}

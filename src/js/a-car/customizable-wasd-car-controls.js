@@ -3,42 +3,21 @@ import {EventListenerStateList} from '../utils/event-listener';
 import {getWorldDistance, playSound, toast} from '../utils/aframe-utils';
 import {getPlayer} from '../game-utils';
 
-// var utils = AFRAME.utils;
-
-// var bind = utils.bind;
-
-/*
-* inits controls based on the "keyboard-actions" plugin
-*
-**/
+/**
+* Init controls based on the "keyboard-actions" plugin
+*/
 
 delete AFRAME.components['customizable-wasd-car-controls'];
 
 AFRAME.registerComponent('customizable-wasd-car-controls', {
+  dependencies: ['simple-car'],
   schema: {},
   init: function () {
-    // Bind methods and add event listeners.
-    this.onBlur = this.onBlur.bind(this);// bind(this.onBlur, this);
-    this.onFocus = this.onFocus.bind(this); // bind(this.onFocus, this);
-
-    this.onVisibilityChange = this.onVisibilityChange.bind(this); // bind(this.onVisibilityChange, this);
-
     this.createListeners();
 
-    // TODO
-    // this.attachVisibilityEventListeners();
-
-    // this.autowalkfixEvents.attachAll();
-
-    this.mStateList.enableStates('enter-vehicle-events');
+    this.mStateList.enableStates('enter-vehicle-events visibility-events');
   },
-  // update: function () {},
-  // tick: function () {},
   remove: function () {
-    this.removeKeyEventListeners();
-    this.removeVisibilityEventListeners();
-
-    // this.autowalkfixEvents.detachAll();
     this.mStateList.disableStates();
   },
 
@@ -54,26 +33,22 @@ AFRAME.registerComponent('customizable-wasd-car-controls', {
       this.mStateList.disableStates('move-events');
     }
   },
+  getCarInstance: function () {
+    return this.el.components['simple-car']._car;
+  },
   createListeners: function () {
     this.mStateList = new EventListenerStateList();
     this.mStateList.createState('visibility-events')
-      .add(window, 'blur', this.onBlur)
-      .add(window, 'focus', this.onFocus)
-      .add(window, 'visibilitychange', this.onVisibilityChange);
+      .add(window, 'blur', this.onBlur.bind(this))
+      .add(window, 'focus', this.onFocus.bind(this))
+      .add(window, 'visibilitychange', this.onVisibilityChange.bind(this));
 
     // -----------------------------
-    let simpleCarComponentInstance = this.el.components['simple-car'];
 
-    if (!simpleCarComponentInstance) {
-      console.error("'customizable-wasd-car-controls' must be attribute of 'a-simple-car'");
-      return;
-    }
-
-    // should be an instance of './car/tquery.car' {@see Car}
-    var that = simpleCarComponentInstance._car;
+    var that = this.getCarInstance();
 
     if (!that) {
-      console.error("component 'simple-car' not compatible with 'a-simple-car'");
+      console.error("car instance not found (you need to attach car-controls via setAttribute to 'a-simple-car')");
       return;
     }
 
@@ -132,28 +107,11 @@ AFRAME.registerComponent('customizable-wasd-car-controls', {
     event.stopPropagation();
     this.mStateList.disableStates('exit-vehicle-events move-events').enableStates('enter-vehicle-events');
     var player = getPlayer();
+
     exitVehicle(player, this.el);
+
+    this.getCarInstance().resetControls();// stop the car inputs
   },
-  attachVisibilityEventListeners: function () {
-    // this.visibilityEvents.attachAll();
-
-    this.mStateList.enableStates('visibility-events');
-
-    /* window.addEventListener('blur', this.onBlur);
-                                      window.addEventListener('focus', this.onFocus);
-                                      document.addEventListener('visibilitychange', this.onVisibilityChange);
-                                      */
-  },
-
-  removeVisibilityEventListeners: function () {
-    // this.visibilityEvents.detachAll();
-    this.mStateList.enableStates('visibility-events');
-    /* window.removeEventListener('blur', this.onBlur);
-                                    window.removeEventListener('focus', this.onFocus);
-                                    document.removeEventListener('visibilitychange', this.onVisibilityChange);
-                                    */
-  },
-
   onBlur: function () {
     this.pause();
   },
