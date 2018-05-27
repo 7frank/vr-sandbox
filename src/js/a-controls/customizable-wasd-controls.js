@@ -31,8 +31,6 @@ var MAX_DELTA = 0.2;
  *
  */
 
-toast('next custom wasd => eventlist => set enabled vehicle enter set true/false', 20000);
-
 module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls', {
   schema: {
     acceleration: {default: 65},

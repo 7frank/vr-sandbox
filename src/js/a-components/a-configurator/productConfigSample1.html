@@ -1,0 +1,20 @@
+<a-entity product-configurator="useConfig:true" simple-billboard>
+    <a-entity>
+        <a-entity material="color: red" available-colors="red,green,black"></a-entity>
+        <a-entity material="shader: flat;color: red" available-colors="red,green,white"></a-entity>
+
+        <a-entity  available-colors="orange,cyan,magenta"></a-entity>
+    </a-entity>
+
+
+<!-- TODO below code shows how it might look like with components
+    <a-entity target=".Mesh:nth-child(0)">
+        <a-entity geometry="primitive: plane"
+                  material="shader: flat; color: blue; wave-height: 10"    available-colors="red,green,yellow"></a-entity>
+
+        <a-entity geometry="primitive: sphere" material="src: canvas"
+        ></a-entity>
+    </a-entity>
+-->
+
+</a-entity>

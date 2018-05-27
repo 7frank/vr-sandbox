@@ -10,7 +10,8 @@ import {createListView} from './gui-list-view';
 
 AFRAME.registerComponent('gui-material-list', {
   schema: {
-    items: {type: 'array', default: ['a-scene']}
+    items: {type: 'array', default: []},
+    selectors: {type: 'array', default: ['a-scene']}
   },
 
   tick: function () {
@@ -19,8 +20,7 @@ AFRAME.registerComponent('gui-material-list', {
     // this.el.object3D.setRotationFromQuaternion(document.querySelector('[camera]').object3D.quaternion);
   },
   init: function () {
-    var y = this.data.items.join(',');
-    var y = this.data.items.join(',');
+    var y = this.data.selectors.join(',');
     var x = document.querySelectorAll(y)[0]; // FIXME foreach
 
     // query and clone materials

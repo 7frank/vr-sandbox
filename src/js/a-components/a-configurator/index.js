@@ -7,8 +7,8 @@ import {appendHTML3D, createHTML} from '../../utils/dom-utils';
 import {createGlowForMesh} from './glow-shader';
 import {FPSCtrl} from '../../utils/fps-utils';
 import {namespaceExists} from '../../utils/namespace';
-import {getWorldPosition} from '../../utils/aframe-utils';
-
+import './available-colors';
+import {toast} from '../../utils/aframe-utils';
 /**
  * Prototyping....
  * currently only working for simple-car
@@ -17,7 +17,8 @@ import {getWorldPosition} from '../../utils/aframe-utils';
 
 AFRAME.registerComponent('product-configurator', {
   schema: {
-    target: {type: 'selector'}
+    target: {type: 'selector'},
+    useConfig: {type: 'boolean', default: false}
   },
   tick () {
     /*    // attach created stuff to scene
@@ -43,6 +44,11 @@ AFRAME.registerComponent('product-configurator', {
     // $(".center-region").appendChild(pc)
   },
   init: function () {
+    var that = this;
+    // prevent config data from rendering directly
+    this.configData = '<span>' + this.el.innerHTML + '</span>';
+    this.el.innerHTML = '';
+
     var el = this.el;
 
     // set target to self by default
@@ -101,6 +107,45 @@ AFRAME.registerComponent('product-configurator', {
       _.each(options, (v, k) => colorListEl.setAttribute(k, v));
     }
 
+    function createConfigMaterialListView (parent, caption, handler, options) {
+      var template = `
+                            <a-entity class="backPlane"  scale='.25 .25 .25' >
+                              <a-entity gui-list-view="caption:${caption}"></a-entity>             
+                            </a-entity>
+                            `;
+
+      var el = createHTML(template);
+
+      parent.appendChild(el);
+
+      var configMaterialListEl = el.querySelector('[gui-list-view]');
+
+      // ----------------------------
+
+      if (that.data.useConfig) {
+        setTimeout(() => {
+          var config = createHTML(that.configData);
+          var materials = config
+            .querySelectorAll('[material]')
+            .toArray()
+            .map(el => el.getAttribute('material'));
+
+          console.log('configMaterialListEl', configMaterialListEl, materials);
+          window.configMaterialListEl = configMaterialListEl;
+
+          // var matList = configMaterialListEl.components['gui-list-view'];
+          // matList.data.items = materials;
+          configMaterialListEl.setAttribute('gui-list-view', 'items', materials);
+        }, 1);
+      }
+
+      // ----------------------------
+
+      configMaterialListEl.addEventListener('change', handler);
+
+      _.each(options, (v, k) => configMaterialListEl.setAttribute(k, v));
+    }
+
     // --------------------------------------------
     // TODO refactor listview and references to data
     function getAllValuesFromListView (el) {
@@ -130,7 +175,6 @@ AFRAME.registerComponent('product-configurator', {
     // ------------------------------
     // ------------------------------
 
-    var that = this;
     var lastEl, lastElWireframe, lastElGlow, lastElGlowTimer;
 
     createMeshListView(el, 'meshes', function (e) {
@@ -217,6 +261,16 @@ AFRAME.registerComponent('product-configurator', {
           tireMaterials[0].copy(e.detail.value);
         });
       }
+    }, {position: '-5 7 0'});
+
+    // --------------------------------
+    createConfigMaterialListView(el, 'conf-mat', function (e) {
+      if (lastEl) {
+        // lastEl.material.copy(e.detail.material);
+
+        toast(e.detail.value);
+        // lastEl.material = e.detail.value;
+      } else toast('select mesh first');
     }, {position: '-5 6 0'});
   },
   remove: function () {
