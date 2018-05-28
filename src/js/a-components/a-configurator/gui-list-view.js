@@ -1,17 +1,55 @@
-import {toast} from '../../utils/aframe-utils';
-
 import {Logger} from '../../utils/Logger';
 import {createHTML} from '../../utils/dom-utils';
 import Vue from 'vue/dist/vue.esm';
-import {throttle} from 'lodash';
+
 import {suppressedThrottle} from '../../utils/misc-utils';
 
 import combinedSample from './combinedSample.html';
-
-var console = Logger.getLogger('gui-list-view');
+import * as _ from 'lodash';
 
 /**
- *  TODO efficient rendering by reusing buttons/elements and clipping planes
+ *  TODO helper components order-items-as
+ * - grid animate current positions to grid positions
+ * - horizontal-list
+ * - vertical-list
+ * - bin-stacking
+ *
+ */
+
+// var console = Logger.getLogger('gui-list-view');
+
+AFRAME.registerPrimitive('nk-list-view', {
+  defaultComponents: {
+    'gui-list-view': {
+      items: [{key: 0, value: '-empty-'}],
+      type: 'list',
+      containerFactory: `<a-entity></a-entity>`,
+      itemFactory: `<a-button
+              v-for="(item, index) in items"
+              :value="item.key"
+              :button-color="selectedIndex==index?'slateblue':'slategrey'"
+              :position="setPositionFromIndex(index,2,5,2.5,-0.45)" 
+              width="2.5"
+              height="0.75"
+              font-family="Arial"
+              margin="0 0 0.05 0"
+              @interaction-pick.stop="onItemClicked(item)"
+              ></a-button>`
+    }
+    // rotation: {x: 0, y: -180, z: 0},
+    // up: {x: 0, y: -1, z: 0}
+  },
+
+  mappings: {
+    items: 'gui-list-view.items',
+    selectedIndex: 'gui-list-view.selectedIndex',
+    itemFactory: 'gui-list-view.itemFactory',
+    requiredKeys: 'gui-list-view.requiredKeys'
+  }
+});
+
+/**
+ *  TODO efficient rendering by reusing buttons/elements and clipping planes as well as max amount of visible
  *   see https://threejs.org/examples/webgl_clipping_advanced.html
  *   https://stackoverflow.com/questions/36557486/three-js-object-clipping
  *  TODO also create a component with  additional items recursion (most simple treeview)
@@ -21,24 +59,69 @@ var console = Logger.getLogger('gui-list-view');
  *  $("a-scene").append(AFRAME.nk.parseHTML(`<a-entity position="5 5 5" gui-list-view></a-entity>`))
  */
 
+const listViewItemFactory = `<a-button  
+              v-for="(item, index) in items"
+              :value="item.key"    
+              :background-color="selectedIndex==index?'slateblue':'slategrey'"
+              :position="setPositionFromIndex(index,2,5,2.5,-0.45)" 
+              width="2.5" 
+              height="0.75" 
+              font-family="Arial" 
+              margin="0 0 0.05 0" 
+              @interaction-pick.stop="onItemClicked(item)"         
+              ></a-button>`;
+
 AFRAME.registerComponent('gui-list-view', {
   schema: {
-    items: {type: 'array', default: []}
-    /* itemFactory: {
-               default: function (item) {
-                 return item;
-               }
-             } */
+    items: {type: 'array', default: [{key: 0, value: 'hello'}, {key: 1, value: 'world'}]},
+    requiredKeys: {type: 'array', default: ['key', 'value']},
+    type: {type: 'string', default: 'list'},
+    containerFactory: {type: 'string', default: `<a-entity></a-entity>`},
+    itemFactory: {type: 'string', default: listViewItemFactory}
   },
-  init: function () {
-    // TODO code only for testing
+  update: function (oldData) {
+    // new entries
+    console.log('listview update', oldData, this.data.items);
+    var addedItems = _.difference(this.data.items, oldData.items);
+    var removedItems = _.difference(oldData.items, this.data.items);
 
-    if (this.data.items.length > 0) {
-      this.vm = createListView(this.data.items);
-    } else {
-      this.vm = createImportedModelsListView();
+    if (addedItems.length > 0) {
+      addedItems.forEach(item => this.vm.addItem(item));
+      console.log('addedItems', addedItems);
+    }
+    // removed entries
+
+    if (removedItems.length > 0) {
+      removedItems.forEach(item => this.vm.removeItem(item));
+      console.log('removedItems', removedItems);
     }
 
+    // ------
+    // update view in case the factory methods changed
+    if (oldData.containerFactory != this.data.containerFactory || oldData.itemFactory != this.data.itemFactory) {
+      this.initViewModel();
+    }
+  },
+  init: function () {
+    this.initViewModel();
+  },
+  initViewModel: function () {
+    console.log('initViewModel');
+    // remove previous vm
+    if (this.vm) {
+      // this.el.removeChild(this.vm.$el);
+      this.vm.$el.parentElement.removeChild(this.vm.$el);
+
+      this.vm = null;
+    }
+
+    // TODO code only for testing
+    if (this.data.type == 'list') {
+      this.vm = createListView(this.data.items, this.data.itemFactory, null, this.data.containerFactory);
+    } else if (this.data.type == 'template') {
+      this.vm = createImportedModelsListView();
+    } else console.error('unknown type');
+    console.log('this.vm', this.vm);
     this.el.appendChild(this.vm.$el);
   },
   remove () {
@@ -50,71 +133,78 @@ AFRAME.registerComponent('gui-list-view', {
 // ----------------------------------
 // FIXME don't use objects directly but rather use their indexes and return the items when selection changes
 // have a non-intrusive listener for items changes to update vm
-export function createListView (items, vueFactoryString, direction = 'column') {
-  if (!items) items = ['hello', 'world', 'test', 'asdf', '1234'];
+export function createListView (items, vueFactoryString, direction = 'column', vueContainerFactoryString) {
+  console.log('createListView()', arguments);
 
-  // template -------------------------------------
-  if (!vueFactoryString) {
-    vueFactoryString =
-            `<a-gui-button  
-              v-for="(item, index) in items"
-              :value="item"    
-              :background-color="selectedIndex==index?'blue':'yellow'"
-              :hover-color="yellow"
-              width="2.5" 
-              height="0.75"    
-              font-family="Arial" 
-              margin="0 0 0.05 0" 
-              @interaction-pick.stop="onItemClicked(item)"               
-              ></a-gui-button>`;
+  // if (!items) items = ['hello', 'world', 'test', 'asdf', '1234'];
+  if (!items) {
+    items = [{key: '1', value: 'hello'}, {key: '2', value: 'hello'}, {key: '3', value: 'hello'}, {
+      key: '4',
+      value: 'hello'
+    }, {key: '5', value: 'hello'}];
   }
+  if (!vueContainerFactoryString) vueContainerFactoryString = '<a-entity></a-entity>';
+  if (!vueFactoryString) throw new Error('must have vue based factory string');
+  // template -------------------------------------
 
-  var el = createHTML(`
-       <a-gui-flex-container 
-        ref="listView"
-        align-items="normal"
-        flex-direction="${direction}"  
-        component-padding="0.1"
-        opacity="0"
-        width="3.5"
-        >
-            ${vueFactoryString}
-        </a-gui-flex-container>
-  `);
+  var el = createHTML(vueContainerFactoryString);
+  let btn = createHTML(vueFactoryString);
+  el.appendChild(btn);
 
-    // vue -------------------------------------
+  el.setAttribute('ref', 'listView');
+
+  // vue -------------------------------------
+
   var app = new Vue({
     el: el,
+
     data: {
       items: items,
       selectedIndex: -1
     },
+
     methods: {
+      setItems: function (items) {
+        this.$data.items = items;
+      },
+      addItem: function (item) {
+        this.$data.items.push(item);
+      },
+      removeItem: function (item) {
+        this.$data.items.splice(this.$data.items.indexOf(item), 1);
+      },
       onItemClicked: function () {
         var data = this.$data.items[this.$data.selectedIndex];
 
         var that = this.$refs.listView.childNodes[this.$data.selectedIndex];
 
+        console.log('onItemClicked', data, that);
+
         var caption = that ? that.getAttribute('value') : '-1'; // TODO improve usability of list view
 
         if (this.$data.selectedIndex > -1) {
-          // toast('clicked ' + caption);
-
           this.$el.emit('change', data);
         }
+      },
+      setPositionFromIndex: function (index, xMax, yMax, xScale = 1, yScale = 1) {
+        let x = index % xMax;
+        let y = parseInt(index / xMax);
+
+        return '' + _.round(xScale * x, 4) + ' ' + _.round(yScale * y, 4) + ' 0';
       }
     },
     watch: {
       items: {
         handler: function (val, oldVal) {
-          this.$refs.listView.components['gui-flex-container'].init();
+          // TODO not watching all the time
+          // console.log('watch.items', val, oldVal);
+
+          //  debouncedUpdate(this);
         },
         deep: false // TODO might interfere with recursive objects
       },
       selectedIndex: {
         handler: function (val, oldVal) {
-          this.$refs.listView.components['gui-flex-container'].init();
-
           var _old = this.$refs.listView.childNodes[oldVal];
           var _new = this.$refs.listView.childNodes[val];
 
@@ -190,16 +280,17 @@ function createTemplateListView (templates) {
     ];
   }
   // toggle="true"
-  var app = createListView(templates, `<a-gui-button  
+  var app = createListView(templates, `<a-button  
               v-for="(item, index) in items"
               :value="item.key"    
               :background-color="selectedIndex==index?'slateblue':'slategrey'"
+              :position="setPositionFromIndex(index,2,5,2.5,-0.45)" 
               width="2.5" 
               height="0.75" 
               font-family="Arial" 
               margin="0 0 0.05 0" 
               @interaction-pick.stop="onItemClicked(item)"         
-              ></a-gui-button>`);
+              ></a-button>`, null, '<a-entity></a-entity>');
 
   return app;
 }
