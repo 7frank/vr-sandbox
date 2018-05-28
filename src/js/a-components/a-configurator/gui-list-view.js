@@ -6,6 +6,7 @@ import {suppressedThrottle} from '../../utils/misc-utils';
 
 import combinedSample from './combinedSample.html';
 import * as _ from 'lodash';
+import {jsonic} from 'jsonic';
 
 /**
  *  TODO helper components order-items-as
@@ -45,6 +46,7 @@ AFRAME.registerPrimitive('nk-list-view', {
     selectedIndex: 'gui-list-view.selectedIndex',
     itemFactory: 'gui-list-view.itemFactory',
     requiredKeys: 'gui-list-view.requiredKeys'
+    // TODO orientation for keys
   }
 });
 
@@ -53,10 +55,10 @@ AFRAME.registerPrimitive('nk-list-view', {
  *   see https://threejs.org/examples/webgl_clipping_advanced.html
  *   https://stackoverflow.com/questions/36557486/three-js-object-clipping
  *  TODO also create a component with  additional items recursion (most simple treeview)
+ * TODO set container size to wrap around buttons to be able to grab events
  *
  *
  *
- *  $("a-scene").append(AFRAME.nk.parseHTML(`<a-entity position="5 5 5" gui-list-view></a-entity>`))
  */
 
 const listViewItemFactory = `<a-button  
@@ -103,6 +105,27 @@ AFRAME.registerComponent('gui-list-view', {
     }
   },
   init: function () {
+    // read <template> tag and interpret it as json data
+    var tplData = this.el.querySelector('template');
+    if (tplData) {
+      var parsed = jsonic(tplData.innerHTML);
+
+      if (parsed.length >= 0) { this.data.items = parsed; } else { console.error("invalid data in template must be array of objects in less strict json format (see 'jsonic')"); }
+
+      tplData.parentElement.removeChild(tplData);
+    }
+
+    // query for itemFactory at entity
+    var itemFactoryTpl = this.el.querySelector(':nth-child(1)');
+    if (itemFactoryTpl) {
+      var parsed = itemFactoryTpl.outerHTML;
+
+      if (parsed.length > 0) { this.data.itemFactory = parsed; } else { console.error('invalid itemFactory'); }
+
+      itemFactoryTpl.parentElement.removeChild(itemFactoryTpl);
+    }
+
+    // init the actual view model
     this.initViewModel();
   },
   initViewModel: function () {
@@ -134,9 +157,6 @@ AFRAME.registerComponent('gui-list-view', {
 // FIXME don't use objects directly but rather use their indexes and return the items when selection changes
 // have a non-intrusive listener for items changes to update vm
 export function createListView (items, vueFactoryString, direction = 'column', vueContainerFactoryString) {
-  console.log('createListView()', arguments);
-
-  // if (!items) items = ['hello', 'world', 'test', 'asdf', '1234'];
   if (!items) {
     items = [{key: '1', value: 'hello'}, {key: '2', value: 'hello'}, {key: '3', value: 'hello'}, {
       key: '4',
@@ -145,12 +165,12 @@ export function createListView (items, vueFactoryString, direction = 'column', v
   }
   if (!vueContainerFactoryString) vueContainerFactoryString = '<a-entity></a-entity>';
   if (!vueFactoryString) throw new Error('must have vue based factory string');
+
   // template -------------------------------------
 
   var el = createHTML(vueContainerFactoryString);
   let btn = createHTML(vueFactoryString);
   el.appendChild(btn);
-
   el.setAttribute('ref', 'listView');
 
   // vue -------------------------------------
@@ -245,7 +265,15 @@ export function createListView (items, vueFactoryString, direction = 'column', v
 
   return app;
 }
-
+/**
+ *
+ *
+ * refactor
+ *
+ *
+ *
+ * @param templates
+ */
 function createTemplateListView (templates) {
   if (!templates) {
     templates = [
@@ -283,12 +311,11 @@ function createTemplateListView (templates) {
   var app = createListView(templates, `<a-button  
               v-for="(item, index) in items"
               :value="item.key"    
-              :background-color="selectedIndex==index?'slateblue':'slategrey'"
-              :position="setPositionFromIndex(index,2,5,2.5,-0.45)" 
-              width="2.5" 
+              :button-color="selectedIndex==index?'slateblue':'lightslategrey'"
+              :position="setPositionFromIndex(index,1,7,2.5,-0.45)" 
+              width="4.5" 
               height="0.75" 
               font-family="Arial" 
-              margin="0 0 0.05 0" 
               @interaction-pick.stop="onItemClicked(item)"         
               ></a-button>`, null, '<a-entity></a-entity>');
 

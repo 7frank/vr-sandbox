@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import {createListView} from './gui-list-view';
+import {createHTML} from '../../utils/dom-utils';
 
 /**
  * Simple color select with accent colors.
@@ -50,15 +51,38 @@ AFRAME.registerComponent('gui-color-list', {
     }
     // --------------------
 
-    var app = createListView(items, `<a-gui-button  
+    var colorList = createHTML(`<nk-list-view order-as="grid: 2 5 .5 .25">
+        <a-circle
+                v-for="(item, index) in items"
+                :color="item.value"
+                :position="setPositionFromIndex(index,5,1,1,1)"
+                radius=.5
+
+                @interaction-pick.stop="onItemClicked(item)"
+        >
+            <a-ring v-if="selectedIndex==index" position="0 0 -0.01" scale=".5 .5 .5" radiusOuter=0.55 radiusInner="0.5"  color="white"></a-ring>
+        </a-circle>
+        <template>[{key:1,value:"red"},{key:1,value:"blue"},{key:1,value:"yellow"}]</template>
+    </nk-list-view>
+`);
+
+    this.el.append(colorList);
+
+    colorList.addEventListener('change', (e) => {
+      e.stopPropagation();
+      this.el.emit('change', {color: e.detail.value});
+    });
+
+    /*
+    var app = createListView(items, `<a-gui-button
               v-for="(item, index) in items"
-              value=" "      
+              value=" "
               :background-color="item.value"
-              width=".5" 
-              height=".5" 
-              font-family="Arial" 
-              margin="0 0 0 0" 
-              @interaction-pick.stop="onItemClicked(item)"         
+              width=".5"
+              height=".5"
+              font-family="Arial"
+              margin="0 0 0 0"
+              @interaction-pick.stop="onItemClicked(item)"
               ></a-gui-button>`);
 
     this.el.append(app.$el);
@@ -67,6 +91,8 @@ AFRAME.registerComponent('gui-color-list', {
       e.stopPropagation();
       this.el.emit('change', {color: e.detail.value});
     });
+
+    */
   }
 
 });

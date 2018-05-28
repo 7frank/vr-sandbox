@@ -50,16 +50,16 @@ AFRAME.registerComponent('gui-mesh-list', {
     console.log('gui-mesh-list', items);
     // --------------------
     //  :background-color="item.value.material.color"
-    this.vm = createListView(items, `<a-gui-button
+    this.vm = createListView(items, `<a-button
               v-for="(item, index) in items"
               :value="item.key"
-            
+              :position="setPositionFromIndex(index,1,10,1,1)"
               width="2.5"
               height=".5"
               font-family="Arial"
               margin="0 0 0 0"
               @interaction-pick.stop="onItemClicked(item)"
-              ></a-gui-button>`);
+              ></a-button>`, null, '<a-entity></a-entity>');
 
     this.el.append(this.vm.$el);
 

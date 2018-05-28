@@ -14,6 +14,7 @@ import {toast} from '../../utils/aframe-utils';
  * currently only working for simple-car
  *
  */
+toast('use nk-list-view to refactor prod-conf and others', 15000);
 
 AFRAME.registerComponent('product-configurator', {
   schema: {
@@ -235,7 +236,7 @@ AFRAME.registerComponent('product-configurator', {
           tireMaterials[0].emissive = new THREE.Color(e.detail.color);
         });
       }
-    }, {position: '4 6 0'});
+    }, {position: '4 4 0'});
 
     createColorListView(el, 'tires', function (e) {
       if (lastEl) {
@@ -247,7 +248,7 @@ AFRAME.registerComponent('product-configurator', {
           tireMaterials[1].color = new THREE.Color(e.detail.color);
         });
       }
-    }, {position: '3 6 0'});
+    }, {position: '4 6 0'});
 
     createMaterialListView(el, 'materials', function (e) {
       console.log('material selected', e.detail, tires);

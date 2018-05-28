@@ -140,6 +140,7 @@
     "jquery": "^3.3.1",
     "jsdom": "^11.10.0",
     "json-loader": "^0.5.7",
+    "jsonic": "^0.3.0",
     "karma": "^1.7.0",
     "karma-chai-shallow-deep-equal": "^0.0.4",
     "karma-chrome-launcher": "^2.2.0",

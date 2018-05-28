@@ -39,8 +39,9 @@ AFRAME.registerComponent('gui-material-list', {
 
     // --------------------
 
-    this.vm = createListView(items, `<a-gui-button  
+    this.vm = createListView(items, `<a-button  
               v-for="(item, index) in items"
+               :position="setPositionFromIndex(index,10,2,1,1)"
               :value="index"      
               :background-color="item.color"
               width=".5" 
@@ -48,7 +49,7 @@ AFRAME.registerComponent('gui-material-list', {
               font-family="Arial" 
               margin="0 0 0 0" 
               @interaction-pick.stop="onItemClicked(item)"         
-              ></a-gui-button>`, 'row');
+              ></a-button>`, 'row', '<a-entity></a-entity>');
 
     this.el.append(this.vm.$el);
 
