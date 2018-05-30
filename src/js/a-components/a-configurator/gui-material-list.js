@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import {createListView} from './gui-list-view';
+import {createHTML} from '../../utils/dom-utils';
 
 /**
  * Simple material list which takes a list of selectors from which the materials are taken
@@ -13,19 +14,34 @@ AFRAME.registerComponent('gui-material-list', {
     items: {type: 'array', default: []},
     selectors: {type: 'array', default: ['a-scene']}
   },
-
-  tick: function () {
-    // TODO billboard stays not 100% in place when moving
-    // TODO refactor into "billboard-cheap"
-    // this.el.object3D.setRotationFromQuaternion(document.querySelector('[camera]').object3D.quaternion);
-  },
   init: function () {
+    // --------------------
+
+    this.mList = createHTML(`<nk-list-view  order-as="grid: 2 5 .5 .25">
+        <a-rounded  
+              v-for="(item, index) in items"
+               :position="setPositionFromIndex(index,10,2,1,1)"
+              :value="index"      
+            
+              width="0.9" 
+              height="0.9"
+              radius=".2" 
+              font-family="Arial" 
+              :material="item.material"
+              @interaction-pick.stop="onItemClicked(item)"         
+              ><a-rounded v-if="selectedIndex==index" position="0 0 -0.01" color="white" material="shader: flat;"></a-rounded></a-rounded>   
+    </nk-list-view>  
+`);
+
+    this.el.append(this.mList);
+
+    // ---------------------------------------
+
     var y = this.data.selectors.join(',');
     var x = document.querySelectorAll(y)[0]; // FIXME foreach
 
     // query and clone materials
     var materialObjects = _.uniq(AFRAME.nk.querySelectorAll(x, '[material]').map((mesh) => mesh.material)).slice(0, 150);
-    window.mat = materialObjects;
     materialObjects = _(materialObjects).compact()
       .map((material) => material.clone && material.type != 'SpriteMaterial' ? material.clone() : undefined) // TODO support multimaterial
       .compact()
@@ -33,25 +49,14 @@ AFRAME.registerComponent('gui-material-list', {
     // --------------------
     var items = _(materialObjects)
       .map((value, key) => ({
-        key: key, value: value.color // value
+        key: key, value: value.color, material: value // value
       }))
       .value();
 
-    // --------------------
-
-    this.vm = createListView(items, `<a-button  
-              v-for="(item, index) in items"
-               :position="setPositionFromIndex(index,10,2,1,1)"
-              :value="index"      
-              :background-color="item.color"
-              width=".5" 
-              height=".5" 
-              font-family="Arial" 
-              margin="0 0 0 0" 
-              @interaction-pick.stop="onItemClicked(item)"         
-              ></a-button>`, 'row', '<a-entity></a-entity>');
-
-    this.el.append(this.vm.$el);
+    setTimeout(() => {
+      this.mList.components['gui-list-view'].setItems(items);
+    }, 1);
+    // ---------------------------------------
 
     /* app.$el.addEventListener('change', (e) => {
       e.stopPropagation();
@@ -60,7 +65,7 @@ AFRAME.registerComponent('gui-material-list', {
 
     */
 
-    this.vm.$el.addEventListener('change', (e) => {
+    this.mList.addEventListener('change', (e) => {
       e.stopPropagation();
 
       console.log('gui-material-list', e.detail.key);
@@ -70,7 +75,7 @@ AFRAME.registerComponent('gui-material-list', {
     });
   },
   remove () {
-    this.el.removeChild(this.vm.$el);
+    this.el.removeChild(this.mList);
   }
 
 });

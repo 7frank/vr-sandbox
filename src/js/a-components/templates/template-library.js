@@ -86,7 +86,7 @@ AFRAME.registerComponent('gui-model-preview', {
         >
          <a-entity scale=".5 .5 .5" position="-3.5 -4.3 0" 
          simple-dialog="caption:Trigger ${getDescriptiveTextForAction('interaction-pick')} , ${getDescriptiveTextForAction('player-move-forward')} or ${getDescriptiveTextForAction('player-move-backward')} to select an element that is shown to the right as preview. Then click on a region below your feet to place one such instance."></a-entity>
-         <a-entity gui-item gui-list-view="type:template"></a-entity>
+         <a-entity id="listView" gui-template-list="type:template"></a-entity>
          
     </a-gui-flex-container>
     `;
@@ -112,8 +112,7 @@ AFRAME.registerComponent('gui-model-preview', {
     // TODO maybe introduce a way to chain changes to the undomanager to be able to create/alter in one step
 
     var that = this;
-    container.find('[gui-list-view]').on('change', function (e) {
-      console.log('gui-list-view.change', e);
+    container.find('#listView').on('change', function (e) {
       preview.html('');
 
       var tplData = e.detail.value;

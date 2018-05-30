@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import {createListView} from './gui-list-view';
 import {Logger} from '../../utils/Logger';
+import {createHTML} from '../../utils/dom-utils';
 
 var console = Logger.getLogger('gui-mesh-list');
 
@@ -29,7 +30,12 @@ AFRAME.registerComponent('gui-mesh-list', {
 
   createList: function (targetEl) {
     // remove previous instances
-    if (this.vm) this.el.removeChild(this.vm.$el);
+    if (this.mList) {
+      // fixme a-button previous instance not cleaned
+      // this.mList.querySelectorAll('a-rounded').forEach(img => img.parentElement.removeChild(img));
+
+      this.el.removeChild(this.mList);
+    }
 
     console.log('gui-mesh-list');
 
@@ -50,20 +56,32 @@ AFRAME.registerComponent('gui-mesh-list', {
     console.log('gui-mesh-list', items);
     // --------------------
     //  :background-color="item.value.material.color"
-    this.vm = createListView(items, `<a-button
+
+    this.mList = createHTML(`<nk-list-view orientation="row" order-as="grid: 2 5 .5 .25">
+       <a-button
               v-for="(item, index) in items"
-              :value="item.key"
+              :value="''+index+item.key"
               :position="setPositionFromIndex(index,1,10,1,1)"
+              :button-color="selectedIndex==index?'slateblue':'lightgrey'"
               width="2.5"
               height=".5"
               font-family="Arial"
               margin="0 0 0 0"
               @interaction-pick.stop="onItemClicked(item)"
-              ></a-button>`, null, '<a-entity></a-entity>');
+              ></a-button>   
+    </nk-list-view>  
+`);
 
-    this.el.append(this.vm.$el);
+    this.el.append(this.mList);
+    setTimeout(() => {
+      this.mList.components['gui-list-view'].setItems(items);
 
-    this.vm.$el.addEventListener('change', (e) => {
+      setTimeout(() => {
+        this.el.querySelectorAll('a-button').forEach(el => el.querySelector('a-entity').setAttribute('visible', false));
+      }, 1);
+    }, 1);
+
+    this.mList.addEventListener('change', (e) => {
       e.stopPropagation();
 
       console.log('gui-mesh-list', e.detail.value);
@@ -73,7 +91,7 @@ AFRAME.registerComponent('gui-mesh-list', {
     });
   },
   remove () {
-    this.el.removeChild(this.vm.$el);
+    this.el.removeChild(this.mList);
   }
 
 });

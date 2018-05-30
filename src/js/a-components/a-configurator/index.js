@@ -2,6 +2,7 @@ import './gui-list-view';
 import './gui-color-list';
 import './gui-material-list';
 import './gui-mesh-list';
+import './gui-template-list';
 import _ from 'lodash';
 import {appendHTML3D, createHTML} from '../../utils/dom-utils';
 import {createGlowForMesh} from './glow-shader';
@@ -9,6 +10,7 @@ import {FPSCtrl} from '../../utils/fps-utils';
 import {namespaceExists} from '../../utils/namespace';
 import './available-colors';
 import {toast} from '../../utils/aframe-utils';
+
 /**
  * Prototyping....
  * currently only working for simple-car
@@ -23,14 +25,14 @@ AFRAME.registerComponent('product-configurator', {
   },
   tick () {
     /*    // attach created stuff to scene
-        var obj = this.el.object3D;
-        var sceneObj = this.el.sceneEl.object3D;
-        if (obj.parent != sceneObj) {
-          sceneObj.add(obj);
-        } else {
-          var pos = getWorldPosition(this.el.parentEl.object3D);
-          obj.position.copy(pos);
-        } */
+            var obj = this.el.object3D;
+            var sceneObj = this.el.sceneEl.object3D;
+            if (obj.parent != sceneObj) {
+              sceneObj.add(obj);
+            } else {
+              var pos = getWorldPosition(this.el.parentEl.object3D);
+              obj.position.copy(pos);
+            } */
 
   },
   update: function () {
@@ -89,6 +91,7 @@ AFRAME.registerComponent('product-configurator', {
       colorListEl.addEventListener('change', handler);
 
       _.each(options, (v, k) => colorListEl.setAttribute(k, v));
+      return el;
     }
 
     function createMaterialListView (parent, caption, handler, options) {
@@ -106,6 +109,7 @@ AFRAME.registerComponent('product-configurator', {
       colorListEl.addEventListener('change-todo', handler);
 
       _.each(options, (v, k) => colorListEl.setAttribute(k, v));
+      return el;
     }
 
     function createConfigMaterialListView (parent, caption, handler, options) {
@@ -150,14 +154,15 @@ AFRAME.registerComponent('product-configurator', {
     // --------------------------------------------
     // TODO refactor listview and references to data
     function getAllValuesFromListView (el) {
-      var d = el.querySelector('a-gui-flex-container');
-      var meshes = d.__vue__.$data.items.map(v => v.value);
+      var listView = el.querySelector('[gui-list-view]').components['gui-list-view'];
+
+      var meshes = listView.vm.$data.items.map(v => v.value);
       return meshes;
     }
 
     // --------------------------------------------
     function createMeshListView (parent, caption, handler, options) {
-      var template = `<a-entity class="backPlane"  scale='.25 .25 .25'  gui-mesh-list="caption:${caption}"></a-entity>`;
+      var template = `<a-entity class="backPlane" id="meshList" scale='.25 .25 .25'  gui-mesh-list="caption:${caption}"></a-entity>`;
 
       var el = createHTML(template);
 
@@ -182,9 +187,10 @@ AFRAME.registerComponent('product-configurator', {
       lastEl = e.detail.value;
 
       // opaopa ------------------------
-
-      var meshes = getAllValuesFromListView(el.querySelector('[gui-mesh-list]'));
-      console.log('meshes in list', meshes);
+      // FIXME get all meshes again
+      // var meshes = getAllValuesFromListView(el.querySelector('[gui-mesh-list]'));
+      // console.log('meshes in list', meshes);
+      var meshes = [];
 
       console.log('mesh selected', lastEl);
 
@@ -227,7 +233,7 @@ AFRAME.registerComponent('product-configurator', {
 
     // ------------------------------
 
-    createColorListView(el, 'body reflect', function (e) {
+    /*  createColorListView(el, 'body reflect', function (e) {
       if (lastEl) {
         lastEl.material.color = new THREE.Color(e.detail.color);
       } else {
@@ -236,19 +242,21 @@ AFRAME.registerComponent('product-configurator', {
           tireMaterials[0].emissive = new THREE.Color(e.detail.color);
         });
       }
-    }, {position: '4 4 0'});
+    }, {position: '4 6 0'}); */
 
     createColorListView(el, 'tires', function (e) {
       if (lastEl) {
-        lastEl.material.color = new THREE.Color(e.detail.color);
-      } else {
+        var c = new THREE.Color(e.detail.value);
+        console.log('new color', c, e.detail);
+        lastEl.material.color = c;
+      } else toast('select mesh first');/* else {
         tires.forEach(function (tireMaterials) {
           // tread aber auch frontblende des autos
           console.log('material', e.details);
           tireMaterials[1].color = new THREE.Color(e.detail.color);
         });
-      }
-    }, {position: '4 6 0'});
+      } */
+    }, {position: '4 4 0'});
 
     createMaterialListView(el, 'materials', function (e) {
       console.log('material selected', e.detail, tires);
@@ -256,16 +264,16 @@ AFRAME.registerComponent('product-configurator', {
       if (lastEl) {
         // lastEl.material.copy(e.detail.material);
         lastEl.material = e.detail.value;
-      } else {
+      } else toast('select mesh first');/* else {
         tires.forEach(function (tireMaterials) {
           // tires[0] emissiveColor=> rim //aber auch karosserie des autos
           tireMaterials[0].copy(e.detail.value);
         });
-      }
+      } */
     }, {position: '-5 7 0'});
 
     // --------------------------------
-    createConfigMaterialListView(el, 'conf-mat', function (e) {
+    /* createConfigMaterialListView(el, 'conf-mat', function (e) {
       if (lastEl) {
         // lastEl.material.copy(e.detail.material);
 
@@ -273,6 +281,8 @@ AFRAME.registerComponent('product-configurator', {
         // lastEl.material = e.detail.value;
       } else toast('select mesh first');
     }, {position: '-5 6 0'});
+
+    */
   },
   remove: function () {
     var planes = this.el.querySelectorAll('.backPlane');
