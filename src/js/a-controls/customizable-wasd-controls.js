@@ -76,9 +76,9 @@ module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls'
     function keyHandler (code, bVal) {
       return function (event) {
         // TODO check if event target is child* of current a-scene
-        if (!shouldCaptureKeyEvent(that.el, event)) {
+        /* if (!shouldCaptureKeyEvent(that.el, event)) {
           return;
-        }
+        } */
         // console.log('keyHandler', [that.keys, that.el, event]);
         if (event.detail.first) {
           that.keys[code] = true;
@@ -99,15 +99,13 @@ module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls'
     // still there needs to be a higher delay (500ms currently) the not trigger to early
     //  and thus solve the  problem with damping the movement
 
-    const fixAutoWalk = _.debounce((key) => (e) => {
-      this.keys[key] = false;
-    }, 200);
+    const fixAutoWalk = _.debounce((e) => { console.log('fix autowalk'); this.keys = {}; }, 500);
 
     this.mStateList.createState('fix-autowalk')
-      .add(window, 'player-move-forward', fixAutoWalk('KeyW'))
-      .add(window, 'player-move-backward', fixAutoWalk('KeyS'))
-      .add(window, 'player-strafe-left', fixAutoWalk('KeyA'))
-      .add(window, 'player-strafe-right', fixAutoWalk('KeyD'));
+      .add(window, 'player-move-forward', fixAutoWalk)
+      .add(window, 'player-move-backward', fixAutoWalk)
+      .add(window, 'player-strafe-left', fixAutoWalk)
+      .add(window, 'player-strafe-right', fixAutoWalk);
   },
   tick: function (time, delta) {
     var currentPosition;
@@ -118,6 +116,8 @@ module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls'
     // TODO the question to answer here would be "do we want an element with physics to be able to move without a proper ground"
     var position = this.el.body ? this.el.body.position : this.position;
     var velocity = this.velocity;
+
+    if (_.isEmpty(this.keys)) return;
 
     if (!velocity[data.adAxis] && !velocity[data.wsAxis] &&
             _.isEmpty(this.keys)) {
