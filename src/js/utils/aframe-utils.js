@@ -191,6 +191,20 @@ export function findClosestEntity (targetSelector, selector = '.player', minDist
 export function toast (msg, duration = 2000, action = 'Ok') {
   var el = getPlayer();
 
+  if (typeof duration != 'number') throw new Error('type mismatch: must be number');
+
+  function checkToastForDeletion (el) {
+    if (_.get(el, 'components.toast.label.object3D.children[0].material.opacity') == 0) {
+      el.parentNode.removeChild(el);
+    }
+  }
+
+  el.querySelectorAll('a-toast').forEach(el => checkToastForDeletion(el));
+
+  // ---------------------------
+  // check if a toast with the same message is already visible in which case do nothing
+  if (el.querySelector(`a-toast[message='${msg}']`)) return;
+
   const renderToast = () => {
     var actionParam = '';
     if (action) {
@@ -200,14 +214,6 @@ export function toast (msg, duration = 2000, action = 'Ok') {
     el.insertAdjacentHTML('beforeend', t);
 
     var wrappers = [...el.querySelectorAll('.toast-wrapper')];
-
-    function checkToastForDeletion (el) {
-      if (_.get(el, 'components.toast.label.object3D.children[0].material.opacity') == 0) {
-        el.parentNode.removeChild(el);
-      }
-    }
-
-    el.querySelectorAll('a-toast').forEach(el => checkToastForDeletion(el));
 
     var i = -0.6;
 
@@ -270,7 +276,7 @@ export function lookAtAndOrient (objectToAdjust,
  */
 export function lookAwayFrom (me, target) {
   var v = new THREE.Vector3();
-  v.subVectors(me.position, target.position).add(me.position);
+  v.subVectors(getWorldPosition(me), getWorldPosition(target)).add(getWorldPosition(me));
   me.lookAt(v);
 }
 

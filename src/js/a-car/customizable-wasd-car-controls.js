@@ -22,14 +22,14 @@ AFRAME.registerComponent('customizable-wasd-car-controls', {
   },
 
   play: function () {
-    if (this.mStateList.getActiveStates()['exit-vehicle-events']) {
+    if (this.mStateList.isActiveState('exit-vehicle-events')) {
       this.mStateList.enableStates('move-events');
     }
   },
 
   pause: function () {
     this.keys = {};
-    if (this.mStateList.getActiveStates()['exit-vehicle-events']) {
+    if (this.mStateList.isActiveState('exit-vehicle-events')) {
       this.mStateList.disableStates('move-events');
     }
   },
@@ -93,13 +93,12 @@ AFRAME.registerComponent('customizable-wasd-car-controls', {
   enterVehicle: function (event) {
     event.stopPropagation();
 
-    this.mStateList.enableStates('exit-vehicle-events move-events').disableStates('enter-vehicle-events');
-
     var player = getPlayer();
     if (getWorldDistance(player.object3D, this.el.object3D) > 5) {
-      toast('Get closer to a vehicle to enter it.', 'Got it.');
+      toast('Get closer to a vehicle to enter it.', 1000, 'Got it.');
       playSound('.command-error');
     } else {
+      this.mStateList.enableStates('exit-vehicle-events move-events').disableStates('enter-vehicle-events');
       enterVehicle(player, this.el);
     }
   },

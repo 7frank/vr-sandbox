@@ -11,7 +11,7 @@ export function createAndAttachCarCameraControls (player, vehicle) {
   var camera = player.object3D.children[0];
   var car = vehicle.components['simple-car'];
   var carCamera = new CarCameraControls({camera: camera, car: car});
-
+  window.carcamcon = carCamera;
   var carUpdateScript = new FPSCtrl(60, () => carCamera.update()).start();
 
   // prevent physics between player and car while "driving"

@@ -27,9 +27,84 @@ AFRAME.registerComponent('simple-car', {
       default: 'veyron'
     }
   },
+  addRigidVehicleBody: function () {
+    var sc = this.el;// = $('[simple-car]');
+    var db = sc.components['dynamic-body'];
+
+    // reset original body
+    db.body.shapes = [];
+    db.body.updateMassProperties();
+
+    //
+    var chassisShape;
+    var centerOfMassAdjust = new CANNON.Vec3(0, 0, -1);
+    chassisShape = new CANNON.Box(new CANNON.Vec3(5, 2, 0.5));
+    var chassisBody = db.body;// new CANNON.Body({ mass: 1 });
+    chassisBody.addShape(chassisShape, centerOfMassAdjust);
+    chassisBody.position.set(0, 0, 0);
+
+    //
+
+    var world = db.body.world;
+    var demo = sc.object3D;// Create the vehicle
+
+    var vehicle;
+
+    var mass = 1; var centerOfMassAdjust = new CANNON.Vec3(0, 0, -1); var wheelMaterial = new CANNON.Material('wheelMaterial'); vehicle = new CANNON.RigidVehicle({
+      chassisBody: chassisBody// db.body
+    });
+    var axisWidth = 7;
+    var wheelShape = new CANNON.Sphere(1.5);
+    var down = new CANNON.Vec3(0, 0, -1);
+    var wheelBody = new CANNON.Body({ mass: mass, material: wheelMaterial });
+    wheelBody.addShape(wheelShape);
+    vehicle.addWheel({
+      body: wheelBody,
+      position: new CANNON.Vec3(5, axisWidth / 2, 0).vadd(centerOfMassAdjust),
+      axis: new CANNON.Vec3(0, 1, 0),
+      direction: down
+    });
+    var wheelBody = new CANNON.Body({ mass: mass, material: wheelMaterial });
+    wheelBody.addShape(wheelShape);
+    vehicle.addWheel({
+      body: wheelBody,
+      position: new CANNON.Vec3(5, -axisWidth / 2, 0).vadd(centerOfMassAdjust),
+      axis: new CANNON.Vec3(0, -1, 0),
+      direction: down
+    });
+    var wheelBody = new CANNON.Body({ mass: mass, material: wheelMaterial });
+    wheelBody.addShape(wheelShape);
+    vehicle.addWheel({
+      body: wheelBody,
+      position: new CANNON.Vec3(-5, axisWidth / 2, 0).vadd(centerOfMassAdjust),
+      axis: new CANNON.Vec3(0, 1, 0),
+      direction: down
+    });
+    var wheelBody = new CANNON.Body({ mass: mass, material: wheelMaterial });
+    wheelBody.addShape(wheelShape);
+    vehicle.addWheel({
+      body: wheelBody,
+      position: new CANNON.Vec3(-5, -axisWidth / 2, 0).vadd(centerOfMassAdjust),
+      axis: new CANNON.Vec3(0, -1, 0),
+      direction: down
+    });
+    // Some damping to not spin wheels too fast
+    for (var i = 0; i < vehicle.wheelBodies.length; i++) {
+      vehicle.wheelBodies[i].angularDamping = 0.4;
+    }
+    // Constrain wheels
+    var constraints = [];
+    // Add visuals
+    // demo.addVisual(vehicle.chassisBody);
+    for (var i = 0; i < vehicle.wheelBodies.length; i++) {
+      // demo.addVisual(vehicle.wheelBodies[i]);
+    }
+    vehicle.addToWorld(world);
+  },
   getCarInstance: function () {
     return this._car;
   },
+
   init: function () {
     var el = this.el;
     var that = this;
@@ -47,8 +122,9 @@ AFRAME.registerComponent('simple-car', {
       this.model = car.model();
 
       el.setObject3D('mesh', this.model);
-
       restartPhysics(that.el);
+      // FIXME not working T_T
+      // this.addRigidVehicleBody();
     });
 
     /*

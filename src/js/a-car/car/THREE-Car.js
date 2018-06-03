@@ -116,7 +116,7 @@ THREE.Car = function () {
      *
      * @param delta
      * @param controls
-     * @param el - a reference to the <a-simple-car> conomponent that should contain a body for the physics
+     * @param el - a reference to the <a-simple-car> component that should contain a body for the physics
      */
   this.updateCarModel = function (delta, controls, el) {
     // speed and wheels based on controls
@@ -171,7 +171,6 @@ THREE.Car = function () {
 
     this.carOrientation += (forwardDelta * this.STEERING_RADIUS_RATIO) * this.wheelOrientation;
 
-    // if (!el.body)
     /*   // displacement
 
     this.root.position.x += Math.sin(this.carOrientation) * forwardDelta;
@@ -187,17 +186,45 @@ THREE.Car = function () {
       el.body.position.z += Math.cos(this.carOrientation) * forwardDelta;
 
       // steering
+      //  this.root.rotation.y = this.carOrientation;
+      // FIXME
+      /*  var quatX = new CANNON.Quaternion();
+      var quatY = new CANNON.Quaternion();
+      quatX.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -this.MAX_TILT_FRONTBACK * this.acceleration);
+      quatY.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), this.carOrientation);
+      var quaternion = quatY.mult(quatX);
+      quaternion.normalize();
+      el.body.quaternion.copy(quaternion); */
 
-      this.root.rotation.y = this.carOrientation;
-      // fixme use quaternion to implact on the rotation otherwise the bounding box will not update when the mesh rotates
-      // el.body.quaternion.y = this.carOrientation / 10;
+      var quatY = new CANNON.Quaternion();
+      var quatX = new CANNON.Quaternion();
+
+      // ------------------
+      var v1 = new THREE.Vector3(); // create once and reuse it
+      var worldQuaternion = new THREE.Quaternion(); // create once and reuse it
+
+      el.object3D.getWorldQuaternion(worldQuaternion);
+      v1.copy(el.object3D.up).applyQuaternion(worldQuaternion);
+
+      // ------------------
+
+      quatX.setFromAxisAngle(v1, 0);
+      quatY.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), this.carOrientation);
+      var quaternion = quatY;// quatY.mult(quatX);
+      quaternion.normalize();
+      // el.body.quaternion.copy(quaternion);
+      el.body.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), this.carOrientation);
     }
 
     // tilt
 
     if (this.loaded) {
-      this.bodyMesh.rotation.z = this.MAX_TILT_SIDES * this.wheelOrientation * (this.speed / this.MAX_SPEED);
-      this.bodyMesh.rotation.x = -this.MAX_TILT_FRONTBACK * this.acceleration;
+      // this.root.rotation.z = this.MAX_TILT_SIDES * this.wheelOrientation * (this.speed / this.MAX_SPEED);
+      // this.root.rotation.x = -this.MAX_TILT_FRONTBACK * this.acceleration;
+      // Note:used until rigidVehicle and quaternions are working
+    /// /  this.root.quaternion.setFromEuler(new THREE.Euler(-this.MAX_TILT_FRONTBACK * this.acceleration, this.carOrientation, this.MAX_TILT_SIDES * this.wheelOrientation * (this.speed / this.MAX_SPEED), 'XYZ'));
+      // el.body.quaternion.setFromEuler(new THREE.Euler(-this.MAX_TILT_FRONTBACK * this.acceleration, this.carOrientation, this.MAX_TILT_SIDES * this.wheelOrientation * (this.speed / this.MAX_SPEED), 'XYZ'));
+      // if (isNaN(el.body.quaternion.x)) el.body.quaternion = new CANNON.Quaternion();
     }
 
     // wheels rolling

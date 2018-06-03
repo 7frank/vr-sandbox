@@ -1,17 +1,6 @@
 
-/*
-tQuery.registerStatic('createCarCameraControls', function(opts, world){
-	// handle parameters
-	world	= world	|| tQuery.world;
-
-	var controls	= new tQuery.CarCameraControls(opts);
-	world.setCameraControls(controls);
-	return controls;
-});
-*/
-
 import Car from './tquery.car';
-import {lookAtAndOrient, lookAwayFrom} from '../../utils/aframe-utils';
+import {getWorldPosition, lookAtAndOrient, lookAwayFrom} from '../../utils/aframe-utils';
 
 export default class CarCameraControls {
   /**
@@ -66,7 +55,7 @@ export default class CarCameraControls {
 
     var distance	= -1;
     if (this._prevPosition) {
-      var delta	= tObject3d.position.clone().sub(this._prevPosition);
+      var delta	= getWorldPosition(tObject3d).sub(this._prevPosition);
       var speed	= delta.length();
       speed		= Math.max(speed, 0);
       speed		= Math.min(speed, 0.15);
@@ -74,7 +63,7 @@ export default class CarCameraControls {
 
       this._curDistance	= spdDistance * this._curDistance + (1 - spdDistance) * distance;
     }
-    this._prevPosition	= tObject3d.position.clone();
+    this._prevPosition	= getWorldPosition(tObject3d);
 
     var tCamera	= this._opts.camera;
     // set camera position
@@ -86,7 +75,7 @@ export default class CarCameraControls {
     var position	= new THREE.Vector3(0, 2.35, -2 + 1.5 * this._curDistance);
 
     var matrix	= new THREE.Matrix4().makeRotationY(this._curAngle);
-    position.applyMatrix4(matrix).add(tObject3d.position);
+    position.applyMatrix4(matrix).add(getWorldPosition(tObject3d));
 
     tCamera.parent.position.copy(position);
 
@@ -101,6 +90,7 @@ export default class CarCameraControls {
     tCamera.parent.lookAt(target);
     */
     // meanwhile this method solves the problem partially
+    // tCamera.parent.lookAt(tObject3d);
     lookAwayFrom(tCamera.parent, tObject3d);
   }
 }
