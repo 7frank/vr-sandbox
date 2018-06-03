@@ -28,7 +28,7 @@ AFRAME.registerComponent('gui-material-list', {
               radius=".2" 
               font-family="Arial" 
               :material="item.material"
-              @interaction-pick.stop="onItemClicked(item)"         
+              @interaction-pick.stop="onItemClicked(index)"         
               ><a-rounded v-if="selectedIndex==index" position="0 0 -0.01" color="white" material="shader: flat;"></a-rounded></a-rounded>   
     </nk-list-view>  
 `);

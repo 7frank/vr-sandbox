@@ -79,7 +79,6 @@ module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls'
         /* if (!shouldCaptureKeyEvent(that.el, event)) {
           return;
         } */
-        // console.log('keyHandler', [that.keys, that.el, event]);
         if (event.detail.first) {
           that.keys[code] = true;
         } else {
@@ -95,17 +94,9 @@ module.exports.Component = AFRAME.registerComponent('customizable-wasd-controls'
       .add(window, 'player-strafe-right', keyHandler('KeyD'));
 
     // --------------------------
-    // mostly fixes autowalk bug when focus changes
-    // still there needs to be a higher delay (500ms currently) the not trigger to early
-    //  and thus solve the  problem with damping the movement
-
-    const fixAutoWalk = _.debounce((e) => { console.log('fix autowalk'); this.keys = {}; }, 500);
-
+    // mostly fixes auto-walk bug when focus changes
     this.mStateList.createState('fix-autowalk')
-      .add(window, 'player-move-forward', fixAutoWalk)
-      .add(window, 'player-move-backward', fixAutoWalk)
-      .add(window, 'player-strafe-left', fixAutoWalk)
-      .add(window, 'player-strafe-right', fixAutoWalk);
+      .add(window, 'player-force-stop', e => { this.keys = {}; });
   },
   tick: function (time, delta) {
     var currentPosition;

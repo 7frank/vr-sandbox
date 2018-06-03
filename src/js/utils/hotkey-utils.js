@@ -2,12 +2,17 @@
  * FIXME don't rely on global
  * @param actionName
  */
+import * as _ from 'lodash';
+
 export function getDescriptiveTextForAction (actionName) {
-  if (!AFRAME.nk.Hotkeys || !AFRAME.nk.Hotkeys.getRegistered) { return '[' + actionName + ']'; }
+  if (!_.has(AFRAME, 'nk.Hotkeys.getRegistered')) { return '"' + actionName + '"'; }
 
   var action = AFRAME.nk.Hotkeys.getRegistered()[actionName];
 
-  if (!action) return '[undefined]';
+  if (!action) return '"undefined"';
 
-  return action.combo.map(c => `[${c.type}:${c.combo}]`).join(' ');
+  return action.combo.map(c => {
+    let type = c.type == 'keyboard' ? '' : c.type;
+    return `"${type}${_.capitalize(c.combo)}"`;
+  }).join(' ');
 }

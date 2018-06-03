@@ -26,6 +26,10 @@ export class EventListenerStateList {
     return _(this.mStates).pickBy(state => state.active()).mapValues(state => state.mList.map(entry => entry.name).join(' ')).value();
   }
 
+  isActiveState (name) {
+    return this.mStates[name] && this.mStates[name].active();
+  }
+
   /**
      * String containing state names separated by one <space>
      * @param [states] - leave empty to enable all registered
@@ -69,11 +73,19 @@ export class EventListenerList {
     return this.attached;
   }
 
-  add (target, name, handler) {
+  /**
+     *
+     * @param {HTMLElement} target
+     * @param {String} name
+     * @param {function} handler
+     * @param options - {@link https://developer.mozilla.org/de/docs/Web/API/EventTarget/addEventListener}
+     * @returns {EventListenerList}
+     */
+  add (target, name, handler, options) {
     if (!name) console.error('EventListenerList missing name');
     if (!handler) console.error('EventListenerList missing handler for: ', name);
 
-    this.mList.push({target, name, handler});
+    this.mList.push({target, name, handler, options});
     return this;
   }
 
@@ -83,7 +95,7 @@ export class EventListenerList {
       return this;
     }
     console.log('attachAll', this.mList);
-    this.mList.forEach(({target, name, handler}) => target.addEventListener(name, handler));
+    this.mList.forEach(({target, name, handler, options}) => target.addEventListener(name, handler, options));
     this.attached = true;
     return this;
   }

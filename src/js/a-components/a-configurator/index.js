@@ -16,7 +16,6 @@ import {toast} from '../../utils/aframe-utils';
  * currently only working for simple-car
  *
  */
-toast('use nk-list-view to refactor prod-conf and others', 15000);
 
 AFRAME.registerComponent('product-configurator', {
   schema: {

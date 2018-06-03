@@ -21,7 +21,7 @@ AFRAME.registerComponent('gui-color-list', {
                 :position="setPositionFromIndex(index,5,1,1,1)"
                 radius=.45
 
-                @interaction-pick.stop="onItemClicked(item)"
+                @interaction-pick.stop="onItemClicked(index)"
         >
             <a-ring v-if="selectedIndex==index" position="0 0 -0.01" scale=".5 .5 .5" radiusOuter=0.47 radiusInner="0.45"  color="white" material="shader: flat;"></a-ring>
         </a-circle>

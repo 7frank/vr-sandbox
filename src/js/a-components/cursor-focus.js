@@ -48,6 +48,7 @@ AFRAME.registerComponent('cursor-focus', {
       // console.log('cursor-focus mouseenter', evt.detail);
       fixFocusable(targetEl);
       targetEl.focus();
+      that.el.emit('change', targetEl);
     });
 
     this.mCursor.addEventListener('mouseleave', function (evt) {

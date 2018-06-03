@@ -1,5 +1,6 @@
 import {createHTML} from '../utils/dom-utils';
 import Vue from 'vue/dist/vue.esm';
+import * as _ from 'lodash';
 
 AFRAME.registerComponent('simple-dialog', {
   schema: {
@@ -7,12 +8,34 @@ AFRAME.registerComponent('simple-dialog', {
     ok: {type: 'string', default: 'Ok'}
   },
   init: function () {
+    //  get innerHTML and use it as text caption
+
+    if (this.el) {
+      var parsed = this.el.innerHTML;
+
+      if (parsed.length > 0) {
+        console.log('parsed', parsed);
+        this.data.caption = parsed;
+      }
+      this.el.innerHTML = '';
+    }
+
+    this.createDialog();
+  },
+  /* update: function (oldData) {
+        if (caption.caption!=this.data.caption)
+        this.createDialog();
+    }, */
+
+  createDialog: function () {
+    if (this.vm) this.vm.$el.parentElement.removeChild(this.vm.$el);
+
     var that = this;
     var el = createHTML(
-      `<a-rounded  material="opacity:.9" width="4" height="3" radius="0.1" >
-                <a-form >
+      `<a-rounded  material="opacity:.3;color:black;" width="4" height="3" radius="0.1" >
                 
-                <a-text width="3.6"  position="0.2 2.6 0.05" :value="caption"></a-text>
+                
+                <a-text width="3.6" height="2" position="0.2 2.4 0.05" :value="caption"></a-text>
                         
                    <!-- <a-switch id="editableActorBtn" value="createEditableActor" position="0.2 2.7 0" enabled="true"></a-switch>
                     <a-radio position="0.2 2.4 0" width="3" name="food" label="Burger with fries and pizza" value="pizza"></a-radio>
@@ -23,7 +46,7 @@ AFRAME.registerComponent('simple-dialog', {
                     -->
                     <a-button @interaction-pick.stop="onOkClick" @click.stop="onOkClick" position="0.2 0.6 0" name="stuff" :value="ok" type="raised"></a-button>
                     <!--<a-button position="0.2 0.35 0" width="3" name="stuff" value="You cannot click me" disabled="true"></a-button> -->
-                </a-form>
+              
             </a-rounded>`
     );
 

@@ -4,9 +4,9 @@ import * as CANNON from 'cannon';
 export function getPlayer () {
   return $('.player').get(0);
 }
-
+// FIXME
 export function getBall () {
-  return $('.player').get(0);
+  return $('.ball').get(0);
 }
 
 export
@@ -33,13 +33,11 @@ function playerKickBall () {
 export
 function activateJetpack () {
   var player = getPlayer();
-  var ball = getBall();
-
   /* el.body.applyImpulse(
                                                                           // impulse  new CANNON.Vec3(0, 1, 0),
                                                                           // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
                                                                         );
                                                                         */
-  var el = ball; // partially works with ball but not with player body as it seems
+  var el = player; // partially works with ball but not with player body as it seems
   el.body.applyImpulse(new CANNON.Vec3(0, 1, 0), new CANNON.Vec3(0, -1, 0)); // new CANNON.Vec3().copy(el.getComputedAttribute('position')));
 }

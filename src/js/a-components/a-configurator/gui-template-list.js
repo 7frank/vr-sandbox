@@ -76,17 +76,18 @@ function createTemplateListView (templates) {
       }
     ];
   }
+
   // toggle="true"
   var app = createListView(templates, {itemFactory: `<a-button  
               v-for="(item, index) in items"
               :value="item.key"    
               :button-color="selectedIndex==index?'slateblue':'lightgrey'"
-              :position="setPositionFromIndex(index,1,7,2.5,-0.45)" 
+              :position="setPositionFromIndex(index,2,5,2,-0.45)" 
               width="1.5" 
               height="0.75" 
               font-family="Arial" 
-              @interaction-pick.stop="onItemClicked(item)"         
-              ></a-button>`}, 'row');
+              @interaction-pick.stop="onItemClicked(index)"         
+              ></a-button>`}, 'row', false, true);
 
   return app;
 }

@@ -91,6 +91,21 @@
     * use created videos in demo scene where dialog contains video
         * https://you-link.herokuapp.com/?url=https://www.youtube.com/watch?v=IwdB-7uNHfk
 * draw placeholder images when gltf-zip does not contain valid links
+
+* components
+    * grass
+    * table from listview
+        * datasource attribute
+    * crud-datasource
+        * pubsub
+        * client/server ajax/fetch datasource component that depends on the crud datasource
+    * hexagon grid with offset for odd rows
+* additional layout component for list-view
+    * https://www.npmjs.com/package/aframe-layout
+             
+
+
+
 ## loading screen
 https://www.npmjs.com/package/loadscreen
 

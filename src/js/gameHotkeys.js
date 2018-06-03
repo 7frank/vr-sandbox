@@ -2,7 +2,7 @@ import $ from 'jquery';
 import {
   findClosestEntity,
   getDirectionForEntity,
-  getPosition,
+  getPosition, getWorldPosition,
   playSound, scaleEntity,
   setPosition,
   toast
@@ -24,6 +24,7 @@ import {exportElementUnderCursor} from './export/GLTF-exporter-utils';
 import {UndoMgr} from './utils/undo-utils';
 import {streamIn} from './utils/stream-utils';
 import {connectToServer, getSomeSampleData} from './database-utils';
+import {createSidebarMenu} from './utils/debug-gui';
 
 // import {Hotkeys} from '@nk/core-components/dist/bundle';
 
@@ -46,7 +47,11 @@ window.addEventListener('load', function () {
   AFRAME.nk.Hotkeys = Hotkeys;
   hotkeyDialog = createHTML("<nk-hotkey-dialog title='Input Configuration' class='card card-1' style='z-index: 1;top:50px;left:50%;position:absolute;width:600px;height:300px;display:none' ></nk-hotkey-dialog>");
   document.body.appendChild(hotkeyDialog);
+  //
   addHotkeys();
+
+  // depends on hotkeys
+  createSidebarMenu();
 });
 
 /**
@@ -69,6 +74,11 @@ function addHotkeys () {
     undo: 'undo',
     redo: 'redo'
   };
+
+  Hotkeys.setDebug(false);
+  Hotkeys.onChange(function (result) {
+    console.log('Hotkeys-change', result);
+  });
 
   Hotkeys.register('show help', 'h');
   Hotkeys().on('show help', function () {
@@ -108,29 +118,29 @@ function addHotkeys () {
 
   /* alert("we can 'R' but not move");
 
-  $('a-scene').setAttribute('cursor-focus', true);
-  sphere = document.activeElement;
-  sphere.addEventListener('keyup', (...args) => console.log('key', args, args[0].which));
-  */
+        $('a-scene').setAttribute('cursor-focus', true);
+        sphere = document.activeElement;
+        sphere.addEventListener('keyup', (...args) => console.log('key', args, args[0].which));
+        */
 
   // ----------------------------------------------
   // FIXME controls are overloaded and will work despite these wasd controls below not being active
-  Hotkeys.register('player-move-forward', ['w', 'touch'], {
+  Hotkeys.register('player-move-forward', ['w', 'up', 'touch'], {
     category: 'player',
     description: 'Moves the player in the forward direction.',
     stopPropagation: false
   });
-  Hotkeys.register('player-move-backward', ['s'], {
+  Hotkeys.register('player-move-backward', ['s', 'down'], {
     category: 'player',
     description: 'Moves the player in the backward direction.',
     stopPropagation: false
   });
-  Hotkeys.register('player-strafe-left', ['a'], {
+  Hotkeys.register('player-strafe-left', ['a', 'left'], {
     category: 'player',
     description: 'Moves the player  sideways.'
   });
 
-  Hotkeys.register('player-strafe-right', ['d'], {
+  Hotkeys.register('player-strafe-right', ['d', 'right'], {
     category: 'player',
     description: 'Moves the player  sideways.'
   });
@@ -172,14 +182,17 @@ function addHotkeys () {
     description: 'Will try to interact with the entity in front of the player. '
   });
 
-  Hotkeys().on('interaction-pick', () => { toast('nothing to pick up'); }); // enterOrExitVehicle);
+  Hotkeys().on('interaction-pick', () => {
+    toast('nothing to pick up');
+  }); // enterOrExitVehicle);
 
   Hotkeys.register('interaction-talk', 't', {
     category: 'interaction',
     description: 'Lets player enter the vehicle and switches from player camera to car camera.'
   });
 
-  Hotkeys().on('interaction-talk', () => {});
+  Hotkeys().on('interaction-talk', () => {
+  });
 
   /**
      * @deprecated not the whole scene should be edited but only smaller parts of it (actors and regions within the world)

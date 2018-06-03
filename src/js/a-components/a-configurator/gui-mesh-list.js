@@ -67,7 +67,7 @@ AFRAME.registerComponent('gui-mesh-list', {
               height=".5"
               font-family="Arial"
               margin="0 0 0 0"
-              @interaction-pick.stop="onItemClicked(item)"
+              @interaction-pick.stop="onItemClicked(index)"
               ></a-button>   
     </nk-list-view>  
 `);

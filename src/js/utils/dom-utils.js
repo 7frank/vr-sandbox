@@ -48,7 +48,7 @@ export function appendStyle (css) {
 }
 
 /**
- * An alternative version of AFRAME.utils.shouldCaptureKeyEvent which ckecks if an element is contained within the scene element.
+ * An alternative version of AFRAME.utils.shouldCaptureKeyEvent which checks if an element is contained within the scene element.
  * This check works better when using hotkeys and the keyboard input library.
  *
  * @param {HTMLElement} el

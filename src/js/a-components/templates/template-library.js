@@ -103,9 +103,17 @@ AFRAME.registerComponent('gui-model-preview', {
       this.object3D.rotation.y += 0.01;
     }, preview.get(0)).start();
 
-    var previewWrapper = $(`<a-entity position="3 0 0" ></a-entity>`);
+    var previewWrapper = $(`<a-entity position="5 0 0" ></a-entity>`);
     previewWrapper.append(preview);
     var container = $(containerTemplate);
+
+    // FIXME this is not how hotkey info texts should be rendered
+    setTimeout(function initText () {
+      console.error('timeout');
+      var dlg = container.find('[simple-dialog]').get(0);
+      // dlg.setAttribute('simple-dialog', 'caption', `Press ${getDescriptiveTextForAction('interaction-pick')} , ${getDescriptiveTextForAction('player-move-forward')} or ${getDescriptiveTextForAction('player-move-backward')} to select an element that is shown to the right as preview. Then click on a region below your feet to place one such instance.`);
+      dlg.components['simple-dialog'].vm.$data.caption = `Press ${getDescriptiveTextForAction('interaction-pick')}, ${getDescriptiveTextForAction('player-move-forward')} or ${getDescriptiveTextForAction('player-move-backward')}\n to select an element that is shown to the right as preview. Then click on a region below your feet to place one such instance. Hold "Shift" to be able to place more than one element at once.`;
+    }, 5000);
 
     wrapper.append(container, previewWrapper);
 

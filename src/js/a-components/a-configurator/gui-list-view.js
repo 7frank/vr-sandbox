@@ -2,11 +2,12 @@ import {Logger} from '../../utils/Logger';
 import {createHTML} from '../../utils/dom-utils';
 import Vue from 'vue/dist/vue.esm';
 
-import {suppressedThrottle} from '../../utils/misc-utils';
+import {forceStopPlayerMovement, suppressedThrottle, throttleFinally} from '../../utils/misc-utils';
 
 import * as _ from 'lodash';
 import {jsonic} from 'jsonic';
-import {getCompoundBoundingBox} from '../../utils/aframe-utils';
+import {getCompoundBoundingBox, getWorldPosition} from '../../utils/aframe-utils';
+import {Box3Ext} from '../../three/Box3Ext';
 
 /**
  *  TODO helper components order-items-as
@@ -33,7 +34,7 @@ AFRAME.registerPrimitive('nk-list-view', {
               height="0.75"
               font-family="Arial"
               margin="0 0 0.05 0"
-              @interaction-pick.stop="onItemClicked(item)"
+              @interaction-pick.stop="onItemClicked(index)"
               ></a-button>`
     }
     // rotation: {x: 0, y: -180, z: 0},
@@ -42,10 +43,10 @@ AFRAME.registerPrimitive('nk-list-view', {
 
   mappings: {
     items: 'gui-list-view.items',
-    selectedIndex: 'gui-list-view.selectedIndex',
-    itemFactory: 'gui-list-view.itemFactory',
+    selectedIndex: 'gui-list-view.selectedIndex', // the id of the currently selected array entry
     requiredKeys: 'gui-list-view.requiredKeys',
     overflow: 'gui-list-view.overflow',
+    invert: 'gui-list-view.invert',
     orientation: 'gui-list-view.orientation'
 
     // TODO orientation for keys
@@ -72,7 +73,7 @@ const listViewItemFactory = `<a-button
               height="0.75" 
               font-family="Arial" 
               margin="0 0 0.05 0" 
-              @interaction-pick.stop="onItemClicked(item)"         
+              @interaction-pick.stop="onItemClicked(index)"         
               ></a-button>`;
 
 AFRAME.registerComponent('gui-list-view', {
@@ -82,12 +83,13 @@ AFRAME.registerComponent('gui-list-view', {
       type: 'array',
       default: [{key: 0, value: 'hello'}, {key: 1, value: 'world'}]
     },
-    requiredKeys: {type: 'array', default: ['key', 'value']},
-    overflow: {type: 'boolean', default: false},
-    orientation: {type: 'string', default: 'column'},
+    requiredKeys: {type: 'array', default: ['key', 'value']}, // TODO
+    overflow: {type: 'boolean', default: false}, // behaviour what happens if end of list is reached and user still selects next element. if enabled, after the last element selected the first will be the next one.
+    invert: {type: 'boolean', default: false}, // whether to invert the controls
+    orientation: {type: 'string', default: 'column'}, // the orientatio of the controls up/down== row left/right==column
     arrowFactory: {type: 'string', default: `<a-triangle></a-triangle>`}, // TODO if defined add arrow at start and end
-    containerFactory: {type: 'string', default: `<a-entity></a-entity>`},
-    itemFactory: {type: 'string', default: listViewItemFactory}
+    containerFactory: {type: 'string', default: `<a-entity></a-entity>`}, // html string that relies on vue attributes
+    itemFactory: {type: 'string', default: listViewItemFactory}// html string that relies on vue attributes
   },
   update: function (oldData) {
     // new entries
@@ -119,25 +121,31 @@ AFRAME.registerComponent('gui-list-view', {
   },
   addArrows: function () {
     if (!this.minArrow) {
-      this.minArrow = createHTML(`<a-triangle></a-triangle>`);
-
+      this.minArrow = createHTML(this.data.arrowFactory);
+      this.minArrow.mPos = this.minArrow.object3D.position.clone();
       this.minArrow.addEventListener('interaction-pick', (e) => {
         e.stopPropagation();
         this.vm.$data.selectedIndex--;
       });
     }
     if (!this.maxArrow) {
-      this.maxArrow = createHTML(`<a-triangle></a-triangle>`);
+      this.maxArrow = createHTML(this.data.arrowFactory);
+      this.maxArrow.mPos = this.maxArrow.object3D.position.clone();
       this.maxArrow.addEventListener('interaction-pick', (e) => {
         e.stopPropagation();
         this.vm.$data.selectedIndex++;
       });
     }
+    // using aabb in relative coordinate system instead of default Box3 will result in correct rotation
+    var box = new Box3Ext();
+    box.setFromObject(this.el.object3D, this.el.object3D, true, true);
 
-    let bb = this.computeBoundingBox();
+    let {min, max} = box;
 
-    let min = bb.min.clone().sub(this.el.object3D.position);
-    let max = bb.max.clone().sub(this.el.object3D.position);
+    let z = (max.z - min.z) / 2;
+
+    min.z += z;
+    max.z -= z;
 
     if (this.data.orientation == 'column') {
       let y = (max.y - min.y) / 2;
@@ -152,12 +160,16 @@ AFRAME.registerComponent('gui-list-view', {
       min.x += x;
       max.x -= x;
 
-      this.minArrow.object3D.rotation.z = 0;
+      this.minArrow.object3D.rotation.z = Math.PI;
       this.maxArrow.object3D.rotation.z = 0;
     }
 
-    this.minArrow.object3D.position.copy(min);
-    this.maxArrow.object3D.position.copy(max);
+    this.minArrow.object3D.position.copy(this.minArrow.mPos.clone().add(min));
+    this.maxArrow.object3D.position.copy(this.maxArrow.mPos.clone().add(max));
+
+    let scaleArrow = max.y - min.y;
+    this.minArrow.object3D.scale.x = scaleArrow;
+    this.maxArrow.object3D.scale.x = scaleArrow;
 
     this.vm.$el.append(this.minArrow);
     this.vm.$el.append(this.maxArrow);
@@ -207,8 +219,13 @@ AFRAME.registerComponent('gui-list-view', {
       this.vm = null;
     }
 
-    this.vm = createListView(this.data.items, {itemFactory: this.data.itemFactory, containerFactory: this.data.containerFactory, arrowFactory: this.data.arrowFactory}, this.data.orientation, this.data.overflow);
+    this.vm = createListView(this.data.items, {
+      itemFactory: this.data.itemFactory,
+      containerFactory: this.data.containerFactory,
+      arrowFactory: this.data.arrowFactory
+    }, this.data.orientation, this.data.overflow, this.data.invert);
     this.el.appendChild(this.vm.$el);
+
     setTimeout(() => this.addArrows(), 500);
   },
   remove () {
@@ -259,7 +276,13 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
       removeItem: function (item) {
         this.$data.items.splice(this.$data.items.indexOf(item), 1);
       },
-      onItemClicked: function () {
+      onItemClicked: function (index) {
+        if (index != undefined) {
+          this.$data.selectedIndex = index;
+
+          console.log('onItemClicked0', index);
+          return;
+        }
         var data = this.$data.items[this.$data.selectedIndex];
 
         var that = this.$refs.listView.childNodes[this.$data.selectedIndex];
@@ -277,18 +300,21 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
         let y = parseInt(index / xMax);
 
         return '' + _.round(xScale * x, 4) + ' ' + _.round(yScale * y, 4) + ' 0';
+      },
+      setPosition: function (x = 0, y = 0, z = 0) {
+        return '' + x + ' ' + y + ' ' + z;
       }
     },
     watch: {
       /* items: {
-                          handler: function (val, oldVal) {
-                            // TODO not watching all the time
-                            // console.log('watch.items', val, oldVal);
+                                      handler: function (val, oldVal) {
+                                        // TODO not watching all the time
+                                        // console.log('watch.items', val, oldVal);
 
-                            //  debouncedUpdate(this);
-                          },
-                          deep: false // TODO might interfere with recursive objects
-                        }, */
+                                        //  debouncedUpdate(this);
+                                      },
+                                      deep: false // TODO might interfere with recursive objects
+                                    }, */
       selectedIndex: {
         handler: function (val, oldVal) {
           console.log('watch', arguments);
@@ -315,20 +341,26 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
 
     // -----------------------------------------
 
-  app.$el.addEventListener(direction == 'row' ? 'player-move-backward' : 'player-strafe-left', suppressedThrottle(function (e) {
-    e.stopPropagation();
+  var decreaseAction = direction == 'row' ? invertControls ? 'player-move-forward' : 'player-move-backward' : invertControls ? 'player-strafe-right' : 'player-strafe-left';
+  var increaseAction = direction == 'row' ? invertControls ? 'player-move-backward' : 'player-move-forward' : invertControls ? 'player-strafe-left' : 'player-strafe-right';
 
+  app.$el.addEventListener(decreaseAction, throttleFinally(function (e) {
     if (e.detail.second) return;
 
     app.$data.selectedIndex--;
-  }, 50));
+  }, 50, function (e) {
+    e.stopPropagation(e);
+    forceStopPlayerMovement();
+  }));
 
-  app.$el.addEventListener(direction == 'row' ? 'player-move-forward' : 'player-strafe-right', suppressedThrottle(function (e) {
-    e.stopPropagation();
+  app.$el.addEventListener(increaseAction, throttleFinally(function (e) {
     if (e.detail.second) return;
 
     app.$data.selectedIndex++;
-  }, 50));
+  }, 50, function (e) {
+    e.stopPropagation(e);
+    forceStopPlayerMovement();
+  }));
 
   return app;
 }

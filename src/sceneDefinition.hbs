@@ -3,7 +3,7 @@
          visible="true"
          id="aframe-project"
          cursor-focus
-         physics="debug: false"> <!-- TODO evaluate local region based physics -->
+         physics="debug: true"> <!-- TODO evaluate local region based physics -->
     <!--<a-camera class="player" static-body="shape:sphere;sphereRadius:1" ></a-camera>-->
 
 
@@ -18,36 +18,6 @@
 
 
 
-    <nk-list-view position="0 5 1" order-as="grid: 2 5 .5 .25">
-        <a-box
-                v-for="(item, index) in items"
-                :color="selectedIndex==index?'white':item.value"
-                :position="setPositionFromIndex(index,5,1,1,1)"
-                width="1"
-                height="1"
-                @interaction-pick.stop="onItemClicked(item)"
-        ></a-box>
-        <template>[{key:1,value:"red"},{key:1,value:"blue"},{key:1,value:"yellow"}]</template>
-    </nk-list-view>
-
-
-    <nk-list-view position="0 3 1" order-as="grid: 2 5 .5 .25">
-        <a-circle
-                v-for="(item, index) in items"
-                :color="item.value"
-                :position="setPositionFromIndex(index,5,1,1,1)"
-                radius=.5
-
-                @interaction-pick.stop="onItemClicked(item)"
-        >
-            <a-ring v-if="selectedIndex==index" position="0 0 -0.01" scale=".5 .5 .5" radiusOuter=0.55 radiusInner="0.5"  color="white"></a-ring>
-        </a-circle>
-        <template>[{key:1,value:"red"},{key:1,value:"blue"},{key:1,value:"yellow"}]</template>
-    </nk-list-view>
-
-
-
-    <a-entity gui-model-preview position="-2 5 4" scale="1 1 1" rotation="0 180 0"></a-entity>
 
 
     <!-- TODO keep distance to player -->
@@ -73,20 +43,29 @@
     <a-box position="0 0 -100"
            editable-region="src:assets/demo/region/animation-and-ai-testbed.html;loadDistance:50;unloadDistance:100"></a-box>
 
-    <a-box position="0 0 0" class="center-region"
-           editable-region="src:assets/demo/region/video-tutorial-section.html"></a-box>
+    <a-box position="0 0 0" id="🏠center-region"
+           editable-region="src:assets/demo/region/editor-demo.html"></a-box>
 
 
     <a-box position="0 0 100" editable-region="src:assets/demo/region/rocket-league.html"></a-box>
 
     <a-box position="100 0 -100" editable-region="src:assets/demo/region/sample-heightmap.html"></a-box>
-    <a-box position="100 0 0" id="physicsTestRegion"
+    <a-box position="100 0 0" id="Environment Physics"
            editable-region="src:assets/demo/region/contest-medieval2.html"></a-box>
-    <a-box position="100 0 100" editable-region="src:assets/demo/region/proc-wood.html"></a-box>
+    <a-box position="100 0 100" id="wood" editable-region="src:assets/demo/region/proc-wood.html"></a-box>
 
     <a-box position="-200 0 -100" editable-region="src:assets/demo/region/contest-medieval3.html"></a-box>
     <a-box position="-200 0 0" editable-region="src:assets/demo/region/contest-medieval4.html"></a-box>
     <a-box position="-200 0 100" editable-region="src:assets/demo/region/contest-medieval5.html"></a-box>
+
+    <a-box position="-300 0 -100" id="media-player" editable-region="src:assets/demo/region/video-tutorial-section.html"></a-box>
+    <a-box position="-300 0 0"   id="sample-menus" editable-region="src:assets/demo/region/menu-section.html"></a-box>
+    <a-box position="-300 0 100"    editable-region="src:assets/demo/region/404.html"></a-box>
+
+    <a-box position="-400 0 -100" id="Car Physics" editable-region="src:assets/demo/region/physics.html"></a-box>
+
+
+
 
 
     <a-plane game-object-limbo shadow="cast: false; receive: false"

@@ -83,6 +83,26 @@ export function suppressedThrottle (fn, wait) {
   };
 }
 
+/**
+ *
+ * @param fn the function that gets throttled
+ * @param wait - the time to wait until the throttled function gets invoked
+ * @param butFn - the function that get called every time
+ * @returns {Function}
+ */
+export function throttleFinally (fn, wait, butFn) {
+  var time = Date.now();
+  var res;
+  return function (e) {
+    if ((time + wait - Date.now()) < 0) {
+      res = fn.apply(this, arguments);
+      time = Date.now();
+    }
+    let res2 = butFn.apply(this, arguments);
+    return res;
+  };
+}
+
 export function roundTo (number, interval) {
   return (_.round(number / interval) * interval);
 }
@@ -139,4 +159,9 @@ function arrayToTree (items, config) {
     }
   }
   return rootItems;
+}
+
+export
+function forceStopPlayerMovement () {
+  window.dispatchEvent(new Event('player-force-stop'));
 }
