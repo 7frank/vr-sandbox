@@ -8,7 +8,7 @@ import * as _ from 'lodash';
  *
  */
 export
-function createTerrain (xS = 64, yS = 64, minHeight = -100, maxHeight = 100, material) {
+function createTerrain (xS = 64, yS = 64, xSize = 1024, ySize = 1024, minHeight = -100, maxHeight = 100, material) {
   xS--; yS--;
 
   // -----------------------
@@ -26,9 +26,9 @@ function createTerrain (xS = 64, yS = 64, minHeight = -100, maxHeight = 100, mat
     steps: 1,
     useBufferGeometry: false,
     xSegments: xS,
-    xSize: 1024,
+    xSize,
     ySegments: yS,
-    ySize: 1024
+    ySize
 
   };
 
@@ -37,7 +37,7 @@ function createTerrain (xS = 64, yS = 64, minHeight = -100, maxHeight = 100, mat
   // terrainScene.scale.set(0.1, 0.1, 0.1);
 
   // storea copy of the heightmap data for z-pos querying
-  terrainScene.data = {heightmap: THREE.Terrain.toArray2D(terrainScene.children[0].geometry.vertices, options), options};
+  terrainScene.data = {heightmap2d: function () { return THREE.Terrain.toArray2D(terrainScene.children[0].geometry.vertices, options); }, heightmap1d: function () { return THREE.Terrain.toArray1D(terrainScene.children[0].geometry.vertices, options); }, factory: THREE.Terrain, options};
 
   // scene.add(terrainScene);
 

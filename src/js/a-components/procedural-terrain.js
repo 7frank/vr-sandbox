@@ -18,7 +18,9 @@ AFRAME.registerComponent('procedural-terrain', {
     let sampleMaterial = this.createSampleMaterial();
     // ------------------------
 
-    var mesh = createTerrain(64, 64, -50, 50, sampleMaterial);
+    var mesh = createTerrain(64, 64, 50, 50, 0, 10, sampleMaterial);
+
+    this.createDataTexture = function () { return new THREE.DataTexture(mesh.data.heightmap1d(), 64, 64, THREE.RGBFormat); };
 
     this.el.setObject3D('mesh', mesh, mesh.data);
 
@@ -32,7 +34,11 @@ AFRAME.registerComponent('procedural-terrain', {
     // query the dom for some materials
     var textures0 = AFRAME.nk.querySelectorAll(this.el.sceneEl, ':where(material-map-image)').map(m => m.material.clone().map);
     var textures = _.uniq(textures0, 'image');
-    var [x, t1, t2, t3, t4] = textures;
+    var [ t1, t2, t3, t4 ] = textures;
+
+    console.log(textures);
+
+    if (textures.length < 4) return null;
 
     var material = generateBlendedMaterial([
       // The first texture is the base; other textures are blended in on top.
@@ -59,6 +65,9 @@ AFRAME.registerComponent('procedural-terrain', {
   },
   putPlayerOnHeightMap: function () {
     let hm = this.el.getObject3D('mesh').data;
+
+    var heightmap2d = hm.heightmap2d();
+
     // let posEl = getWorldPosition(this.el.object3D);
 
     let pos = getWorldPosition(getPlayer().object3D);
@@ -77,9 +86,9 @@ AFRAME.registerComponent('procedural-terrain', {
 
       var direction = getWorldDirection(getPlayer().object3D);
 
-      let baseY = _.get(hm, `heightmap[${parseInt(px)}][${parseInt(py)}]`, 0);
-      let baseY_x = _.get(hm, `heightmap[${parseInt(px + direction.x)}][${parseInt(py)}]`, 0);
-      let baseY_y = _.get(hm, `heightmap[${parseInt(px)}][${parseInt(py + direction.y)}]`, 0);
+      let baseY = _.get(heightmap2d, `[${parseInt(px)}][${parseInt(py)}]`, 0);
+      let baseY_x = _.get(heightmap2d, `[${parseInt(px + direction.x)}][${parseInt(py)}]`, 0);
+      let baseY_y = _.get(heightmap2d, `[${parseInt(px)}][${parseInt(py + direction.y)}]`, 0);
 
       let dx = (baseY_x - baseY) * (px % 1);
       let dy = (baseY_y - baseY) * (py % 1);

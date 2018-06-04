@@ -10,6 +10,7 @@ import './code-editor/code-editor';
 import './compass';
 import './cannon-compound';
 import './procedural-terrain';
+import './a-grass/simple-gras';
 import './infinite-plane/infinite-plane';
 import './lod-terrain/cdlod-terrain';
 import './proctree';
