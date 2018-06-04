@@ -7,6 +7,8 @@ function getMeaningfulnameFromRegionEl (el) {
   var id = el.getAttribute('id');
   if (id) return id;
   let src = el.getAttribute('editable-region').src;
+
+  if (!src) return '<undefined>';
   return src.substring(src.lastIndexOf('/') + 1, src.length).split('.')[0];
 }
 
@@ -49,9 +51,11 @@ function createDroplet (caption) {
       font-family: monospace;
     `;
 
-  var d = createHTML(`<div ><div id="head" style="${headStyle}">${caption}</div><div id="body" style="${bodyStyle}"></div></div>`);
+  var d = createHTML(`<div ></div>`);
+  d.innerHTML = `<div id="head" style="${headStyle}">${caption}</div><div id="body" style="${bodyStyle}"></div>`;
   d.head = d.querySelector('#head');
   d.body = d.querySelector('#body');
+
   return d;
 }
 

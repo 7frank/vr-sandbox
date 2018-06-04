@@ -232,17 +232,17 @@ export function toast (msg, duration = 2000, action = 'Ok') {
  * @param layer
  */
 export function debugText (txt, layer) {
-  var el = $(`<a-text look-at="src:[camera]" color="#ccc" width=50 align="center" position="0 3 0" value="'${txt}'"></a-text>`);
+  var el = createHTML(`<a-text look-at="src:[camera]" color="#ccc" width=50 align="center" position="0 3 0" value="'${txt}'"></a-text>`);
   setTimeout(function loop () {
-    var t = el.get(0).getObject3D('text');
-    if (t) {
+    var t;
+    if (el.getObject3D && (t = el.getObject3D('text'))) {
       setLayersForObject(t, layer);
     } else {
       setTimeout(loop, 100);
     }
   }, 100);
 
-  return el.get(0);
+  return el;
 }
 
 /**
