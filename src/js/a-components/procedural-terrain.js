@@ -18,9 +18,42 @@ AFRAME.registerComponent('procedural-terrain', {
     let sampleMaterial = this.createSampleMaterial();
     // ------------------------
 
-    var mesh = createTerrain(64, 64, 50, 50, 0, 10, sampleMaterial);
+    let width = 64;
+    let height = 64;
+    let minHeight = 0;
+    let maxHeight = 10;
 
-    this.createDataTexture = function () { return new THREE.DataTexture(mesh.data.heightmap1d(), 64, 64, THREE.RGBFormat); };
+    var mesh = createTerrain(width, height, 50, 50, minHeight, maxHeight, sampleMaterial);
+
+    // r - altitude, g - lighting (also wind noise atm.), b - noise(delta-height of grass),
+    this.createDataTexture = function () {
+      let size = width * height;
+      let maxMin = maxHeight - minHeight;
+
+      var heightMap = mesh.data.heightmap1d();
+      var dataRaw = _.map(heightMap, function (v) { return new THREE.Color((v - minHeight) / maxMin, _.random(0, 64) / 255, Math.random(), 1); });
+
+      // ---------
+
+      var data = new Uint8Array(3 * size);
+      for (var i = 0; i < size; i++) {
+        let color = dataRaw[i];
+        var r = Math.floor(color.r * 255);
+        var g = Math.floor(color.g * 255);
+        var b = Math.floor(color.b * 255);
+
+        var stride = i * 3;
+
+        data[ stride ] = r;
+        data[ stride + 1 ] = g;
+        data[ stride + 2 ] = b;
+      }
+
+      // ---------
+      let texture = new THREE.DataTexture(data, 64, 64, THREE.RGBFormat);
+      texture.needsUpdate = true;
+      return texture;
+    };
 
     this.el.setObject3D('mesh', mesh, mesh.data);
 

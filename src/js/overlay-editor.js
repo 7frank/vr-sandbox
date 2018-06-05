@@ -2,6 +2,9 @@
 // --------------------------------------
 /**
  * edit currently focused entity
+ * TODO
+ *
+ *
  * @deprecated refactor useful parts
  */
 function reloadSceneToDOM () {
