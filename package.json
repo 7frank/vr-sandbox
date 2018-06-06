@@ -37,16 +37,10 @@
     "vendor:perf": "webpack --config ./config/webpack-perf.js",
     "prebuild": "npm-run-all clean:dist vendor:perf",
     "build": "webpack --config ./config/webpack.config.babel.js --env.devel --progress",
-
     "start": "npm-run-all dev",
-
-
     "build-client-dist": "set NODE_ENV=production && webpack --config ./config/webpack.config.babel.js --progress",
     "build-server-dist": "babel -d  ./build/server ./server/devel -s",
     "start-dist": "set NODE_ENV=production&& node  build/server/index.js",
-
-
-
     "start-dev": "npm-run-all build dev",
     "dev": "babel-node server/devel --env.devel --hot --port 9000",
     "####dist": "babel-node server/devel --env.production --port 9000",
@@ -56,9 +50,11 @@
     "docker-build": "docker build -t frank1147/vrsandbox .",
     "docker-run": "docker run -p 80:9000 frank1147/vrsandbox",
     "docker:runningProcesses": "docker ps",
+    "heroku-login": "heroku login",
     "heroku-container-login": "heroku container:login",
-    "heroku-docker-build-push": "heroku container:push web --app rocky-fjord-67773",
-    "heroku-docker-open": "heroku open --app rocky-fjord-67773"
+    "heroku-docker-build-push": "heroku container:push web --app mighty-everglades-60535",
+    "heroku-docker-release": "heroku container:release web --app mighty-everglades-60535",
+    "heroku-docker-open": "heroku open --app mighty-everglades-60535"
   },
   "dependencies": {
     "@nk11/core-components": "^0.1.13",
@@ -79,6 +75,7 @@
     "diff-dom": "^2.4.0",
     "easyrtc": "^1.1.0",
     "enumify": "^1.0.4",
+
     "pretty": "^2.0.0",
     "proctree": "^0.1.1",
     "socket.io": "^2.1.1",
@@ -139,6 +136,7 @@
     "file-type": "^8.0.0",
     "glsl-template-loader": "^1.1.0",
     "handlebars-loader": "^1.7.0",
+    "heroku": "^7.0.86",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^2.29.0",
     "husky": "^0.14.3",
