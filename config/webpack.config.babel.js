@@ -14,7 +14,8 @@ const WpPluginWatchOffset = require('@ff0000-ad-tech/wp-plugin-watch-offset');
 const helper = require('../server/devel/utils/helpers');
 const argv = helper.parseArguments(process.argv.slice(2));
 
-const isDevel = (process.env.NODE_ENV && process.env.NODE_ENV.trim()!== 'production') && !argv['env.production'];
+
+const isDevel = (process.env.NODE_ENV ?process.env.NODE_ENV.trim()!== 'production':true) && !argv['env.production'];
 const isProduction = !isDevel;
 
 
@@ -242,7 +243,7 @@ module.exports = {
     entry: helper.sanitizeObject({
         vendors: isProduction ? ['babel-polyfill', './js/vendors.js'] : [],
         'aframe-project': (isHot ? [
-            '../devel/utils/webpack-runtime.js',
+            '../server/devel/utils/webpack-runtime.js',
             'webpack-hot-middleware/client?path=/webpack-hot-module-replace&timeout=20000&reload=true',
         ] : [] ).concat(["babel-polyfill",
             './js/index.js',
@@ -405,6 +406,7 @@ module.exports = {
             {from: '../node_modules/aframe-material-snickell/assets', to: 'assets'},
             {from: '../node_modules/beta-dev-zip/lib', to: 'lib/zip'},
             {from: '../node_modules/@nk11/core-components/dist/assets', to: 'assets'},
+            {from: '../node_modules/easyrtc/api/easyrtc.js', to: 'lib'}
         ]),
 
         new Webpack.NamedModulesPlugin(),

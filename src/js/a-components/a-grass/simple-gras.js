@@ -82,7 +82,9 @@ AFRAME.registerComponent('simple-grass', {
       const pyaw = rot2.z * 2; // rotation.z + Math.PI / 2;// player.state.yaw
       // const ppitch = rotation.x; // player.state.pitch
       // const proll = rotation.z; // player.state.roll
-      console.log('rotation', _.round(rotation.x, 2), _.round(rotation.y, 2), _.round(rotation.z, 2), rot2);
+
+      // console.log('rotation', _.round(rotation.x, 2), _.round(rotation.y, 2), _.round(rotation.z, 2), rot2);
+
       // console.log(_.round(pyaw, 2), _.round(Math.cos(pyaw) * grassPatchRadius, 2), _.round(Math.sin(pyaw) * grassPatchRadius, 2));
 
       // Update grass.

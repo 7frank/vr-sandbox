@@ -12,13 +12,14 @@ routing.get('/debug', (req, res) => {
 });
 routing.get('/v1/*', (req, res) => {
   clioutput.ok('[200] ' + req.params[0]);
-  res.sendFile(path.join(__dirname, '/../../src/api/', req.params[0] ? req.params[0] : 'status.json'));
+
+  res.sendFile(path.join(__dirname, '/../../../src/api/', req.params[0] ? req.params[0] : 'status.json'));
   res.status(200);
 });
 
 routing.get('/coverage/*', (req, res) => {
   clioutput.ok('[200] ' + req.params[0]);
-  res.sendFile(path.join(__dirname, '/../coverage/', req.params[0] ? req.params[0] : 'index.html'));
+  res.sendFile(path.join(__dirname, '/../../coverage/', req.params[0] ? req.params[0] : 'index.html'));
   res.status(200);
 });
 
