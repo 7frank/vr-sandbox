@@ -1,6 +1,6 @@
 import 'babel-polyfill';
 import webpack from 'webpack';
-import config from '../config/webpack.config.babel';
+import config from '../../config/webpack.config.babel';
 import express from 'express';
 import path from 'path';
 import history from 'connect-history-api-fallback';
@@ -19,8 +19,11 @@ import socketIo from "socket.io";
 
 const argv = helper.parseArguments(process.argv.slice(2));
 const isHot = argv['hot'] || false;
+
+console.log("isHot",isHot)
+
 const publicPath = config.output.publicPath || '/';
-const outputPath = config.output.path || path.resolve(process.cwd(), 'dist');
+const outputPath = config.output.path || path.resolve(process.cwd(), 'build/client');
 const host = '0.0.0.0';
 const port = process.env.PORT || argv.port || 9000;
 const app = express();
@@ -53,12 +56,13 @@ else {
   const compression = require('compression');
   app.use(compression());
 
-
+//FIXME using webpackDevMiddleware for production builds will have darmatic ram impact (leaving it disabled for now)
   //TODO evaluate how to start using static to reduce memory consumption
     const webpackDevMiddleware = require('webpack-dev-middleware');
     const compiler = webpack(config);
 
-    app.use(webpackDevMiddleware(compiler, {
+
+   /* app.use(webpackDevMiddleware(compiler, {
         noInfo: true,
         publicPath: publicPath,
         contentBase: config.context,
@@ -70,7 +74,7 @@ else {
         headers: {'Access-Control-Allow-Origin': '*'},
     }));
 
-
+*/
 
 
 }
@@ -84,6 +88,10 @@ app.use(bodyParser.json());
 //TODO partially working: prevents loading half way
 //have a 401 for when the user did the sketchfab login and pressed cancel
 app.use(publicPath,function(req, res,next) {
+
+
+    //no referrer?
+    if (!req.headers.referer){next(); return}
 
     var query = require('url').parse(req.headers.referer,true).query;
 
@@ -102,6 +110,9 @@ console.log("--------------------------")
 console.log("publicPath:",publicPath)
 console.log("outputPath:",outputPath)
 /* serving static assets*/
+
+console.log("public path:",outputPath)
+
 app.use(publicPath, express.static(outputPath,{index:false,redirect:false,setHeaders: function (res, path, stat) {
    // res.set('Content-Type', "text/html")
 
@@ -122,11 +133,13 @@ app.use(function(req, res) {
 
 // Handle 500
 app.use(function(error, req, res, next) {
+    console.log("error",error)
     res.status(500).send('500: Internal Server Error');
 });
 
 
 /*********************************************/
+
 //a-frame-network
 
 // Start Express http server
