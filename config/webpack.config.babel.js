@@ -1,4 +1,5 @@
-import clioutput from '../devel/utils/clioutput';
+
+
 
 const path = require('path');
 const fs = require('fs');
@@ -10,15 +11,35 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const StyleLintPlugin = require('stylelint-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const WpPluginWatchOffset = require('@ff0000-ad-tech/wp-plugin-watch-offset');
-const helper = require('../devel/utils/helpers');
+const helper = require('../server/devel/utils/helpers');
 const argv = helper.parseArguments(process.argv.slice(2));
-const isDevel = process.env.NODE_ENV !== 'production' && !argv['env.production'];
+
+const isDevel = (process.env.NODE_ENV && process.env.NODE_ENV.trim()!== 'production') && !argv['env.production'];
 const isProduction = !isDevel;
+
+
+//------------------------
+// bad practice...
+
+//require  from '../devel/utils/clioutput';
+var clioutput;
+if (!isProduction)
+    clioutput = require  ('../server/devel/utils/clioutput').default;
+    else
+    clioutput = require  ('../build/server/utils/clioutput').default;
+
+
+
+//------------------------
+
+
+
+console.log("isDevel",isDevel,"isProduction",isProduction)
 
 
 const isHot = argv['hot'] || false;
 const src = path.resolve(process.cwd(), 'src');
-const dist = path.resolve(process.cwd(), 'dist');
+const dist = path.resolve(process.cwd(), 'build/client');
 const jsDir = path.resolve(dist, 'js');
 const cssDir = path.resolve(dist, 'css');
 const vendorDir = path.resolve(dist, 'vendors');
@@ -207,7 +228,7 @@ const cssRules = isHot ? [
 
 module.exports = {
     context: src,
-    devtool: isProduction ? 'source-map' : 'cheap-module-eval-source-map',
+    devtool: isProduction ? undefined : 'cheap-module-eval-source-map',
     cache: !isProduction,
     bail: isProduction,
     target: 'web',

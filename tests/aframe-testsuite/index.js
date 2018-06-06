@@ -1,6 +1,6 @@
 /* global sinon, setup, teardown */
 'use strict';
-import clioutput from '../../devel/utils/clioutput';
+import clioutput from '../../server/devel/utils/clioutput';
 class AFRAME_TS {
 
   constructor() {

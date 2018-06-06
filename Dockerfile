@@ -8,14 +8,18 @@ WORKDIR /usr/src/app
 COPY . .
 
 RUN npm install
-RUN npm run build
+#building client and server code
+RUN npm run build-server-dist  #order matters as we copy the clioutput in this step
+RUN npm run build-client-dist
+
 
 #RUN npm prune --production # TODO remove dev dependencies and stuff (before: create production config)
 
 
 EXPOSE 9000
-#TODO compile dist instead of relying on babel-node
-CMD ["npm","run","dist"]
+#CMD ["npm","run","dist"]
+# compile es5 dist instead of relying on babel-node
+CMD ["npm","run","start-dist"]
 
 
 # cheatsheet https://gist.github.com/bahmutov/1003fa86980dda147ff6
@@ -29,3 +33,7 @@ CMD ["npm","run","dist"]
 
 # heroku deploy docker container
 # https://medium.com/travis-on-docker/how-to-run-dockerized-apps-on-heroku-and-its-pretty-great-76e07e610e22
+
+## one liners to stop and remove all containers (use in power shell if windows user)
+# docker stop $(docker ps -a -q)
+# docker rm $(docker ps -a -q)

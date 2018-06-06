@@ -37,11 +37,20 @@
     "vendor:perf": "webpack --config ./config/webpack-perf.js",
     "prebuild": "npm-run-all clean:dist vendor:perf",
     "build": "webpack --config ./config/webpack.config.babel.js --env.devel --progress",
+
     "start": "npm-run-all dev",
+
+
+    "build-client-dist": "set NODE_ENV=production && webpack --config ./config/webpack.config.babel.js --progress",
+    "build-server-dist": "babel -d  ./build/server ./server/devel -s",
+    "start-dist": "set NODE_ENV=production&& node  build/server/index.js",
+
+
+
     "start-dev": "npm-run-all build dev",
-    "dev": "babel-node devel --env.devel --hot --port 9000",
-    "dist": "babel-node devel --env.production --port 9000",
-    "dev-link": "npm link @nk/core-components",
+    "dev": "babel-node server/devel --env.devel --hot --port 9000",
+    "####dist": "babel-node server/devel --env.production --port 9000",
+    "####dev-link": "npm link @nk/core-components",
     "####heroku-prebuild": "export NPM_CONFIG_PRODUCTION=false; export NODE_ENV=; NPM_CONFIG_PRODUCTION=false NODE_ENV=development npm install --only=dev --dev",
     "####heroku-postbuild": "export NPM_CONFIG_PRODUCTION=true; export NODE_ENV=production;",
     "docker-build": "docker build -t frank1147/vrsandbox .",
@@ -52,7 +61,7 @@
     "heroku-docker-open": "heroku open --app rocky-fjord-67773"
   },
   "dependencies": {
-    "@nk11/core-components": "^0.1.12",
+    "@nk11/core-components": "^0.1.13",
     "babel-cli": "^6.24.1",
     "babel-core": "^6.26.3",
     "babel-eslint": "^7.2.3",

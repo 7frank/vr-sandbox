@@ -3,7 +3,7 @@
  */
 const webpack = require('webpack');
 const path = require('path');
-const vendorDir = path.resolve(process.cwd(), 'dist', 'vendors');
+const vendorDir = path.resolve(process.cwd(), 'build/client', 'vendors');
 
 module.exports = {
   context: process.cwd(),
