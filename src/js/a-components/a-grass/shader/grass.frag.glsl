@@ -24,7 +24,7 @@ void main() {
 	color.a = 1.0 - smoothstep(grassFogFar * 0.55, grassFogFar * 0.8, depth);
 
 	// apply terrain lightmap
-	float light = hdata.g;
+	float light = hdata.a;
 	color.r *= light;
 	color.g *= light;
 	color.b *= light;

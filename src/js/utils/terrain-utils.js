@@ -2,6 +2,23 @@
 import 'three.terrain.js/build/THREE.Terrain.min.js';
 import * as _ from 'lodash';
 
+THREE.Terrain.DebugHeightmap = function (g, options) {
+  var amplitude = (options.maxHeight - options.minHeight) * 0.5,
+    frequencyScalar = options.frequency * Math.PI / (Math.min(options.xSegments, options.ySegments) + 1),
+    phase = 0;// Math.random() * Math.PI * 2;
+  for (var i = 0, xl = options.xSegments + 1; i < xl; i++) {
+    for (var j = 0, yl = options.ySegments + 1; j < yl; j++) {
+      if (i < 15 && j < 15) { g[j * xl + i].z = amplitude * 4; } else {
+        g[j * xl + i].z += amplitude *
+                (
+                  Math.sin(i * frequencyScalar + phase)
+        // + Math.cos(j * frequencyScalar + phase)
+                );
+      }
+    }
+  }
+};
+
 /**
  * creates a procedural terrain
  *
@@ -19,7 +36,8 @@ function createTerrain (xS = 64, yS = 64, xSize = 1024, ySize = 1024, minHeight 
   let options = {
     easing: THREE.Terrain.Linear,
     frequency: 2.5,
-    heightmap: THREE.Terrain.DiamondSquare,
+    // heightmap: THREE.Terrain.DiamondSquare,
+    heightmap: THREE.Terrain.DebugHeightmap,
     material,
     maxHeight: maxHeight,
     minHeight: minHeight,

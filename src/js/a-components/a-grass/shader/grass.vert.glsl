@@ -20,6 +20,8 @@ precision highp float;
 const vec3 LIGHT_COLOR = vec3(1.0, 1.0, 0.99);
 const vec3 SPECULAR_COLOR = vec3(1.0, 1.0, 0.0);
 
+const vec3 MeshPosition = vec3(1.5, 1.5, 5.0);
+
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
 uniform vec3 lightDir;
@@ -157,9 +159,12 @@ void main() {
 	vUv = vec2(bedge, di * 2.0);
 
 	// Translate to world coordinates
-	vpos.x += bladePos.x;
-	vpos.y += bladePos.y;
-	vpos.z += altitude;
+	vpos.x += MeshPosition.x+bladePos.x;
+	vpos.y += MeshPosition.y+bladePos.y;
+	//if  (altitude < 5.0)
+	vpos.z += MeshPosition.z+altitude;
+	//else
+	//vpos.z += -15.0;
 
 	gl_Position = projectionMatrix * modelViewMatrix * vec4(vpos, 1.0);
 

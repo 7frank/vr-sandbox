@@ -6,6 +6,12 @@ import * as _ from 'lodash';
 import {getWorldPosition, getWorldDirection, getWorldQuaternion} from '../../utils/aframe-utils';
 import {getPlayer} from '../../game-utils';
 import { FPSCtrl} from '../../utils/fps-utils';
+
+import grassImage from './assets/grass.jpg';
+
+// TODO check light direction property
+window.order2 = 'xyz';
+
 /**
  * Grass that can be used on a terrain
  */
@@ -13,10 +19,8 @@ updateHotComponent('simple-grass');
 AFRAME.registerComponent('simple-grass', {
   dependencies: ['procedural-terrain'],
   schema: {},
-  init: function () {
-    var textures0 = AFRAME.nk.querySelectorAll(this.el.sceneEl, ':where(material-map-image)').map(m => m.material.clone().map);
-    var textures = _.uniq(textures0, 'image');
-    var [t1, t2, t3, t4] = textures;
+  init: async function () {
+    let texture = await this.loadGrassTexture();
 
     // ------------------------
 
@@ -31,14 +35,14 @@ AFRAME.registerComponent('simple-grass', {
            */
 
     // defaults from the demo for medium power laptop
-    let numGrassBlades = 84000;
+    let numGrassBlades = 120000;
     let grassPatchRadius = 85;
 
     // const HEIGHTFIELD_SIZE = 1024.0;
     // const HEIGHTFIELD_HEIGHT = 50.0;
 
-    const HEIGHTFIELD_SIZE = 100.0;
-    const HEIGHTFIELD_HEIGHT = 1.0;
+    const HEIGHTFIELD_SIZE = 50;
+    const HEIGHTFIELD_HEIGHT = 1;
 
     const heightMapScale = new THREE.Vector3(
       1.0 / HEIGHTFIELD_SIZE,
@@ -48,8 +52,11 @@ AFRAME.registerComponent('simple-grass', {
 
     let terrainDataTexture = this.el.components['procedural-terrain'].createDataTexture();
 
-    let grassMesh = this.generateGrassPatch(t2, terrainDataTexture, heightMapScale, numGrassBlades, grassPatchRadius);
+    let grassMesh = this.generateGrassPatch(texture, terrainDataTexture, heightMapScale, numGrassBlades, grassPatchRadius);
+
+    grassMesh.rotation.x = -Math.PI / 2;
     grassMesh.raycast = function () {}; // override raycast
+
     window.grassMesh = grassMesh;
     this.el.setObject3D('grass-mesh', grassMesh);
 
@@ -62,48 +69,62 @@ AFRAME.registerComponent('simple-grass', {
       // Move player (viewer)
       // player.update(dt)
       const ppos = getWorldPosition(getPlayer().object3D);// player.state.pos
+      // only for directional sun light computation in shader
       const pdir = getWorldDirection(getPlayer().object3D);// player.state.dir
-      let {qx, qy, qz} = getWorldQuaternion(getPlayer().object3D);
-      const pyaw = qy;// player.state.yaw
-      const ppitch = qx; // player.state.pitch
-      const proll = qz; // player.state.roll
+      let quaternion = getWorldQuaternion(getPlayer().object3D);
+
+      var rotation = new THREE.Euler();
+      rotation.setFromRotationMatrix(getPlayer().object3D.matrix);
+
+      let a = pdir.length();
+      let rot2 = new THREE.Vector3(Math.acos(pdir.x / a), Math.acos(pdir.y / a), Math.acos(pdir.z / a));
+
+      const pyaw = rot2.z * 2; // rotation.z + Math.PI / 2;// player.state.yaw
+      // const ppitch = rotation.x; // player.state.pitch
+      // const proll = rotation.z; // player.state.roll
+      console.log('rotation', _.round(rotation.x, 2), _.round(rotation.y, 2), _.round(rotation.z, 2), rot2);
+      // console.log(_.round(pyaw, 2), _.round(Math.cos(pyaw) * grassPatchRadius, 2), _.round(Math.sin(pyaw) * grassPatchRadius, 2));
 
       // Update grass.
       // Here we specify the centre position of the square patch to
       // be drawn. That would be directly in front of the camera, the
       // distance from centre to edge of the patch.
 
+      // FIXME rotation yaw != euler.z
       drawPos.set(
         ppos.x + Math.cos(pyaw) * grassPatchRadius,
-        ppos.y + Math.sin(pyaw) * grassPatchRadius
+        -ppos.z + Math.sin(pyaw) * grassPatchRadius
+
       );
 
       // ------------------------------------------------
+      // FIXME the grass is not rendered in place
+      // update(grassMesh, info.time * 0.001, ppos, pdir, drawPos);
+      // let dp = new THREE.Vector3(drawPos.z, drawPos.y, drawPos.x);
+      // let pd = new THREE.Vector3(pdir.y, pdir.x, pdir.z);
 
-      update(grassMesh, info.time * 0.001, ppos, pdir, drawPos);
+      //
+      function transform (vec, str = 'xyz') {
+        let res = _.map(str.split(''), function (v) { return vec[v]; });
+        return new THREE.Vector3(...res);
+      }
+
+      update(grassMesh, info.time * 0.001, undefined /* transform(ppos, window.order1) */, transform(pdir, window.order2), drawPos);
     }, this).start();
-
-    /* var loader = new THREE.TextureLoader();
-                 loader.load(
-                     // resource URL
-                     'textures/land_ocean_ice_cloud_2048.jpg',
-
-                     // onLoad callback
-                     function ( texture ) {
-                         // in this example we create the material when the texture is loaded
-                         var material = new THREE.MeshBasicMaterial( {
-                             map: texture
-                         } );
-                     },
-
-                     // onProgress callback currently not supported
-                     undefined,
-
-                     // onError callback
-                     function ( err ) {
-                         console.error( 'An error happened.' );
-                     }
-                 ); */
+  },
+  loadGrassTexture: async function () {
+    return new Promise(function (resolve, reject) {
+      var loader = new THREE.TextureLoader();
+      loader.load(
+        // resource URL
+        grassImage,
+        // onLoad callback
+        resolve,
+        // onProgress callback currently not supported
+        undefined,
+        reject
+      );
+    });
   },
 
   /**

@@ -31,26 +31,34 @@ AFRAME.registerComponent('procedural-terrain', {
       let maxMin = maxHeight - minHeight;
 
       var heightMap = mesh.data.heightmap1d();
-      var dataRaw = _.map(heightMap, function (v) { return new THREE.Color((v - minHeight) / maxMin, _.random(0, 64) / 255, Math.random(), 1); });
+
+      var dataRaw = _.map(heightMap, function (v) {
+        return new THREE.Vector4(
+          (v - minHeight) / maxMin, // height data
+          _.random(0, 64) / 255, // wind per blade
+          _.random(150, 255) / 255, // blade height offset (use noise to alter height a bit)
+          _.random(200, 255) / 255); // light data (the more the highter)
+      });
 
       // ---------
 
-      var data = new Uint8Array(3 * size);
+      var data = new Uint8Array(4 * size);
       for (var i = 0; i < size; i++) {
         let color = dataRaw[i];
-        var r = Math.floor(color.r * 255);
-        var g = Math.floor(color.g * 255);
-        var b = Math.floor(color.b * 255);
-
-        var stride = i * 3;
+        var r = Math.floor(color.x * 255);
+        var g = Math.floor(color.y * 255);
+        var b = Math.floor(color.z * 255);
+        var a = Math.floor(color.w * 255);
+        var stride = i * 4;
 
         data[ stride ] = r;
         data[ stride + 1 ] = g;
         data[ stride + 2 ] = b;
+        data[ stride + 3 ] = a;
       }
 
       // ---------
-      let texture = new THREE.DataTexture(data, 64, 64, THREE.RGBFormat);
+      let texture = new THREE.DataTexture(data, 64, 64, THREE.RGBAFormat);
       texture.needsUpdate = true;
       return texture;
     };
