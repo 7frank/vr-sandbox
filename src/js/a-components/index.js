@@ -29,3 +29,4 @@ import './cursor-focus';
 import './a-configurator';
 import './billboard/simple-billboard';
 import './dummy-raycaster';
+import './renderer-listener';

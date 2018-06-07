@@ -20,6 +20,8 @@ AFRAME.registerComponent('foreground', {
   // dependencies: ['world-map'],
   schema: {},
   init: function () {
+    console.warn("deprecated: use 'a-hud' instead");
+
     // FIXME should work without loop
     new FPSCtrl(1, function () {
       this.update();
@@ -71,7 +73,7 @@ AFRAME.registerComponent('world-map', {
     document.querySelector('body').addEventListener('wheel', this.onWheel.bind(this), {passive: true});
 
     // -----------------------------------
-    this.el.setAttribute('foreground', true);
+    // this.el.setAttribute('foreground', true);
     // -----------------------------------
 
     var width = 256, height = 256;
@@ -89,7 +91,7 @@ AFRAME.registerComponent('world-map', {
       transparent: true
     });
     var plane = new THREE.Mesh(geometry, material);
-    //  var plane = new THREE.Mesh(geometry);
+
     // TODO onBeforeRender .. only show static elements or similar
 
     var renderer = this.el.sceneEl.renderer;
@@ -172,7 +174,7 @@ AFRAME.registerComponent('world-map', {
       }
 
       // ----------------------------------
-
+      // FIXME  interference with a-hud (flickering each update)
       renderer.render(bufferScene, camera, bufferTexture);
     }, this);
 
