@@ -1,10 +1,14 @@
 import {createTerrain, generateBlendedMaterial} from '../utils/terrain-utils';
 import {updateHotComponent} from '../utils/aframe-debug-utils';
-import {getWorldDirection, getWorldPosition, getWorldQuaternion, restartPhysics, toast} from '../utils/aframe-utils';
+import {
+  getWorldDirection, getWorldPosition, getWorldQuaternion, loadTexture, restartPhysics,
+  toast
+} from '../utils/aframe-utils';
 import {getPlayer} from '../game-utils';
 import * as _ from 'lodash';
 import {Box3Ext} from '../three/Box3Ext';
-
+import grassImage from './a-grass/assets/terrain-gras.jpg';
+import dirtImage from './a-grass/assets/terrain-dirt.jpg';
 /**
  *  A terrain generator
  *  Note: might be used to generate terrain data which will be used for <cdlod-terrain> later
@@ -12,22 +16,29 @@ import {Box3Ext} from '../three/Box3Ext';
 updateHotComponent('procedural-terrain');
 AFRAME.registerComponent('procedural-terrain', {
   schema: {},
-  init: function () {
+  init: async function () {
     console.log('procedural-terrain');
 
-    let sampleMaterial = this.createSampleMaterial();
+    let xSize = 100;
+    let ySize = 100;
+
+    let sampleMaterial = await this.createSampleMaterial(xSize, ySize);
     // ------------------------
 
-    let width = 64;
-    let height = 64;
+    let xSegments = 64;
+    let ySegments = 64;
     let minHeight = 0;
-    let maxHeight = 10;
+    let maxHeight = 5;
 
-    var mesh = createTerrain(width, height, 50, 50, minHeight, maxHeight, sampleMaterial);
+    var mesh = createTerrain(xSegments, ySegments, xSize, ySize, minHeight, maxHeight, sampleMaterial);
+
+    this.dimensions = mesh.data.dimensions;
+
+    window.terrainMesh = mesh.children[0];
 
     // r - altitude, g - lighting (also wind noise atm.), b - noise(delta-height of grass),
     this.createDataTexture = function () {
-      let size = width * height;
+      let size = xSegments * ySegments;
       let maxMin = maxHeight - minHeight;
 
       var heightMap = mesh.data.heightmap1d();
@@ -60,41 +71,53 @@ AFRAME.registerComponent('procedural-terrain', {
       // ---------
       let texture = new THREE.DataTexture(data, 64, 64, THREE.RGBAFormat);
       texture.needsUpdate = true;
+
       return texture;
     };
 
-    this.el.setObject3D('mesh', mesh, mesh.data);
+    this.el.setObject3D('terrain-mesh', mesh, mesh.data);
 
     // create a aabb boundingbox in world coordinates for position testing
     var box = new Box3Ext();
     box.setFromObject(this.el.object3D, null, true, true);
     this.bb = box;
+
+    //
+    this.el.emit('terrain-model-loaded');
   },
-  createSampleMaterial: function () {
+  createSampleMaterial: async function (xSize, ySize) {
     // ------------------------
     // query the dom for some materials
-    var textures0 = AFRAME.nk.querySelectorAll(this.el.sceneEl, ':where(material-map-image)').map(m => m.material.clone().map);
+    /*    var textures0 = AFRAME.nk.querySelectorAll(this.el.sceneEl, ':where(material-map-image)').map(m => m.material.clone().map);
     var textures = _.uniq(textures0, 'image');
     var [ t1, t2, t3, t4 ] = textures;
 
-    console.log(textures);
-
     if (textures.length < 4) return null;
+*/
+
+    let textureGrass = await loadTexture(grassImage);
+    window.textureGrass = textureGrass;
+    textureGrass.repeat.set(xSize / 10, ySize / 10);
+    textureGrass.wrapS = THREE.RepeatWrapping;
+    textureGrass.wrapT = THREE.RepeatWrapping;
+
+    let textureDirt = await loadTexture(dirtImage);
 
     var material = generateBlendedMaterial([
       // The first texture is the base; other textures are blended in on top.
-      {texture: t1},
+      {texture: textureDirt},
       // Start blending in at height -80; opaque between -35 and 20; blend out by 50
-      {texture: t2, levels: [-40, -17, 10, 25]},
-      {texture: t3, levels: [10, 25, 30, 42]},
+      {texture: textureGrass, levels: [-40, -17, 10, 25]},
+      {texture: textureDirt, // t3
+        levels: [10, 25, 30, 42]},
       // How quickly this texture is blended in depends on its x-position.
       {
-        texture: t4,
+        texture: textureDirt, // t4
         glsl: '1.0 - smoothstep(65.0 + smoothstep(-256.0, 256.0, vPosition.x) * 10.0, 80.0, vPosition.z)'
       },
       // Use this texture if the slope is between 27 and 45 degrees
       {
-        texture: t3,
+        texture: textureDirt, // t3
         glsl: 'slope > 0.7853981633974483 ? 0.2 : 1.0 - smoothstep(0.47123889803846897, 0.7853981633974483, slope) + 0.2'
       }
     ]);
@@ -105,7 +128,9 @@ AFRAME.registerComponent('procedural-terrain', {
     this.putPlayerOnHeightMap();
   },
   putPlayerOnHeightMap: function () {
-    let hm = this.el.getObject3D('mesh').data;
+    if (!this.el.getObject3D('terrain-mesh')) return;
+
+    let hm = this.el.getObject3D('terrain-mesh').data;
 
     var heightmap2d = hm.heightmap2d();
 
@@ -116,6 +141,8 @@ AFRAME.registerComponent('procedural-terrain', {
     // pos.add(posEl.clone().sub(pos));
 
     // let pos = new THREE.Vector3(playerPos.x, playerPos.y, playerPos.z);
+
+    if (!this.bb) { console.error('boundingbox not defined', this); return; }
 
     let pctX = (pos.x - this.bb.min.x) / (this.bb.max.x - this.bb.min.x);
     let pctY = (pos.z - this.bb.min.z) / (this.bb.max.z - this.bb.min.z);
@@ -140,8 +167,11 @@ AFRAME.registerComponent('procedural-terrain', {
       // add average player eye height/size
       y += 1.6;
 
-      // FIXME add offset of this.el to calculations
-      y += 10;
+      //
+      y += this.el.object3D.position.y;
+
+      // TODO remove after blade size is a parameter
+      //  y += 7;
 
       getPlayer().object3D.position.y = y;
     }

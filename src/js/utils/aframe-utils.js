@@ -674,3 +674,23 @@ export function restartPhysics (el, bodyType = 'dynamic-body', defaultVal = '', 
   el.removeAttribute(bodyType);
   el.setAttribute(bodyType, val);
 }
+
+/**
+ * promise texture
+ */
+
+export
+async function loadTexture (url) {
+  return new Promise(function (resolve, reject) {
+    var loader = new THREE.TextureLoader();
+    loader.load(
+      // resource URL
+      url,
+      // onLoad callback
+      resolve,
+      // onProgress callback currently not supported
+      undefined,
+      reject
+    );
+  });
+}

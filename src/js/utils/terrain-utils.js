@@ -8,12 +8,13 @@ THREE.Terrain.DebugHeightmap = function (g, options) {
     phase = 0;// Math.random() * Math.PI * 2;
   for (var i = 0, xl = options.xSegments + 1; i < xl; i++) {
     for (var j = 0, yl = options.ySegments + 1; j < yl; j++) {
-      if (i < 15 && j < 15) { g[j * xl + i].z = amplitude * 4; } else {
-        g[j * xl + i].z += amplitude *
-                (
-                  Math.sin(i * frequencyScalar + phase)
-        // + Math.cos(j * frequencyScalar + phase)
-                );
+      if (i < options.xSegments / 2 && j < options.ySegments / 2) { g[j * xl + i].z = amplitude * 4; } else
+      if (i > options.xSegments / 2 && j < options.ySegments / 2) { g[j * xl + i].z = amplitude * 2; } else {
+        g[j * xl + i].z = 0;
+        /* amplitude * (
+         Math.sin(i * frequencyScalar + phase) +
+         Math.cos(j * frequencyScalar + phase)
+       ); */
       }
     }
   }
@@ -36,8 +37,8 @@ function createTerrain (xS = 64, yS = 64, xSize = 1024, ySize = 1024, minHeight 
   let options = {
     easing: THREE.Terrain.Linear,
     frequency: 2.5,
-    // heightmap: THREE.Terrain.DiamondSquare,
-    heightmap: THREE.Terrain.DebugHeightmap,
+    heightmap: THREE.Terrain.DiamondSquare,
+    // heightmap: THREE.Terrain.DebugHeightmap,
     material,
     maxHeight: maxHeight,
     minHeight: minHeight,
@@ -55,7 +56,7 @@ function createTerrain (xS = 64, yS = 64, xSize = 1024, ySize = 1024, minHeight 
   // terrainScene.scale.set(0.1, 0.1, 0.1);
 
   // storea copy of the heightmap data for z-pos querying
-  terrainScene.data = {heightmap2d: function () { return THREE.Terrain.toArray2D(terrainScene.children[0].geometry.vertices, options); }, heightmap1d: function () { return THREE.Terrain.toArray1D(terrainScene.children[0].geometry.vertices, options); }, factory: THREE.Terrain, options};
+  terrainScene.data = {dimensions: {xSize, ySize, minHeight, maxHeight}, heightmap2d: function () { return THREE.Terrain.toArray2D(terrainScene.children[0].geometry.vertices, options); }, heightmap1d: function () { return THREE.Terrain.toArray1D(terrainScene.children[0].geometry.vertices, options); }, factory: THREE.Terrain, options};
 
   // scene.add(terrainScene);
 

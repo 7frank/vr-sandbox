@@ -34,5 +34,8 @@ void main() {
 	color.rgb = mix(color.rgb, fogColor, fogFactor);
 	// output
 	gl_FragColor = color;
+
 	//gl_FragColor = vec4(1,0,0,1);  // draw red
+	//gl_FragColor = vec4(hdata.r,hdata.r,hdata.r,hdata.r); //draw greyscale height
+
 }

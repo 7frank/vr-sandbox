@@ -20,8 +20,6 @@ precision highp float;
 const vec3 LIGHT_COLOR = vec3(1.0, 1.0, 0.99);
 const vec3 SPECULAR_COLOR = vec3(1.0, 1.0, 0.0);
 
-const vec3 MeshPosition = vec3(1.5, 1.5, 5.0);
-
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
 uniform vec3 lightDir;
@@ -66,10 +64,6 @@ void main() {
 		shape.y * di / BLADE_SEGS // height of vtx, unbent
 	);
 
-//gl_Position = projectionMatrix * modelViewMatrix * vec4(vpos, 1.0);
-//return;
-
-
 	// Start computing a normal for this vertex
 	vec3 normal = vec3(rotate(0.0, bside * 2.0 - 1.0, offset.w), 0.0);
 
@@ -111,6 +105,10 @@ void main() {
 	wind = (clamp(wind, 0.25, 1.0) - 0.25) * (1.0 / 0.75);
 	wind = wind * wind * windIntensity;
 	wind *= hpct; // scale wind by height of blade
+
+	//FIXME scale wind with size of blades
+	//wind *= BLADE_HEIGHT_TALL / 30.0;
+
 	wind = -wind;
 	rotv = vec2(cos(wind), sin(wind));
 	// Wind blows in axis-aligned direction to make things simpler
@@ -118,6 +116,7 @@ void main() {
 	normal.yz = rotate(normal.y, normal.z, rotv);
 
 	// Sample the heightfield data texture to get altitude for this blade position
+	vSamplePos.y*=-1.0;
 	vec4 hdata = texture2D(heightMap, vSamplePos);
 	float altitude = hdata.r;
 
@@ -159,12 +158,10 @@ void main() {
 	vUv = vec2(bedge, di * 2.0);
 
 	// Translate to world coordinates
-	vpos.x += MeshPosition.x+bladePos.x;
-	vpos.y += MeshPosition.y+bladePos.y;
-	//if  (altitude < 5.0)
-	vpos.z += MeshPosition.z+altitude;
-	//else
-	//vpos.z += -15.0;
+	vpos.x += bladePos.x;
+	vpos.y += bladePos.y;
+	vpos.z +=altitude;
+
 
 	gl_Position = projectionMatrix * modelViewMatrix * vec4(vpos, 1.0);
 
