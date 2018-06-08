@@ -25,6 +25,7 @@ import {UndoMgr} from './utils/undo-utils';
 import {streamIn} from './utils/stream-utils';
 import {connectToServer, getSomeSampleData} from './database-utils';
 import {createSidebarMenu} from './utils/debug-gui';
+import * as _ from 'lodash';
 
 // import {Hotkeys} from '@nk/core-components/dist/bundle';
 
@@ -100,6 +101,14 @@ function addHotkeys () {
       worldMap.removeAttribute('world-map');
     } else worldMap.setAttribute('world-map', true);
   });
+
+  Hotkeys.register('toggle-example-gui', 'F2', {
+    category: 'HUD'
+  });
+
+  Hotkeys().on('toggle-example-gui', _.throttle(function () {
+    document.querySelector('#example-gui-elements').object3D.visible = !document.querySelector('#example-gui-elements').object3D.visible;
+  }, 100));
 
   // FIXME menu is working suboptimally
   var mRingMenu = $(`<a-entity ring-menu position="0 0 0"></a-entity>`);

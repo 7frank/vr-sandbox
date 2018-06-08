@@ -141,7 +141,7 @@ AFRAME.registerComponent('world-map', {
 
     this.el.setObject3D('mesh', plane);
 
-    this.updateWorldMapScript = new FPSCtrl(1, function () {
+    this.updateWorldMapScript = new FPSCtrl(5, function () {
       // center map at player position
       var observerPosition = new THREE.Vector3().copy(this.data.distanceVector).multiplyScalar(this.data.distanceScale).add(origCamera.position.clone());
 
@@ -174,8 +174,8 @@ AFRAME.registerComponent('world-map', {
       }
 
       // ----------------------------------
-      // FIXME  interference with a-hud (flickering each update)
-      renderer.render(bufferScene, camera, bufferTexture);
+
+      renderer.render(undefined, bufferScene, camera, bufferTexture);
     }, this);
 
     this.updateWorldMapScript.start();
