@@ -17,7 +17,9 @@ const argv = helper.parseArguments(process.argv.slice(2));
 
 const isDevel = (process.env.NODE_ENV ?process.env.NODE_ENV.trim()!== 'production':true) && !argv['env.production'];
 const isProduction = !isDevel;
-
+console.log("process.env.NODE_ENV",process.env.NODE_ENV)
+console.log("isDevel",isDevel)
+console.log("isProduction",isProduction)
 
 //------------------------
 // bad practice...

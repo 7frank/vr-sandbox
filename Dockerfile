@@ -7,18 +7,24 @@ WORKDIR /usr/src/app
 
 COPY . .
 
+
 RUN npm install
+
+
+ENV NODE_ENV production
+
 #building client and server code
 RUN npm run build-server-dist  #order matters as we copy the clioutput in this step
 RUN npm run build-client-dist
 
 
-#RUN npm prune --production # TODO remove dev dependencies and stuff (before: create production config)
-
+ # remove dev dependencies and stuff
+# RUN npm prune --production TODO  test locally and  change package.json accordingly
+RUN rm /usr/src/app/src/assets/ -r
 
 EXPOSE 9000
-#CMD ["npm","run","dist"]
-# compile es5 dist instead of relying on babel-node
+
+
 CMD ["npm","run","start-dist"]
 
 
@@ -29,6 +35,7 @@ CMD ["npm","run","start-dist"]
 # docker export  xxx > contents.tar
 # docker logs xxx
 #docker container prune ## delete all containers that are currently not running
+#docker image prune  ## same for images
 #docker pull frank1147/vrsandbox
 
 # heroku deploy docker container
@@ -37,3 +44,6 @@ CMD ["npm","run","start-dist"]
 ## one liners to stop and remove all containers (use in power shell if windows user)
 # docker stop $(docker ps -a -q)
 # docker rm $(docker ps -a -q)
+
+## access console
+# docker exec -it <id|name> <command>
