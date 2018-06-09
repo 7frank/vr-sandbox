@@ -43,12 +43,12 @@ AFRAME.registerPrimitive('nk-list-view', {
 
   mappings: {
     items: 'gui-list-view.items',
-    selectedIndex: 'gui-list-view.selectedIndex', // the id of the currently selected array entry
-    requiredKeys: 'gui-list-view.requiredKeys',
+    'selected-index': 'gui-list-view.selectedIndex', // the id of the currently selected array entry
+    'required-keys': 'gui-list-view.requiredKeys',
     overflow: 'gui-list-view.overflow',
     invert: 'gui-list-view.invert',
-    orientation: 'gui-list-view.orientation'
-
+    orientation: 'gui-list-view.orientation',
+    arrows: 'gui-list-view.arrowsVisible'
     // TODO orientation for keys
   }
 });
@@ -83,10 +83,12 @@ AFRAME.registerComponent('gui-list-view', {
       type: 'array',
       default: [{key: 0, value: 'hello'}, {key: 1, value: 'world'}]
     },
+    selectedIndex: {type: 'number', default: -1},
     requiredKeys: {type: 'array', default: ['key', 'value']}, // TODO
     overflow: {type: 'boolean', default: false}, // behaviour what happens if end of list is reached and user still selects next element. if enabled, after the last element selected the first will be the next one.
     invert: {type: 'boolean', default: false}, // whether to invert the controls
-    orientation: {type: 'string', default: 'column'}, // the orientatio of the controls up/down== row left/right==column
+    orientation: {type: 'string', default: 'column'}, // the orientation of the controls up/down== row left/right==column
+    arrowsVisible: {type: 'boolean', default: true},
     arrowFactory: {type: 'string', default: `<a-triangle></a-triangle>`}, // TODO if defined add arrow at start and end
     containerFactory: {type: 'string', default: `<a-entity></a-entity>`}, // html string that relies on vue attributes
     itemFactory: {type: 'string', default: listViewItemFactory}// html string that relies on vue attributes
@@ -113,6 +115,9 @@ AFRAME.registerComponent('gui-list-view', {
     if (oldData.containerFactory != this.data.containerFactory || oldData.itemFactory != this.data.itemFactory) {
       this.initViewModel();
     }
+    // update selectedIndex
+    console.log(oldData, this.data);
+    if (oldData.selectedIndex != this.data.selectedIndex) { if (this.vm.$data.selectedIndex != this.data.selectedIndex) { this.vm.$data.selectedIndex = this.data.selectedIndex; } }
   },
   computeBoundingBox: function () {
     this.bb = new THREE.Box3();
@@ -226,7 +231,11 @@ AFRAME.registerComponent('gui-list-view', {
     }, this.data.orientation, this.data.overflow, this.data.invert);
     this.el.appendChild(this.vm.$el);
 
-    setTimeout(() => this.addArrows(), 500);
+    if (this.data.arrowsVisible) {
+      setTimeout(() => {
+        this.addArrows();
+      }, 500);
+    }
   },
   remove () {
     this.vm.$el.removeChild(this.vm.$el);
