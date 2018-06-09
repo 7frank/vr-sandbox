@@ -89,7 +89,7 @@ export function createSidebarMenu () {
   let style = `
     position: absolute;
     top: 0em;
-    left: 0em;
+    right: 0em;
         width: 15%;
     `;
 

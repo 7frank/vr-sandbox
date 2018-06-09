@@ -18,6 +18,7 @@ import './a-shaders';
 import './a-components';
 import './a-primitives';
 import './a-car';
+import './a-hud/hud-hud';
 
 import './a-html3d/html';
 
@@ -27,6 +28,7 @@ import './a-editable/editable-region';
 import './a-controls/customizable-wasd-controls';
 
 import './interactions/attraction';
+
 // Load Application
 import './a-project';
 
@@ -56,6 +58,9 @@ import {UndoMgr} from './utils/undo-utils';
 
 import './utils/raycaster-performance-util';
 import {attachClipboard} from './clipboard';
+
+import registerClickDrag from 'aframe-click-drag-component';
+registerClickDrag(AFRAME);
 
 // TODO log per instance of global active inactive
 // Logger.setState(true);

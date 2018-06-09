@@ -1,0 +1,40 @@
+<a-plane id="m-main-menu" gui-border position="0 0 -10.1" scale="1 1 1" height="1" width="1"
+         material="transparent:true;opacity:0.3;color:lightgrey">
+
+    <!--
+
+    <a-text value="Main-Menu" align='center' opacity="0.3" width="1.8" transparent="true"></a-text>
+    <a-text value="- toggle pressing F3 -" align='center' opacity="0.6" transparent="true"
+            position="0 -.1 0" scale=".1 .1 .1"></a-text>
+    -->
+
+
+    <a-sphere gui-border="opacity:0.3" src="#earth" segments-height="36" segments-width="72"
+           position="-1.4 0 0"
+           scale="1 1 1"
+           material="normalMap:earth-normal-map">
+        <a-animation easing="linear" attribute="rotation" to="720 360 0" fill="both" dur="30000"
+                     repeat="indefinite"></a-animation>
+    </a-sphere>
+
+
+    <nk-list-view position="0 0.4 .1" scale="1 1 1">
+        <a-text  font="assets/fonts/DejaVu-sdf.fnt" height=".2" align='center'
+                v-for="(item, index) in items"
+                :value="item.value"
+                :position="setPositionFromIndex(index,1,10,1,-0.25)"
+                material="transparent:true;opacity:0.3;"
+                color="lightgrey"
+                @interaction-pick.stop="onItemClicked(index)"
+        >
+
+
+        </a-text>
+        <template>[{key:1,value:"Start"},{key:1,value:"Info"},{key:1,value:"Config"}]</template>
+    </nk-list-view>
+
+
+</a-plane>
+
+
+

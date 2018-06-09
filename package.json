@@ -66,7 +66,6 @@
     "diff-dom": "^2.4.0",
     "easyrtc": "^1.1.0",
     "enumify": "^1.0.4",
-
     "pretty": "^2.0.0",
     "proctree": "^0.1.1",
     "socket.io": "^2.1.1",
@@ -87,6 +86,7 @@
     "@vue/web-component-wrapper": "^1.2.0",
     "aframe": "^0.8.2",
     "aframe-animation-component": "^4.2.0",
+    "aframe-click-drag-component": "^3.0.1",
     "aframe-daydream-controller-component": "^1.0.0",
     "aframe-dev-components": "^1.0.0",
     "aframe-environment-component": "^1.0.0",
@@ -105,7 +105,6 @@
     "babel-eslint": "^7.2.3",
     "babel-loader": "^7.1.4",
     "babel-plugin-istanbul": "^4.1.6",
-
     "babel-preset-env": "^1.7.0",
     "babel-preset-latest": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",

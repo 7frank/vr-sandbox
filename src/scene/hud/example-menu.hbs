@@ -1,0 +1,47 @@
+<a-entity id="example-gui-elements" visible="false">
+
+    <a-plane gui-border position="0 0 0" scale="1 1 1" height="1" width="1"
+             material="transparent:true;opacity:0.3;color:lightgrey">
+        <a-text value="HUD" align='center' opacity="0.3" transparent="true"></a-text>
+        <a-text value="- toggle pressing F2 -" align='center' opacity="0.6" transparent="true"
+                position="0 -.1 0" scale=".1 .1 .1"></a-text>
+    </a-plane>
+
+
+    <a-plane gui-border click-drag position=".75 .25 0" height="0.5" width=".5"
+             material="transparent:true;opacity:0.3;color:lightgrey">
+        <a-text value="-drag me-" width="1" align='center' opacity="0.3" transparent="true"></a-text>
+
+        <nk-list-view position="-.125 -.125 0" scale=".05 .05 .05">
+            <a-circle
+                    v-for="(item, index) in items"
+                    :color="item.value"
+                    :position="setPositionFromIndex(index,10,1,1,1)"
+                    radius=.5
+
+                    @interaction-pick.stop="onItemClicked(index)"
+            >
+                <a-ring v-if="selectedIndex==index" position="0 0 -0.01" scale=".5 .5 .5" radiusOuter=0.55 radiusInner="0.5"  color="white"></a-ring>
+            </a-circle>
+            <template>[{key:1,value:"slateblue"},{key:1,value:"blue"},{key:1,value:"slategrey"}]</template>
+        </nk-list-view>
+
+    </a-plane>
+
+    <a-plane gui-border click-drag position=".75 -.25 0" height="0.5" width=".5"
+             material="transparent:true;opacity:0.3;color:lightgrey">
+
+        <a-box src="#boxTexture"
+               position="0 0 0"
+               scale=".1 .1 .1"
+               material="color:red">
+            <a-animation attribute="rotation" to="180 360 0" fill="forwards" dur="2000"
+                         repeat="indefinite"></a-animation>
+        </a-box>
+
+        <a-button position="-.05 -.1 0" scale=".1 .1 .1" value="Select"></a-button>
+
+    </a-plane>
+
+
+</a-entity>
