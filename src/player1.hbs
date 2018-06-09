@@ -14,14 +14,14 @@
 
     <!--  cursor ="fuse: true; fuseTimeout: 500" -->
     <a-entity cursor
-              raycaster="interval: 50"
+              raycaster="interval: 50" raycaster-listener
               position="0 0 -1"
               geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
               material="color: black; shader: flat">
     </a-entity>
 
 
-    <a-hud>
+    <a-hud id="mainHUD" hud-raycaster-helper>
 
       {{> scene/hud/player-default-hud}}
       {{> scene/hud/example-menu}}
