@@ -6,7 +6,10 @@ AFRAME.registerPrimitive('a-hud', {
   defaultComponents: {
     'hud-hud': {}
   },
-  mappings: {defaultLight: 'hud-hud.defaultLight', 'camera-mode': 'hud-hud.camera'}
+  mappings: {defaultLight: 'hud-hud.defaultLight',
+    'camera-mode': 'hud-hud.camera',
+    'size': 'hud-hud.size'
+  }
 });
 
 /**
@@ -38,7 +41,9 @@ AFRAME.registerComponent('hud-hud', {
     this.el.setAttribute('visible', false);
     // set the element at "z-index" -1
 
-    if (this.isOrtho()) { this.el.setAttribute('position', '0 0 -1'); }
+    if (this.isOrtho()) {
+      this.el.setAttribute('position', '0 0 -1');
+    }
 
     this.mRenderer = this.el.sceneEl.renderer;
 
@@ -64,7 +69,13 @@ AFRAME.registerComponent('hud-hud', {
     this.mScene = scene;
   },
   update: function (oldData) {
-    if (this.data.camera != oldData.camera) { this.resizeHUD(); }
+    if (this.data.camera != oldData.camera) {
+      this.resizeHUD();
+    }
+
+    if (this.data.size != oldData.size) {
+      this.resizeHUD();
+    }
   },
   renderHUD: function () {
     // ------------
@@ -88,12 +99,36 @@ AFRAME.registerComponent('hud-hud', {
     this.mRenderer.autoClear = ac; // restore auto clear value
   },
   resizeHUD_Ortho: function () {
-    let camera = this.el.sceneEl.camera;
+    // let camera = this.el.sceneEl.camera;
 
-    // ------------------------------------
-
+    // TODO contain//cover for ortho the same way it is implemented for perspective
     // this.mCamera = this.createOrthographicCameraFromPerspectiveCamera(this.el.sceneEl.camera, this.el.object3D);
-    let width = window.innerWidth / window.innerHeight, height = 1;
+
+    let windowAspect = window.innerWidth / window.innerHeight;
+    // test here when back
+
+    var [width, height] = [1, 1];
+
+    if (this.data.size == 'contain') {
+      if (windowAspect > 1) {
+        width = windowAspect;
+        height = 1;
+      } else {
+        width = 1;
+        height = 1 / windowAspect;
+      }
+    }
+
+    if (this.data.size == 'cover') {
+      if (windowAspect > 1) {
+        width = 1;
+        height = 1 / windowAspect;
+      } else {
+        width = windowAspect;
+        height = 1;
+      }
+    }
+
     this.mCamera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 0.1, 1000);
 
     this.el.object3D.parent.add(this.mCamera);
@@ -114,7 +149,11 @@ AFRAME.registerComponent('hud-hud', {
     this.el.object3D.position.z = -zDepth;
   },
   resizeHUD: function () {
-    if (this.isOrtho()) { this.resizeHUD_Ortho(); } else { this.resizeHUD_Perspective(); }
+    if (this.isOrtho()) {
+      this.resizeHUD_Ortho();
+    } else {
+      this.resizeHUD_Perspective();
+    }
 
     // ------------------------------------
   },
