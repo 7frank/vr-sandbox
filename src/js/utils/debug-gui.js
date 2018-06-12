@@ -1,7 +1,8 @@
 import {createHTML} from './dom-utils';
 
 import {getWorldPosition, toast} from './aframe-utils';
-import {getPlayer} from '../game-utils';
+import {getCursor, getPlayer} from '../game-utils';
+import * as _ from 'lodash';
 
 function getMeaningfulnameFromRegionEl (el) {
   var id = el.getAttribute('id');
@@ -10,6 +11,17 @@ function getMeaningfulnameFromRegionEl (el) {
 
   if (!src) return '<undefined>';
   return src.substring(src.lastIndexOf('/') + 1, src.length).split('.')[0];
+}
+
+function createButton (name) {
+  let style = `     background: rgba(43, 9, 229, 0.4);
+    border-radius: 10px;
+    color: lightgrey;
+    margin-right: 0.5em;
+    `;
+
+  let btn = AFRAME.nk.parseHTML(`<button style="${style}">${name}</button>`);
+  return btn;
 }
 
 function createTeleportLocationButtons () {
@@ -22,7 +34,7 @@ function createTeleportLocationButtons () {
     margin-right: 0.5em;
     `;
 
-    let btn = AFRAME.nk.parseHTML(`<button style="${style}">${name}</button>`);
+    let btn = createButton(name);
     btn.addEventListener('click', function () {
       toast('teleporting to:' + name);
       let regionPosition = getWorldPosition(el.object3D);
@@ -64,10 +76,12 @@ function createActiveTargetPanel () {
 
   function
   getActiveElName (el) {
+    if (!el) return '-undefined-';
     return (el.getAttribute ? el.getAttribute('id') || el.getAttribute('name') : null) || el.tagName.toLowerCase();
   }
 
-  document.querySelector('[cursor-focus]').addEventListener('change', function ({detail}) {
+  document.querySelector('[cursor-focus]').addEventListener('focus-change', function ({detail}) {
+    console.log('focus-change', detail);
     var name = getActiveElName(detail);
     container.body.innerHTML = name;
   });
@@ -82,6 +96,26 @@ function createHotkeysDebugLog () {
   });
 
   return hotkeyLog;
+}
+
+function createMenuSelect () {
+  var container = createDroplet('Menu Select');
+
+  let menus = document.querySelector('[hud-hud]').childNodes.toArray().filter(n => n.nodeType != 3);
+
+  _.each(menus, function (node, k) {
+    let btn = createButton(node.getAttribute('id') || '<no-id>');
+    btn.addEventListener('click', function () {
+      _.each(menus, (el) => el.setAttribute('visible', false));
+
+      node.setAttribute('visible', true);
+
+      node.flushToDOM();
+    });
+    container.append(btn);
+  });
+
+  return container;
 }
 
 // TODO
@@ -108,6 +142,9 @@ export function createSidebarMenu () {
 
   var btns = createTeleportLocationButtons();
   btns.forEach(btn => locations.body.appendChild(btn));
+
+  var menus = createMenuSelect();
+  parent.append(menus);
 
   document.querySelector('body').append(parent);
 }

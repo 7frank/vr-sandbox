@@ -1,5 +1,6 @@
 import 'three/examples/js/exporters/GLTFExporter.js';
 import {toast} from '../utils/aframe-utils';
+import {getCursor, getCursorComponent, getIntersectedEl} from '../game-utils';
 
 var _exporter;
 
@@ -14,7 +15,7 @@ export function exportGLTF (obj) {
 }
 
 export function exportElementUnderCursor () {
-  var intersected = document.querySelector('[cursor]').components['cursor'].intersectedEl;
+  var intersected = getIntersectedEl();
 
   if (!intersected) toast('to export, look at something first ');
 

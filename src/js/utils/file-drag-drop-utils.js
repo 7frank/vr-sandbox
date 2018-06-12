@@ -5,6 +5,7 @@ import {
   renderZipFile
 } from '../sketchfab/sketchfab-render';
 import {renderImage, renderVideo} from './aframe-utils';
+import {getCursor, getCursorComponent} from '../game-utils';
 
 // helper that keeps track of the shift key to dass functionality for dropping files
 var bShift = false;
@@ -47,7 +48,7 @@ export function onDropZoneDrop (data) {
       // TODO it seems we can't drag-hover images as the event does not contain the files
       if (!isShiftDown()) {
         // relying on the default raycaster //TODO set cursor to rayorigin:mouse while dropping or find a better solution
-        var intersects = document.querySelector('[cursor]').components['cursor'].intersectedEl;
+        var intersects = getCursorComponent().intersectedEl;
         var id = appendImageToDOM(url).id;
 
         console.log('intersects', intersects);

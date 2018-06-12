@@ -13,6 +13,7 @@ import {roundTo} from '../../utils/misc-utils';
 import {isShiftDown} from '../../utils/file-drag-drop-utils';
 
 import productConfigSample1 from '../a-configurator/productConfigSample1.html';
+import {getIntersectedEl} from '../../game-utils';
 
 // a list that contains template-containers to select them
 // first lets have a simple select like in fallout 4
@@ -182,7 +183,7 @@ AFRAME.registerComponent('template-droppable', {
 
     this.createPreview();
 
-    this.mCursor = document.querySelector('[cursor]').components.cursor;
+    // this.mCursor = document.querySelector('[cursor]').components.cursor;
 
     this.rayHelper = raycasterHelper(20);
   },
@@ -211,7 +212,8 @@ AFRAME.registerComponent('template-droppable', {
     // FIXME this is partially working apart from adding an element to every region in the dom  as template-droppable is added to all regions not only those next to the player
     // FIXME also implementation of raycaster is  bad performance wise
 
-    if (this.mCursor.intersectedEl != this.el) return;
+    // if (this.mCursor.intersectedEl != this.el) return;
+    if (getIntersectedEl() != this.el) return;
 
     // var targetPos = this.mCursor.intersectedEventDetail.intersection.point;
 
