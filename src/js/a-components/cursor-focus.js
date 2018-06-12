@@ -40,45 +40,19 @@ AFRAME.registerComponent('cursor-focus', {
 
     initCursor();
     onElementChange(undefined, '[cursor]', initCursor);
-    onElementChange(undefined, '[mouse-cursor]', () => {
-      initCursor();
-
-      let mc = this.mCursor.components['mouse-cursor'];
-      mc._setIntersectObject = function _setIntersectObject (el) {
-        console.log('_setIntersectObject', el);
-        this._intersectedEl = el;
-        if (this._isMobile) { return; }
-        el.addState('hovered'); this._emit('mouseenter');
-        el.emit('mouseenter');
-        this.el.addState('hovering');
-      };
-
-      mc._clearIntersectObject = function _clearIntersectObject () {
-        const { _intersectedEl: el } = this;
-        if (el && !this._isMobile) {
-          el.removeState('hovered'); this._emit('mouseleave');
-          el.emit('mouseleave');
-          this.el.removeState('hovering');
-        }
-
-        this._intersectedEl = null;
-      };
-
-      this.el.sceneEl.addEventListener('renderstart', () => mc._attachEventListeners());
-    });
   },
   updateCursorHandlers: function () {
     var that = this;
 
     // cursor and mouse-cursor
-    function T_T (evt) {
-      return evt.detail.intersectedEl || evt.detail.target;
+    function getIntersectedEl (evt) {
+      return evt.detail.intersectedEl;
     }
 
     // -----------------------------
     // TODO currently click handler is there for the HUD and main menu
     this.mCursor.addEventListener('click', function (evt) {
-      var targetEl = T_T(evt);
+      var targetEl = getIntersectedEl(evt);
       console.log('cursor-focus click', evt.detail);
       if (targetEl == document.activeElement) return;
       fixFocusable(targetEl);
@@ -89,7 +63,7 @@ AFRAME.registerComponent('cursor-focus', {
     // -----------------------------
 
     this.mCursor.addEventListener('mouseenter', function (evt) {
-      var targetEl = T_T(evt);
+      var targetEl = getIntersectedEl(evt);
       console.log('cursor-focus mouseenter', evt.detail);
       fixFocusable(targetEl);
       targetEl.focus();
@@ -97,7 +71,7 @@ AFRAME.registerComponent('cursor-focus', {
     });
 
     this.mCursor.addEventListener('mouseleave', function (evt) {
-      var targetEl = T_T(evt);
+      var targetEl = getIntersectedEl(evt);
       console.log('cursor-focus mouseleave', evt.detail);
 
       targetEl.blur();

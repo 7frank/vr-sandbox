@@ -6,18 +6,17 @@ export function getPlayer () {
 }
 
 export function getCursor () {
-  return document.querySelector('[cursor]') || document.querySelector('[mouse-cursor]');
+  return document.querySelector('[cursor]');
 }
 
 export function getCursorComponent () {
   let c = getCursor();
-  return c.components['cursor'] || c.components['mouse-cursor'];
+  return c.components['cursor'];
 }
 
-// TODO only works for cursor and mouse cursor
 export function getIntersectedEl () {
   let c = getCursorComponent();
-  return c.intersectedEl || c._intersectedEl;
+  return c.intersectedEl;
 }
 
 // FIXME

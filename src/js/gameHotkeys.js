@@ -107,7 +107,18 @@ function addHotkeys () {
   });
 
   Hotkeys().on('toggle-main-menu', _.throttle(function () {
-    document.querySelector('#m-main-menu').object3D.visible = !document.querySelector('#m-main-menu').object3D.visible;
+    var visible = !document.querySelector('#m-main-menu').object3D.visible;
+    document.querySelector('#m-main-menu').object3D.visible = visible;
+
+    let state = visible ? 'mouse' : 'entity';
+
+    // FIXME the cursor needs to be detached to be able to switch from mouse to entity mode
+    var c = document.querySelector('[cursor]');
+    c.removeAttribute('cursor');
+    c.setAttribute('cursor', 'rayOrigin', state);
+    c.setAttribute('cursor', 'showLine', visible);
+
+    toast('cursor rayOrigin: ' + state);
   }, 100));
 
   // FIXME menu is working suboptimally

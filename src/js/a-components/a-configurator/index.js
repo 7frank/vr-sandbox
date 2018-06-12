@@ -8,7 +8,7 @@ import {appendHTML3D, createHTML} from '../../utils/dom-utils';
 import {createGlowForMesh} from './glow-shader';
 import {FPSCtrl} from '../../utils/fps-utils';
 import {namespaceExists} from '../../utils/namespace';
-import './available-colors';
+// import './available-colors'; TODO remove if no use case in near next iterations
 import {toast} from '../../utils/aframe-utils';
 
 /**

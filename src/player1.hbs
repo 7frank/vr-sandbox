@@ -3,7 +3,6 @@
 
 <!-- FIXME universal-controls="rotationSensitivity:0.2" are necessary for physics but interfere with customisation -->
 <a-entity
-          -mouse-cursor
           customizable-wasd-controls look-controls class="player"
           static-body="shape:sphere;sphereRadius:1"
           networked="template:#avatar-template;showLocalTemplate:false;" camera="far:20000"
@@ -16,7 +15,9 @@
 
     <!--  cursor ="fuse: true; fuseTimeout: 500" -->
     <a-entity cursor="rayOrigin:entity"
-              raycaster="interval: 50;showLine:true" raycaster-listener
+              raycaster="interval: 50;showLine:true"
+              raycaster-listener
+
               position="0 0 -1"
               geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
               material="color: black; shader: flat">

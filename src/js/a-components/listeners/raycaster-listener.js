@@ -1,14 +1,19 @@
-import {toast} from '../../utils/aframe-utils';
-
 /**
  *
  * attach this to a matching HTMLElement, (a-hud or [hud-hud])
  */
+import * as _ from 'lodash';
+
 console.error('fix hud raycaster, ortho camera aspect on resize,el.emit, ');
 AFRAME.registerComponent('hud-raycaster-helper', {
   schema: {},
   init: function () {
-    var rc = document.querySelector('[raycaster]');
+    var rc = document.querySelector('[raycaster]');// TODO this does not wait for a raycaster to be attached by another component
+
+    if (!rc) {
+      console.error('hud-raycaster-helper needs an entity with a raycaster to be able to inject hud interaction');
+      return;
+    }
 
     // intercept raycast and enable visibility for a moment
     var meshes = [], mStats = [];
@@ -17,7 +22,7 @@ AFRAME.registerComponent('hud-raycaster-helper', {
 
       meshes = AFRAME.nk.querySelectorAll(this.el, '.Mesh');
       mStats = meshes.map((m, k) => [m.renderOrder, m.material.depthTest]);
-      meshes.map((m, k) => {
+      meshes.map(m => {
         m.renderOrder = 999;
         m.material.depthTest = false;
       });
@@ -45,6 +50,12 @@ AFRAME.registerComponent('raycaster-listener', {
   schema: {},
   init: function () {
     var raycasterComponent = this.el.components.raycaster;
+
+    /* if (!raycasterComponent) {
+      console.error('no raycaster at entity', this.el, 'for raycaster-listener');
+      return;
+    } */
+
     this.mRaycaster = raycasterComponent.raycaster;
 
     if (this.mRaycaster.__raycaster_listener__) {
@@ -85,14 +96,14 @@ function overrideRelevantRaycasterCode (rc, el) {
     if (object.visible === false) return;
 
     /*  // @changed
-        var t0 = performance.now();
-       */
+                var t0 = performance.now();
+               */
     object.raycast(raycaster, intersects);
     /*  var t1 = performance.now();
-        // if (!children.length) //only store leaf nodes
-        var info = {time: t1 - t0, object, intersects};
-        tmpRaycastStack.push(info);
-    */
+                // if (!children.length) //only store leaf nodes
+                var info = {time: t1 - t0, object, intersects};
+                tmpRaycastStack.push(info);
+            */
     if (recursive === true) {
       var children = object.children;
 
@@ -119,8 +130,6 @@ function overrideRelevantRaycasterCode (rc, el) {
   rc.intersectObjects = function (objects, recursive, optionalTarget) {
     var intersects = optionalTarget || [];
 
-    window.intersects = intersects;
-
     if (Array.isArray(objects) === false) {
       console.warn('THREE.Raycaster.intersectObjects: objects is not an Array.');
       return intersects;
@@ -133,6 +142,9 @@ function overrideRelevantRaycasterCode (rc, el) {
     el.emit('after-raycast');
 
     intersects.sort(ascSort);
+
+    window.intersects = intersects;
+    if (_.has(intersects[0], 'object.el')) { console.log('rc:intersects[0].object.el.tagName', intersects[0].object.el.tagName); } else { console.log('rc:intersects[0]', intersects[0]); }
 
     return intersects;
   };
