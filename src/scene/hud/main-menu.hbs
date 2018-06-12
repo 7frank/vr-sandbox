@@ -1,4 +1,4 @@
-<a-plane id="m-main-menu" position="0 0 -10.1" scale="1 1 1" height="1" width="1"
+<a-plane visible="false" id="m-main-menu" position="0 0 -10.1" scale="1 1 1" height="1" width="1"
          material="transparent:true;opacity:0.0;color:lightgrey">
 
     <!--
@@ -14,27 +14,34 @@
 
 
     <a-sphere gui-border="opacity:0.3" src="#earth" segments-height="36" segments-width="72"
-              position="-1.4 0 0"
+              position="-2.4 0 0"
               scale="1 1 1"
+              radius="2"
               material="normalMap:#earth-normal-map">
-        <a-animation easing="linear" attribute="rotation" to="720 360 0" fill="both" dur="30000"
+        <a-animation easing="linear" attribute="rotation" to="720 360 0" fill="both" dur="200000"
                      repeat="indefinite"></a-animation>
     </a-sphere>
 
 
-    <nk-list-view id="mm" position="0 0.4 .1" scale=".5 .5 .5" orientation="row" invert="true" selected-index="0" arrows="false">
+
+
+
+
+    <nk-list-view id="mm" position="0 0 .1" scale=".5 .5 .5" orientation="row" invert="false" selected-index="0" arrows="false">
         <a-plane v-for="(item, index) in items"
-                 :position="setPositionFromIndex(index,1,10,1,-0.25)"
+
+                 :position="setPosition(-4+4*Math.cos(0.05*index/items.length*2*Math.PI-Math.PI*0.0),4*Math.sin(0.05*index/items.length*2*Math.PI-Math.PI*0.0))"
                  material="transparent:true;opacity:0.3;"
                  :color="selectedIndex==index?'blue':'white'"
                  height=".21"
-                 @interaction-pick.stop="onItemClicked(index)"
+                 @interaction-talk.stop="onItemClicked(index)"
         >
             <a-text font="assets/fonts/DejaVu-sdf.fnt" height=".19" align='center'
                     :value="item.value"
                     material="transparent:true;opacity:0.3;"
                     color="lightgrey"
                     @interaction-pick.stop="onItemClicked(index)"
+                    @interaction-talk.stop="onItemSelected(index)"
             ></a-text>
         </a-plane>
 

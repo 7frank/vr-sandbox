@@ -2,7 +2,9 @@
 
 
 <!-- FIXME universal-controls="rotationSensitivity:0.2" are necessary for physics but interfere with customisation -->
-<a-entity customizable-wasd-controls look-controls class="player"
+<a-entity
+          -mouse-cursor
+          customizable-wasd-controls look-controls class="player"
           static-body="shape:sphere;sphereRadius:1"
           networked="template:#avatar-template;showLocalTemplate:false;" camera="far:20000"
           spawn-in-circle="radius:3;"
@@ -13,19 +15,21 @@
 
 
     <!--  cursor ="fuse: true; fuseTimeout: 500" -->
-    <a-entity cursor
-              raycaster="interval: 50" raycaster-listener
+    <a-entity cursor="rayOrigin:entity"
+              raycaster="interval: 50;showLine:true" raycaster-listener
               position="0 0 -1"
               geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
               material="color: black; shader: flat">
     </a-entity>
 
 
-    <a-hud id="mainHUD" hud-raycaster-helper>
+    <a-hud id="mainHUD" aspect="16 9" hud-raycaster-helper>
 
       {{> scene/hud/player-default-hud}}
       {{> scene/hud/example-menu}}
       {{> scene/hud/main-menu}}
+      {{> scene/hud/flow-test-menu}}
+      {{> scene/hud/flow-test-menu-goal}}
 
     </a-hud>
 

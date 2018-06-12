@@ -8,7 +8,8 @@ AFRAME.registerPrimitive('a-hud', {
   },
   mappings: {defaultLight: 'hud-hud.defaultLight',
     'camera-mode': 'hud-hud.camera',
-    'size': 'hud-hud.size'
+    'size': 'hud-hud.size',
+    'aspect': 'hud-hud.aspect'
   }
 });
 
@@ -76,6 +77,10 @@ AFRAME.registerComponent('hud-hud', {
     if (this.data.size != oldData.size) {
       this.resizeHUD();
     }
+
+    if (this.data.aspect != oldData.aspect) {
+      this.resizeHUD();
+    }
   },
   renderHUD: function () {
     // ------------
@@ -105,26 +110,32 @@ AFRAME.registerComponent('hud-hud', {
     // this.mCamera = this.createOrthographicCameraFromPerspectiveCamera(this.el.sceneEl.camera, this.el.object3D);
 
     let windowAspect = window.innerWidth / window.innerHeight;
+
+    // FIXME instead of multiplying the targetAspect the element needs to be scaled
+    let targetAspect = 1;// this.data.aspect.x / this.data.aspect.y;
+
+    // console.log('targetAspect', targetAspect);
+
     // test here when back
 
     var [width, height] = [1, 1];
 
     if (this.data.size == 'contain') {
       if (windowAspect > 1) {
-        width = windowAspect;
+        width = windowAspect / targetAspect;
         height = 1;
       } else {
         width = 1;
-        height = 1 / windowAspect;
+        height = 1 / windowAspect / targetAspect;
       }
     }
 
     if (this.data.size == 'cover') {
       if (windowAspect > 1) {
         width = 1;
-        height = 1 / windowAspect;
+        height = 1 / windowAspect / targetAspect;
       } else {
-        width = windowAspect;
+        width = windowAspect / targetAspect;
         height = 1;
       }
     }

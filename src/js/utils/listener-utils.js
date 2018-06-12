@@ -28,3 +28,24 @@ export function onElementChange (node = window.document, elem, handler) {
     //     handleChangesUpToHere(summaries);
   return observer;
 }
+
+export function onAttrChange (node = window.document, attrName, handler) {
+  var observer = new MutationSummary({
+    callback: handler, // required
+    rootNode: node, // optional, defaults to window.document
+    //  observeOwnChanges: // optional, defaults to false
+    // oldPreviousSibling: // optional, defaults to false
+    queries: [
+      {
+        attribute: attrName
+
+      }
+    ]
+  });
+
+    // If/when change report callbacks are no longer desired
+    // var summaries = observer.disconnect();
+    // if (summaries)
+    //     handleChangesUpToHere(summaries);
+  return observer;
+}

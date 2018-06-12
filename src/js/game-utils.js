@@ -4,6 +4,22 @@ import * as CANNON from 'cannon';
 export function getPlayer () {
   return $('.player').get(0);
 }
+
+export function getCursor () {
+  return document.querySelector('[cursor]') || document.querySelector('[mouse-cursor]');
+}
+
+export function getCursorComponent () {
+  let c = getCursor();
+  return c.components['cursor'] || c.components['mouse-cursor'];
+}
+
+// TODO only works for cursor and mouse cursor
+export function getIntersectedEl () {
+  let c = getCursorComponent();
+  return c.intersectedEl || c._intersectedEl;
+}
+
 // FIXME
 export function getBall () {
   return $('.ball').get(0);

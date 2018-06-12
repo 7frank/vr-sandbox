@@ -102,12 +102,12 @@ function addHotkeys () {
     } else worldMap.setAttribute('world-map', true);
   });
 
-  Hotkeys.register('toggle-example-gui', 'F2', {
+  Hotkeys.register('toggle-main-menu', 'F2', {
     category: 'HUD'
   });
 
-  Hotkeys().on('toggle-example-gui', _.throttle(function () {
-    document.querySelector('#example-gui-elements').object3D.visible = !document.querySelector('#example-gui-elements').object3D.visible;
+  Hotkeys().on('toggle-main-menu', _.throttle(function () {
+    document.querySelector('#m-main-menu').object3D.visible = !document.querySelector('#m-main-menu').object3D.visible;
   }, 100));
 
   // FIXME menu is working suboptimally
