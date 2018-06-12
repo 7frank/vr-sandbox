@@ -4,7 +4,7 @@ import {toast} from '../../utils/aframe-utils';
  *
  * attach this to a matching HTMLElement, (a-hud or [hud-hud])
  */
-alert('fix hud raycaster, ortho camera aspect on resize,el.emit, ');
+console.error('fix hud raycaster, ortho camera aspect on resize,el.emit, ');
 AFRAME.registerComponent('hud-raycaster-helper', {
   schema: {},
   init: function () {
@@ -54,6 +54,7 @@ AFRAME.registerComponent('raycaster-listener', {
 
     let raycasterFunction = this.mRaycaster.intersectObject;
 
+    console.log('overrideRelevantRaycasterCode', this.mRaycaster, raycasterComponent.el);
     overrideRelevantRaycasterCode(this.mRaycaster, raycasterComponent.el);
 
     this.mRaycaster.__raycaster_listener__ = true;
@@ -117,6 +118,8 @@ function overrideRelevantRaycasterCode (rc, el) {
 
   rc.intersectObjects = function (objects, recursive, optionalTarget) {
     var intersects = optionalTarget || [];
+
+    window.intersects = intersects;
 
     if (Array.isArray(objects) === false) {
       console.warn('THREE.Raycaster.intersectObjects: objects is not an Array.');

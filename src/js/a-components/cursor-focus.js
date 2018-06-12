@@ -4,6 +4,7 @@
  */
 import {onElementChange} from '../utils/listener-utils';
 import {updateHotComponent} from '../utils/aframe-debug-utils';
+import {getCursor} from '../game-utils';
 
 /**
  * Fixes  keyboard support for non-control elements.
@@ -33,26 +34,72 @@ AFRAME.registerComponent('cursor-focus', {
   init: function () {
     // keep track of the cursor component
     var initCursor = () => {
-      this.mCursor = document.querySelector('[cursor]');
+      this.mCursor = getCursor();
       if (this.mCursor) { this.updateCursorHandlers(); }
     };
 
     initCursor();
     onElementChange(undefined, '[cursor]', initCursor);
+    onElementChange(undefined, '[mouse-cursor]', () => {
+      initCursor();
+
+      let mc = this.mCursor.components['mouse-cursor'];
+      mc._setIntersectObject = function _setIntersectObject (el) {
+        console.log('_setIntersectObject', el);
+        this._intersectedEl = el;
+        if (this._isMobile) { return; }
+        el.addState('hovered'); this._emit('mouseenter');
+        el.emit('mouseenter');
+        this.el.addState('hovering');
+      };
+
+      mc._clearIntersectObject = function _clearIntersectObject () {
+        const { _intersectedEl: el } = this;
+        if (el && !this._isMobile) {
+          el.removeState('hovered'); this._emit('mouseleave');
+          el.emit('mouseleave');
+          this.el.removeState('hovering');
+        }
+
+        this._intersectedEl = null;
+      };
+
+      this.el.sceneEl.addEventListener('renderstart', () => mc._attachEventListeners());
+    });
   },
   updateCursorHandlers: function () {
     var that = this;
 
-    this.mCursor.addEventListener('mouseenter', function (evt) {
-      var targetEl = evt.detail.intersectedEl;
-      // console.log('cursor-focus mouseenter', evt.detail);
+    // cursor and mouse-cursor
+    function T_T (evt) {
+      return evt.detail.intersectedEl || evt.detail.target;
+    }
+
+    // -----------------------------
+    // TODO currently click handler is there for the HUD and main menu
+    this.mCursor.addEventListener('click', function (evt) {
+      var targetEl = T_T(evt);
+      console.log('cursor-focus click', evt.detail);
+      if (targetEl == document.activeElement) return;
       fixFocusable(targetEl);
       targetEl.focus();
-      that.el.emit('change', targetEl);
+      that.el.emit('focus-change', targetEl);
+    });
+
+    // -----------------------------
+
+    this.mCursor.addEventListener('mouseenter', function (evt) {
+      var targetEl = T_T(evt);
+      console.log('cursor-focus mouseenter', evt.detail);
+      fixFocusable(targetEl);
+      targetEl.focus();
+      that.el.emit('focus-change', targetEl);
     });
 
     this.mCursor.addEventListener('mouseleave', function (evt) {
-      var targetEl = evt.detail.intersectedEl;
+      var targetEl = T_T(evt);
+      console.log('cursor-focus mouseleave', evt.detail);
+
       targetEl.blur();
     });
   },
