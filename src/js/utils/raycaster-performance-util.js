@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import {injectMethod} from './performance-utils';
-import {countDepth} from './aframe-utils';
+import {countDepth, toast} from './aframe-utils';
 import {arrayToTree} from './misc-utils';
 
 var tmpRaycastStack = [];
@@ -62,6 +62,9 @@ export function getRaycastPerfTree (mCallback) {
 /**
  * This method contains copies of the raycaster code wich should be updated if code of original raycaster changes.
  * Only changes are the time tracking in the intersectObject function (@changed)
+ *
+ *
+ *
  * @param {THREE.Raycaster} rc - An instance of the THREE.Raycaster
  */
 function overrideRelevantRaycasterCode (rc) {
@@ -69,6 +72,8 @@ function overrideRelevantRaycasterCode (rc) {
     console.warn('raytrace performance tool needs compatability revision');
   }
 
+  toast('warning hud raycast will not work until page refresh', 10000);
+  console.error(' hud raycast will not work until page refresh');
   // ----------------------------
 
   function ascSort (a, b) {
@@ -104,7 +109,6 @@ function overrideRelevantRaycasterCode (rc) {
 
   rc.intersectObject = function (object, recursive, optionalTarget) {
     var intersects = optionalTarget || [];
-
     intersectObject(object, this, intersects, recursive);
 
     intersects.sort(ascSort);

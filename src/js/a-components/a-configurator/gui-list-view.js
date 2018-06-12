@@ -18,7 +18,7 @@ import {Box3Ext} from '../../three/Box3Ext';
  *
  */
 
-// var console = Logger.getLogger('gui-list-view');
+var console = Logger.getLogger('gui-list-view');
 // FIXME mappings not working
 AFRAME.registerPrimitive('nk-list-view', {
   defaultComponents: {
@@ -95,19 +95,19 @@ AFRAME.registerComponent('gui-list-view', {
   },
   update: function (oldData) {
     // new entries
-    console.warn('listview update', oldData, this.data);
+    // console.warn('listview update', oldData, this.data);
     var addedItems = _.difference(this.data.items, oldData.items);
     var removedItems = _.difference(oldData.items, this.data.items);
 
     if (addedItems.length > 0) {
       addedItems.forEach(item => this.vm.addItem(item));
-      console.log('addedItems', addedItems);
+    //  console.log('addedItems', addedItems, this.vm.$data);
     }
     // removed entries
 
     if (removedItems.length > 0) {
       removedItems.forEach(item => this.vm.removeItem(item));
-      console.log('removedItems', removedItems);
+    //  console.log('removedItems', removedItems);
     }
 
     // ------
@@ -116,7 +116,7 @@ AFRAME.registerComponent('gui-list-view', {
       this.initViewModel();
     }
     // update selectedIndex
-    console.log(oldData, this.data);
+    // console.log(oldData, this.data);
     if (oldData.selectedIndex != this.data.selectedIndex) { if (this.vm.$data.selectedIndex != this.data.selectedIndex) { this.vm.$data.selectedIndex = this.data.selectedIndex; } }
   },
   computeBoundingBox: function () {
@@ -183,7 +183,7 @@ AFRAME.registerComponent('gui-list-view', {
     this.vm.setItems(items);
   },
   init: function () {
-    console.log('gui list view init');
+    // console.log('gui list view init');
     // read <template> tag and interpret it as json data
     var tplData = this.el.querySelector('template');
     if (tplData) {
@@ -204,7 +204,7 @@ AFRAME.registerComponent('gui-list-view', {
       var parsed = itemFactoryTpl.outerHTML;
 
       if (parsed.length > 0) {
-        console.log('parsed', parsed);
+        //   console.log('parsed', parsed);
         this.data.itemFactory = parsed; // FIXME when update is called from setting settAttr("items",[]) the previous itemFactory is used
       } else {
         console.error('invalid itemFactory');
@@ -217,7 +217,7 @@ AFRAME.registerComponent('gui-list-view', {
     this.initViewModel();
   },
   initViewModel: function () {
-    console.log('initViewModel');
+    // console.log('initViewModel');
     // remove previous vm
     if (this.vm) {
       this.vm.$el.parentElement.removeChild(this.vm.$el);
@@ -280,7 +280,7 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
         this.$data.items = items;
       },
       addItem: function (item) {
-        this.$data.items.push(item);
+        if (this.$data.items.indexOf(item) == -1) { this.$data.items.push(item); }
       },
       removeItem: function (item) {
         this.$data.items.splice(this.$data.items.indexOf(item), 1);
@@ -304,6 +304,26 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
           this.$el.emit('change', data);
         }
       },
+      onItemSelected: function (index) {
+        if (index != undefined) {
+          this.$data.selectedIndex = index;
+
+          console.log('onItemSelected0', index);
+          //    return;
+        }
+        var data = this.$data.items[this.$data.selectedIndex];
+
+        var that = this.$refs.listView.childNodes[this.$data.selectedIndex];
+
+        console.log('onItemSelected', data, that);
+
+        var caption = that ? that.getAttribute('value') : '-1'; // TODO improve usability of list view
+
+        if (this.$data.selectedIndex > -1) {
+          this.$el.emit('selected', data);
+        }
+      },
+
       setPositionFromIndex: function (index, xMax, yMax, xScale = 1, yScale = 1) {
         let x = index % xMax;
         let y = parseInt(index / xMax);
@@ -326,7 +346,7 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
                                     }, */
       selectedIndex: {
         handler: function (val, oldVal) {
-          console.log('watch', arguments);
+          // console.log('watch', arguments);
 
           var len = app.$data.items.length - 1;
           if (val > len) app.$data.selectedIndex = overflow ? 0 : len;

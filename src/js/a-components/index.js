@@ -31,3 +31,4 @@ import './billboard/simple-billboard';
 import './dummy-raycaster';
 import './renderer-listener';
 import './listeners/raycaster-listener';
+import './hexagon';

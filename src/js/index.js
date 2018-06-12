@@ -29,6 +29,8 @@ import './a-controls/customizable-wasd-controls';
 
 import './interactions/attraction';
 
+import './flow-layout';
+
 // Load Application
 import './a-project';
 

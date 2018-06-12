@@ -7,6 +7,7 @@ import {addControlsToModel, appendImageToDOM} from './sketchfab/sketchfab-render
 import {isShiftDown} from './utils/file-drag-drop-utils';
 import {retrieveImageOrTextFromClipboardAsBlob} from './utils/paste-utils';
 import fileType from 'file-type';
+import {getCursor, getCursorComponent, getIntersectedEl} from './game-utils';
 
 export
 function attachClipboard () {
@@ -25,7 +26,8 @@ function attachClipboard () {
 
         if (!isShiftDown()) {
           // relying on the default raycaster //TODO set cursor to rayorigin:mouse while dropping or find a better solution
-          var intersects = document.querySelector('[cursor]').components['cursor'].intersectedEl;
+
+          var intersects = getIntersectedEl();
           var id = appendImageToDOM(url).id;
 
           console.log('intersects', intersects);
