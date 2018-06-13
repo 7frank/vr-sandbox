@@ -1,5 +1,5 @@
 /**
- * will add additional handlers to be able to send keyboard events to target
+ * Does add additional handlers to be able to send keyboard events to target.
  * @param target
  */
 import {onElementChange} from '../utils/listener-utils';
@@ -53,7 +53,7 @@ AFRAME.registerComponent('cursor-focus', {
     // TODO currently click handler is there for the HUD and main menu
     this.mCursor.addEventListener('click', function (evt) {
       var targetEl = getIntersectedEl(evt);
-      console.log('cursor-focus click', evt.detail);
+      // console.log('cursor-focus click', evt.detail);
       if (targetEl == document.activeElement) return;
       fixFocusable(targetEl);
       targetEl.focus();
@@ -64,7 +64,7 @@ AFRAME.registerComponent('cursor-focus', {
 
     this.mCursor.addEventListener('mouseenter', function (evt) {
       var targetEl = getIntersectedEl(evt);
-      console.log('cursor-focus mouseenter', evt.detail);
+      // console.log('cursor-focus mouseenter', evt.detail);
       fixFocusable(targetEl);
       targetEl.focus();
       that.el.emit('focus-change', targetEl);
@@ -72,7 +72,7 @@ AFRAME.registerComponent('cursor-focus', {
 
     this.mCursor.addEventListener('mouseleave', function (evt) {
       var targetEl = getIntersectedEl(evt);
-      console.log('cursor-focus mouseleave', evt.detail);
+      // console.log('cursor-focus mouseleave', evt.detail);
 
       targetEl.blur();
     });

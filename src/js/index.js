@@ -18,7 +18,7 @@ import './a-shaders';
 import './a-components';
 import './a-primitives';
 import './a-car';
-import './a-hud/hud-hud';
+import './a-hud';
 
 import './a-html3d/html';
 

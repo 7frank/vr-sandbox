@@ -116,7 +116,12 @@ function addHotkeys () {
     var c = document.querySelector('[cursor]');
     c.removeAttribute('cursor');
     c.setAttribute('cursor', 'rayOrigin', state);
-    c.setAttribute('cursor', 'showLine', visible);
+    // c.setAttribute('cursor', 'showLine', visible);
+
+    // FIXME
+    // var l = document.querySelector('[look-controls]');
+    // c.removeAttribute('look-controls');
+    //  c.setAttribute('look-controls', 'pointerLockEnabled', !visible);
 
     toast('cursor rayOrigin: ' + state);
   }, 100));

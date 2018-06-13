@@ -23,7 +23,7 @@ AFRAME.registerPrimitive('a-hud', {
  */
 
 AFRAME.registerComponent('hud-hud', {
-  // dependencies:["camera"],
+  dependencies: [],
   schema: {
     defaultLight: {type: 'boolean', default: true},
     height: {type: 'number', default: 1},
@@ -141,6 +141,7 @@ AFRAME.registerComponent('hud-hud', {
     }
 
     this.mCamera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 0.1, 1000);
+    this.mCamera.isOrthographicCamera = true;
 
     this.el.object3D.parent.add(this.mCamera);
   },

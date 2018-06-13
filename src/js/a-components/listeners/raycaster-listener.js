@@ -1,50 +1,14 @@
 /**
+ * Injects THREE::Raycaster.intersectObject with event emitters for before-raycast and after-raycast
+ * which the user can start listening to.
+ * TODO this will break or interfere with performance utils
  *
- * attach this to a matching HTMLElement, (a-hud or [hud-hud])
+ * Note: in addition currently the logic to merge the result of the hud raycasting is pu in here.
+ *
  */
 import * as _ from 'lodash';
 
-console.error('fix hud raycaster, ortho camera aspect on resize,el.emit, ');
-AFRAME.registerComponent('hud-raycaster-helper', {
-  schema: {},
-  init: function () {
-    var rc = document.querySelector('[raycaster]');// TODO this does not wait for a raycaster to be attached by another component
-
-    if (!rc) {
-      console.error('hud-raycaster-helper needs an entity with a raycaster to be able to inject hud interaction');
-      return;
-    }
-
-    // intercept raycast and enable visibility for a moment
-    var meshes = [], mStats = [];
-    rc.addEventListener('before-raycast', () => {
-      this.el.setAttribute('visible', true);
-
-      meshes = AFRAME.nk.querySelectorAll(this.el, '.Mesh');
-      mStats = meshes.map((m, k) => [m.renderOrder, m.material.depthTest]);
-      meshes.map(m => {
-        m.renderOrder = 999;
-        m.material.depthTest = false;
-      });
-    });
-    rc.addEventListener('after-raycast', () => {
-      this.el.setAttribute('visible', false);
-
-      meshes.map((m, k) => {
-        m.renderOrder = mStats[k][0];
-        m.material.depthTest = mStats[k][1];
-      });
-    });
-  }
-});
-
-/**
- * Injects THREE::Raycaster.intersectObject with event emitters for before-raycast and after-raycast
- * which the user can start listening to.
- * FIXME this will break or interfere with performance utils
- */
-
-console.error('raycaster-listener will break or interfere with performance utils');
+console.warn('raycaster-listener will break or interfere with performance utils');
 AFRAME.registerComponent('raycaster-listener', {
   dependencies: ['raycaster'],
   schema: {},
@@ -52,9 +16,9 @@ AFRAME.registerComponent('raycaster-listener', {
     var raycasterComponent = this.el.components.raycaster;
 
     /* if (!raycasterComponent) {
-      console.error('no raycaster at entity', this.el, 'for raycaster-listener');
-      return;
-    } */
+          console.error('no raycaster at entity', this.el, 'for raycaster-listener');
+          return;
+        } */
 
     this.mRaycaster = raycasterComponent.raycaster;
 
@@ -96,14 +60,14 @@ function overrideRelevantRaycasterCode (rc, el) {
     if (object.visible === false) return;
 
     /*  // @changed
-                var t0 = performance.now();
-               */
+                    var t0 = performance.now();
+                   */
     object.raycast(raycaster, intersects);
     /*  var t1 = performance.now();
-                // if (!children.length) //only store leaf nodes
-                var info = {time: t1 - t0, object, intersects};
-                tmpRaycastStack.push(info);
-            */
+                    // if (!children.length) //only store leaf nodes
+                    var info = {time: t1 - t0, object, intersects};
+                    tmpRaycastStack.push(info);
+                */
     if (recursive === true) {
       var children = object.children;
 
@@ -117,14 +81,15 @@ function overrideRelevantRaycasterCode (rc, el) {
   }
 
   rc.intersectObject = function (object, recursive, optionalTarget) {
-    var intersects = optionalTarget || [];
+    console.error('if this error occurs then some refactoring needs to be done here or try to use intersectObjects instead ');
+    /* var intersects = optionalTarget || [];
 
-    el.emit('before-raycast');
-    intersectObject(object, this, intersects, recursive);
-    el.emit('after-raycast');
-    intersects.sort(ascSort);
+      el.emit('before-raycast');
+      intersectObject(object, this, intersects, recursive);
+      el.emit('after-raycast');
+      intersects.sort(ascSort);
 
-    return intersects;
+      return intersects; */
   };
 
   rc.intersectObjects = function (objects, recursive, optionalTarget) {
@@ -134,7 +99,8 @@ function overrideRelevantRaycasterCode (rc, el) {
       console.warn('THREE.Raycaster.intersectObjects: objects is not an Array.');
       return intersects;
     }
-
+    // -------------------------
+    // emitting two additional events before- and after- raycast
     el.emit('before-raycast');
     for (var i = 0, l = objects.length; i < l; i++) {
       intersectObject(objects[i], this, intersects, recursive);
@@ -142,9 +108,18 @@ function overrideRelevantRaycasterCode (rc, el) {
     el.emit('after-raycast');
 
     intersects.sort(ascSort);
+    // -------------------------
+    // merging the result of the scene-raycast with the one of the HUD
+    let hrc = document.querySelector('[hud-raycaster]');
+    if (hrc) {
+      let hudIntersected = hrc.components['hud-raycaster'].intersected;
 
-    window.intersects = intersects;
-    if (_.has(intersects[0], 'object.el')) { console.log('rc:intersects[0].object.el.tagName', intersects[0].object.el.tagName); } else { console.log('rc:intersects[0]', intersects[0]); }
+      if (hudIntersected) {
+        hudIntersected.sort(ascSort);
+        intersects.unshift(...hudIntersected);
+      }
+    }
+    // -------------------------
 
     return intersects;
   };

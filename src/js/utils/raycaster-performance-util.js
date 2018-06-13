@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import {injectMethod} from './performance-utils';
 import {countDepth, toast} from './aframe-utils';
 import {arrayToTree} from './misc-utils';
+import {getCursor} from '../game-utils';
 
 var tmpRaycastStack = [];
 
@@ -14,7 +15,10 @@ export function trackRendererPerformance (onBeforeRender) {
   var mStack = [];
   var renderer = document.querySelector('a-scene').renderer;
 
-  var rc = document.querySelector('[raycaster]').components.raycaster.raycaster;
+  // document.querySelector('[raycaster]')
+  // reference raycaster indirectly by cursor instead as there is a second raycaster for the hud in use
+
+  var rc = getCursor().components.raycaster.raycaster;
   overrideRelevantRaycasterCode(rc);
 
   var inspector = injectMethod(renderer, 'render', false, function () {
@@ -36,6 +40,7 @@ window.countDepth = countDepth;
 
 var raycastInspect;
 var treebuffer = [];
+
 export function getRaycastPerfTree (mCallback) {
   var mRaycastPerfData = [];
 
@@ -74,6 +79,7 @@ function overrideRelevantRaycasterCode (rc) {
 
   toast('warning hud raycast will not work until page refresh', 10000);
   console.error(' hud raycast will not work until page refresh');
+
   // ----------------------------
 
   function ascSort (a, b) {

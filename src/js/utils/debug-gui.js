@@ -81,9 +81,13 @@ function createActiveTargetPanel () {
   }
 
   document.querySelector('[cursor-focus]').addEventListener('focus-change', function ({detail}) {
-    console.log('focus-change', detail);
+    // console.log('focus-change', detail);
     var name = getActiveElName(detail);
-    container.body.innerHTML = name;
+
+    let els = document.querySelector('[raycaster]').components.raycaster.intersectedEls;
+    let names = els.map(getActiveElName).join(' ');
+
+    container.body.innerHTML = `${name}<hr>${names}`;
   });
   return container;
 }

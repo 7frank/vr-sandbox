@@ -1,6 +1,6 @@
 <a-entity id="example-gui-elements" visible="false" height="1" width="2">
 
-    <a-plane gui-border position="0 0 0" scale="1 1 1" height="1" width="1"
+    <a-plane id="plane1" gui-border position="0 0 0" scale="1 1 1" height="1" width="1"
              material="transparent:true;opacity:0.3;color:lightgrey">
         <a-text value="HUD" align='center' opacity="0.3" transparent="true"></a-text>
         <a-text value="- toggle pressing F2 -" align='center' opacity="0.6" transparent="true"
@@ -8,11 +8,11 @@
     </a-plane>
 
 
-    <a-plane gui-border click-drag position=".75 .25 0" height="0.5" width=".5"
+    <a-plane id="plane2" gui-border click-drag position=".75 .25 0" height="0.5" width=".5"
              material="transparent:true;opacity:0.3;color:lightgrey">
         <a-text value="-drag me-" width="1" align='center' opacity="0.3" transparent="true"></a-text>
 
-        <nk-list-view position="-.125 -.125 0" scale=".05 .05 .05">
+        <nk-list-view position="-.125 -.125 0.1" scale=".05 .05 .05">
             <a-circle
                     v-for="(item, index) in items"
                     :color="item.value"
@@ -28,7 +28,7 @@
 
     </a-plane>
 
-    <a-plane gui-border click-drag position=".75 -.25 0" height="0.5" width=".5"
+    <a-plane id="plane3" gui-border click-drag position=".75 -.25 0" height="0.5" width=".5"
              material="transparent:true;opacity:0.3;color:lightgrey">
 
         <a-box src="#boxTexture"

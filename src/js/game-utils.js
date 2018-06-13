@@ -5,6 +5,9 @@ export function getPlayer () {
   return $('.player').get(0);
 }
 
+/**
+ * retrieves the entity that has the cursor component attached
+ */
 export function getCursor () {
   return document.querySelector('[cursor]');
 }
