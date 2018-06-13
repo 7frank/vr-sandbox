@@ -23,6 +23,24 @@ function fixFocusable (target) {
 }
 
 /**
+ * temporary enable mouse click here until another solution with hotkeys is found
+ */
+
+var previousActiveElement;
+var onClick = function (e) {
+  e.target.dispatchEvent(new Event('interaction-pick'));
+};
+
+function enableClickAsInteractionPick (el) {
+  if (previousActiveElement) { previousActiveElement.removeEventListener('pointerdown', onClick); previousActiveElement.removeEventListener('click', onClick); }
+
+  el.addEventListener('pointerdown', onClick);
+  el.addEventListener('click', onClick);
+
+  previousActiveElement = el;
+}
+
+/**
  * A helper component that sets focus to the element under the cursor component.
  * This is necessary for keyboard events and hotkeys to be forwarded to the correct element.
  *
@@ -57,6 +75,7 @@ AFRAME.registerComponent('cursor-focus', {
       if (targetEl == document.activeElement) return;
       fixFocusable(targetEl);
       targetEl.focus();
+
       that.el.emit('focus-change', targetEl);
     });
 
@@ -67,6 +86,10 @@ AFRAME.registerComponent('cursor-focus', {
       // console.log('cursor-focus mouseenter', evt.detail);
       fixFocusable(targetEl);
       targetEl.focus();
+
+      // TODO refactor
+      enableClickAsInteractionPick(targetEl);
+
       that.el.emit('focus-change', targetEl);
     });
 
