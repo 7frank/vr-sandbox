@@ -1,7 +1,8 @@
-
 import {createHTML} from '../utils/dom-utils';
 import Vue from 'vue/dist/vue.esm';
 import template from './main-menu.hbs';
+import listTemplate from './main-menu-list.hbs';
+import {showMenu} from '../utils/debug-gui';
 
 AFRAME.registerComponent('hud-main-menu', {
   schema: {},
@@ -15,18 +16,32 @@ AFRAME.registerComponent('hud-main-menu', {
     var that = this;
     var el = createHTML(template());
 
-    /*    this.vm = new Vue({
+    this.vm = new Vue({
       el: el,
       data: this.data,
       methods: {
-        onOkClick: function (e) {
-          // that.el.parentElement.removeChild(that.el);
+        onStartClick: function (e) {
+          alert('start');
         }
       }
-    }); */
+    });
 
-    this.el.append(el);
-    // this.el.append(this.vm.$el);
+    var listEl = createHTML(listTemplate());
+
+    listEl.addEventListener('selected', function ({detail}) {
+      var hud = document.querySelector('[hud-hud]');
+
+      switch (detail.value) {
+        case 'Start':showMenu(hud, 'player-hud'); break;
+        case 'Config':showMenu(hud, 'sample-config-menu'); break;
+        case 'About':showMenu(hud, 'flow-test-menu'); break;
+      }
+
+      console.log('list picked', arguments);
+    });
+
+    this.vm.$el.append(listEl);
+    this.el.append(this.vm.$el);
   }
 
 });

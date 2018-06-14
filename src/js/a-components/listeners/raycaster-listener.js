@@ -112,7 +112,8 @@ function overrideRelevantRaycasterCode (rc, el) {
     // merging the result of the scene-raycast with the one of the HUD
     let hrc = document.querySelector('[hud-raycaster]');
     if (hrc) {
-      let hudIntersected = hrc.components['hud-raycaster'].intersected;
+      //    let hudIntersected = hrc.components['hud-raycaster'].intersected;
+      let hudIntersected = hrc.components['hud-raycaster'].getIntersected();
 
       if (hudIntersected) {
         hudIntersected.sort(ascSort);

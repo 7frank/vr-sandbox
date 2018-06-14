@@ -24,7 +24,7 @@ import {exportElementUnderCursor} from './export/GLTF-exporter-utils';
 import {UndoMgr} from './utils/undo-utils';
 import {streamIn} from './utils/stream-utils';
 import {connectToServer, getSomeSampleData} from './database-utils';
-import {createSidebarMenu, createSidebarToggleIcon} from './utils/debug-gui';
+import {createSidebarMenu, createSidebarToggleIcon, showMenu} from './utils/debug-gui';
 import * as _ from 'lodash';
 
 // import {Hotkeys} from '@nk/core-components/dist/bundle';
@@ -108,9 +108,9 @@ function addHotkeys () {
 
   Hotkeys().on('toggle-main-menu', _.throttle(function () {
     var visible = !document.querySelector('#m-main-menu').object3D.visible;
-    document.querySelector('#m-main-menu').object3D.visible = visible;
 
-    document.querySelector('#player-hud').object3D.visible = !visible;
+    var hud = document.querySelector('[hud-hud]');
+    if (visible) { showMenu(hud, 'm-main-menu'); } else { showMenu(hud, 'player-hud'); }
 
     let state = visible ? 'mouse' : 'entity';
 

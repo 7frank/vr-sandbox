@@ -102,6 +102,22 @@ function createHotkeysDebugLog () {
   return hotkeyLog;
 }
 
+/**
+ *
+ * @param {HTMLElement} parent - the oarent container that contains one or more child elements with with the id parameter
+ * @param {string} ids - comma separated list of id
+ */
+export
+function showMenu (parent, ids) {
+  ids = ids.split(', ').map(n => n.trim());
+
+  let menus = parent.childNodes.toArray().filter(n => n.nodeType != 3);
+  _.each(menus, function (node, k) {
+    node.setAttribute('visible', ids.indexOf(node.getAttribute('id')) >= 0);
+    node.flushToDOM();
+  });
+}
+
 function createMenuSelect () {
   var container = createDroplet('Menu Select');
 
@@ -168,7 +184,11 @@ export function createSidebarToggleIcon () {
   let parent = createHTML(`<div style="${style}">💡</div>`);
   var instance;
   parent.addEventListener('click', () => {
-    if (!instance) { instance = createSidebarMenu(); } else { toggleEl(instance); }
+    if (!instance) {
+      instance = createSidebarMenu();
+    } else {
+      toggleEl(instance);
+    }
   });
 
   document.querySelector('body').append(parent);

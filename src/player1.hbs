@@ -3,7 +3,9 @@
 
 <!-- FIXME universal-controls="rotationSensitivity:0.2" are necessary for physics but interfere with customisation -->
 <a-entity
-          customizable-wasd-controls look-controls="pointerLockEnabled:false" class="player"
+          customizable-wasd-controls look-controls="pointerLockEnabled:false"
+          daydream-controls="hand: right"
+          class="player"
           static-body="shape:sphere;sphereRadius:1"
           networked="template:#avatar-template;showLocalTemplate:false;" camera="far:20000"
           spawn-in-circle="radius:3;"
@@ -32,7 +34,7 @@
       {{> scene/hud/flow-test-menu}}
       {{> scene/hud/flow-test-menu-goal}}
         {{> scene/hud/menu-as-component}}
-
+        {{> scene/hud/sample-list-views}}
     </a-hud>
 
 

@@ -61,15 +61,17 @@ import {UndoMgr} from './utils/undo-utils';
 import './utils/raycaster-performance-util';
 import {attachClipboard} from './clipboard';
 
-import 'aframe-effects';
+import './a-preview';
 
+import 'aframe-effects';
+import {toast} from './utils/aframe-utils';
 import registerClickDrag from 'aframe-click-drag-component';
 registerClickDrag(AFRAME);
 
 // TODO log per instance of global active inactive
 // Logger.setState(true);
 // if we really want to have a partially global object for debugging this should go into a separate file then..
-AFRAME.nk = {querySelectorAll, ZoomUtils, Layers, streamIn, parseHTML, Vue, UndoMgr};
+AFRAME.nk = {querySelectorAll, ZoomUtils, Layers, streamIn, parseHTML, Vue, UndoMgr, toast};
 
 // ------------------
 

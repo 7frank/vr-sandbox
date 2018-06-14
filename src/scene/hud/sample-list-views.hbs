@@ -1,0 +1,98 @@
+<a-entity visible="false" id="sample-config-menu" position="0 0 0" height="1" width="1">
+
+
+    <a-rounded position="-.95 -.475 -.1" scale=".95 .95 .95" height="1" width="2" radius="0.05" opacity="0.9"
+               color="grey"></a-rounded>
+
+
+    <a-entity scale=".17 .17 .17" position="0 -.1 0" simple-dialog>
+        This is going to be a configuration menu. Until then you will only see variants of the 'nk-list-view' -
+        component.
+    </a-entity>
+
+
+    <nk-list-view position="-.5 .3 0" scale=".1 .1 .1" order-as="grid: 2 5 .5 .25">
+        <a-circle
+                v-for="(item, index) in items"
+                :color="item.value"
+                :position="setPositionFromIndex(index,10,1,1,1)"
+                radius=.5
+
+                @interaction-pick.stop="onItemClicked(index)"
+        >
+            <a-ring v-if="selectedIndex==index" position="0 0 -0.01" scale=".5 .5 .5" radiusOuter=0.55 radiusInner="0.5"
+                    color="white"></a-ring>
+        </a-circle>
+        <template>[{key:1,value:"red"},{key:1,value:"blue"},{key:1,value:"yellow"}]</template>
+    </nk-list-view>
+
+
+    <nk-list-view overflow="true" position="-.5 .1 0" scale=".05 .05 .05" order-as="grid: 2 5 .5 .25">
+        <a-plane gui-border
+                 v-for="(item, index) in items"
+                 :color="selectedIndex==index?'blue':'grey'"
+                 :position="setPositionFromIndex(index,10,1,1,1)"
+
+                 @focus="onItemClicked(index)"
+                 @interaction-pick.stop="onItemClicked(index)"
+        >
+
+        </a-plane>
+        <template>[{key:1,value:""},{key:1,value:""},{key:1,value:""},{key:1,value:""},{key:1,value:""},{key:1,value:""},{key:1,value:""}]</template>
+    </nk-list-view>
+
+
+    <nk-list-view position="-.75 .25 0" scale=".2 .2 .2" orientation="row" invert="true" selected-index="0"
+                  arrows="false">
+        <a-plane v-for="(item, index) in items"
+
+                 :position="setPositionFromIndex(index,1,10,1,-.25)"
+                 material="transparent:true;opacity:0.3;"
+                 :color="selectedIndex==index?'blue':'white'"
+                 height=".25"
+                 @focus="onItemClicked(index)"
+                 @interaction-pick.stop="onItemSelected(index)"
+                 @interaction-talk.stop="AFRAME.nk.toast(item.value)"
+        >
+            <a-text font="assets/fonts/DejaVu-sdf.fnt" height=".19" align='center'
+                    :value="item.value"
+                    material="transparent:false;opacity:0.3;"
+                    color="lightgrey"
+                    @focus="onItemClicked(index)"
+                    @interaction-pick.stop="onItemSelected(index)"
+                    @interaction-talk.stop="AFRAME.nk.toast(item.value)"
+            ></a-text>
+        </a-plane>
+
+        <template>
+            [{key:1,value:"Hello"},{key:1,value:"Visitor"},{key:1,value:"how"},{key:1,value:"are"},{key:1,value:"you"},{key:1,value:"?"}]
+        </template>
+    </nk-list-view>
+
+
+    <nk-list-view overflow="true" position="-.6 -.275 0" scale=".3 .3 .3" order-as="grid: 2 5 .5 .25">
+        <a-plane gui-border
+                 v-for="(item, index) in items"
+                 opacity="0.1"
+                 :color="selectedIndex==index?'blue':'grey'"
+                 :position="setPositionFromIndex(index,10,1,2,1)"
+                    width="2"
+                 @focus="onItemClicked(index)"
+                 @interaction-pick.stop="onItemClicked(index)"
+        >
+
+            <!-- repeat:indefinite -->
+            <a-entity bb transparent="true" opacity="0.1" @focus="onItemClicked(index)"
+                      :scale="item.scale?item.scale:'.8 .8 .8'"
+                      :position="item.position?item.position:'0 0 0'"
+                      mesh-preview
+                      :animation__rotate="(selectedIndex==index)?'property: rotation;  to: 0 360 0; dur: 2000; easing: linear;':null">
+
+            </a-entity>
+        </a-plane>
+        <template>[{key:1,value:"red",scale:".5 .5 .5",position:"0 -.4 0"},{key:1,value:"blue",position:"0 -.4 0",scale:".5 .5 .5"},{key:1,value:"yellow",position:"0 -.4 0",scale:".5 .5 .5"}]
+        </template>
+    </nk-list-view>
+
+
+</a-entity>

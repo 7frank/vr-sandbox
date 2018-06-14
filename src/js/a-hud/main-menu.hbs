@@ -4,7 +4,7 @@
              material="transparent:false;opacity:1;color:grey"></a-circle>
 
 
-    <a-text value="VR-Sandbox" align='center' opacity="0.3" width="1.8" transparent="true"
+    <a-text  @interaction-pick.stop="onStartClick(index)" value="VR-Sandbox" align='center' opacity="0.3" width="1.8" transparent="true"
             position="0 -.3 0"></a-text>
     <a-text value="- toggle menu by pressing F2 -" align='center' opacity="0.6" transparent="true"
             position="0 -.4 0" scale=".1 .1 .1"></a-text>
@@ -18,7 +18,7 @@
               position="-2.35 0 0"
               scale="1 1 1"
               radius="2"
-              material="normalMap:#earth-normal-map">
+              material="normalMap:#earth-normal-map;">
         <a-animation easing="linear" attribute="rotation" to="720 360 0" fill="both" dur="200000"
                      repeat="indefinite"></a-animation>
     </a-sphere>
@@ -27,27 +27,6 @@
 
 
 
-
-    <nk-list-view id="mm" position="0 0 .1" scale=".5 .5 .5" orientation="row" invert="false" selected-index="0" arrows="false">
-        <a-plane v-for="(item, index) in items"
-
-                 :position="setPosition(-4+4*Math.cos(0.05*index/items.length*2*Math.PI-Math.PI*0.0),4*Math.sin(0.05*index/items.length*2*Math.PI-Math.PI*0.0))"
-                 material="transparent:true;opacity:0.3;"
-                 :color="selectedIndex==index?'blue':'white'"
-                 height=".21"
-                 @interaction-talk.stop="onItemClicked(index)"
-        >
-            <a-text font="assets/fonts/DejaVu-sdf.fnt" height=".19" align='center'
-                    :value="item.value"
-                    material="transparent:true;opacity:0.3;"
-                    color="lightgrey"
-                    @interaction-pick.stop="onItemClicked(index)"
-                    @interaction-talk.stop="onItemSelected(index)"
-            ></a-text>
-        </a-plane>
-
-        <template>[{key:1,value:"Start"},{key:1,value:"Config"},{key:1,value:"About"},{key:1,value:"T-o-S"}]</template>
-    </nk-list-view>
 
 
 </a-entity>
