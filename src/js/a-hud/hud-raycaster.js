@@ -35,7 +35,7 @@ AFRAME.registerComponent('hud-raycaster', {
           console.log('hud-raycaster intersectedEls', this.intersectedEls);
           window.ooo = this.intersectedEls;
         } */
-    return intersected;
+    return this.intersected;
   }, 50),
   tick: function () {
     this.getIntersected();

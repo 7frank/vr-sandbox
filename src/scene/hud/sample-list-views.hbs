@@ -78,16 +78,14 @@
                  :position="setPositionFromIndex(index,10,1,2,1)"
                     width="2"
                  @focus="onItemClicked(index)"
-                 @interaction-pick.stop="onItemClicked(index)"
-        >
+                 @interaction-pick.stop="onItemClicked(index)">
 
             <!-- repeat:indefinite -->
-            <a-entity bb transparent="true" opacity="0.1" @focus="onItemClicked(index)"
+            <a-entity mesh-preview
+                      @focus="onItemClicked(index)"
                       :scale="item.scale?item.scale:'.8 .8 .8'"
                       :position="item.position?item.position:'0 0 0'"
-                      mesh-preview
-                      :animation__rotate="(selectedIndex==index)?'property: rotation;  to: 0 360 0; dur: 2000; easing: linear;':null">
-
+                      :animation__rotate="selectedIndex==index?'property: rotation; from:0 0 0; to: 0 360 0; dur: 5000; easing: linear;loop:true':null">
             </a-entity>
         </a-plane>
         <template>[{key:1,value:"red",scale:".5 .5 .5",position:"0 -.4 0"},{key:1,value:"blue",position:"0 -.4 0",scale:".5 .5 .5"},{key:1,value:"yellow",position:"0 -.4 0",scale:".5 .5 .5"}]

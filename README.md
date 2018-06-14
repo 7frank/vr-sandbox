@@ -1,50 +1,52 @@
-
-
-
-
 | |
 | :---: |
-| <h1>simple-rocket-league</h1> |
-| A-Frame based rudimentary implementation of the game rocket league |
+| <h1>VR-Sandbox</h1> |
+| Previously an A-Frame based rudimentary implementation of the game rocket league. Now having a broader focus on component generation and VR exploration. |
 | [![Build Status][ci-image]][ci-url] [![A-Frame Version][aframe-image]][aframe-url] [![Project License][license-image]][license-url] |
 | [![Grade Badge][codacy-grade-image]][codacy-grade-url] [![Coverage Badge][coverage-image]][coverage-url]   |
 | [![Dependencies][dep-status-image]][dep-status-url] [![Dev Dependencies][devdep-status-image]][devdep-status-url] |
 
 
 # project overview
-* NOTE:currently it is a mix of a quick and dirty rocket-league clone and rudimentary scene/html editing tool
-
-the goal of this project is to test the capabilities of a-frame together with some live-editing by using a etherpad-lite overlay to enter or edit the content of the scene
+This sandbox contains an approach to incrementally load regions of the 3D world to enable an open world approach.
+The goal of this project is to create a sandbox where users may create and explore content together.
 
 ## Features
-* physics - cannon.js
-* network - npm i networked-aframe
-* visulalisation - a-frame
+* HUD - Head-up-Display to be able to generate graphical user interfaces (GUI) for Desktop and VR  
+* Physics - Using AFrame and Cannon.js the objects in the world are movable.
+* Network - Currently relying on Networked-AFrame for multi player sessions
+* Keymap - Enables the user to customize/change its keyboard/mouse inputs.
+ 
 
 ## credits, references, acknowledgements
 * car behaviour and assets -  [jeromeetienne/tquery/car](https://github.com/jeromeetienne/tquery/tree/master/plugins/car)
 * boilerplate code -   [mkungla/aframe-webpack-boilerplate](https://github.com/mkungla/aframe-webpack-boilerplate)
 * network physics -  [lance-gg/sprocketleague](https://github.com/lance-gg/sprocketleague)
-
+* grass - [spacejack/terra](https://github.com/spacejack/terra)
 
 
 * [Try out online](https://fierce-earth-97894.herokuapp.com/)
+* [Watch some Features on Youtube](https://www.youtube.com/channel/UC6Z6IM3_QyQtuFAcKAz1Ucg)
+* [Support via Patreon](https://www.patreon.com/7frank)
+* [Get bored while watching me program on Twitch.tv](https://www.twitch.tv/frank_next)
+
+
+
 
 ## technical goals
-* test react components and elements
-* use a-frame
-* create some a-frame components
-* have an easy way to import a-frame components into the project from the viewer to extend scene
-* have an <strike>ace-editor</strike> overlay  
-    * but use etherpad-lite in the future for the colalboartive demo aspect
-* have some diffing tool for the virtual dom and live editing
+* Test React/Vue components and elements.
+* Use A-Frame to create components.
+* Have an easy way to import A-Frame components into the project from within the application/browser to extend the scene.
+* Have an <strike>ace-editor</strike> overlay to manipulate content on the fly.  
+    * but use etherpad-lite in the future for the collaborative aspect.
+* have some diffing tool for the virtual dom and live editing to speed up editing 
 
     
 ## potential extensions
 
 * xsd validation for html artifacts to make sure that a edited scene is updated as soon as the dom would be in a valid state    
-* see stackblitz for how a possible ide container wwould look like
-* file system with user access policy to prevent harrasement of public code
+* see stackblitz for how a possible ide container would look like
+* file system with user access policy to prevent harassment of generated content
 * https://oasis.sandstorm.io/grain/2xFiyRc7z9QgLaKG73Log9 for hosting apps
 * vs code as basic editor for advanced users with elevated priviliges
     * a-frame-testas a preview extension and standalone viewer for a list of areas (each area owned by a specific user and a list of colalborators which the author may define in a separate file) 
@@ -148,15 +150,6 @@ the goal of this project is to test the capabilities of a-frame together with so
 - **test** testsuites.
 - **tmp** Temporary files.
 
-### Custom A-Frame Theme
-You can change A-Frame themes by modifying SASS configuration [`$theme` variable](src/sass/config/_index.scss)
-```sass
-// Color themes red !default, yellow, green, blue
-$theme: red;
-```
-| red | blue | green | yellow |
-| :---: | :---: | :---: | :---: |
-| ![Theme Default][screeenshot-theme-red] | ![Theme Default][screeenshot-theme-blue]  | ![Theme Default][screeenshot-theme-green]  | ![Theme Default][screeenshot-theme-yellow] |
 
 <!-- ASSETS and LINKS -->
 <!-- License -->
@@ -170,8 +163,6 @@ $theme: red;
 <!-- travis-ci -->
 [ci-image]: https://travis-ci.org/frank1147/simple-rocket-league.svg?branch=master
 [ci-url]: https://travis-ci.org/frank1147/simple-rocket-league
-
- [![Build Status](https://travis-ci.org/frank1147/simple-rocket-league.svg?branch=master)]()
 
 <!-- Codacy Badge Grade -->
 [codacy-grade-image]: https://api.codacy.com/project/badge/Grade/7a47a8ae8682467b9e33a3d47a6fbd54

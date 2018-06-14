@@ -92,8 +92,25 @@ function overrideRelevantRaycasterCode (rc, el) {
       return intersects; */
   };
 
+  var hrc;
   rc.intersectObjects = function (objects, recursive, optionalTarget) {
     var intersects = optionalTarget || [];
+
+    // -------------------------
+    // get the result of the HUD-raycaster
+    // in case it is not empty return that as the result, as there is no more need to check the scene raycaster
+    if (!hrc) hrc = document.querySelector('[hud-raycaster]');
+    if (hrc) {
+      //    let hudIntersected = hrc.components['hud-raycaster'].intersected;
+      let hudIntersected = hrc.components['hud-raycaster'].getIntersected();
+
+      if (hudIntersected) {
+        hudIntersected.sort(ascSort);
+        intersects.unshift(...hudIntersected);
+        if (hudIntersected.length > 0) return intersects;
+      }
+    }
+    // -------------------------
 
     if (Array.isArray(objects) === false) {
       console.warn('THREE.Raycaster.intersectObjects: objects is not an Array.');
@@ -108,19 +125,6 @@ function overrideRelevantRaycasterCode (rc, el) {
     el.emit('after-raycast');
 
     intersects.sort(ascSort);
-    // -------------------------
-    // merging the result of the scene-raycast with the one of the HUD
-    let hrc = document.querySelector('[hud-raycaster]');
-    if (hrc) {
-      //    let hudIntersected = hrc.components['hud-raycaster'].intersected;
-      let hudIntersected = hrc.components['hud-raycaster'].getIntersected();
-
-      if (hudIntersected) {
-        hudIntersected.sort(ascSort);
-        intersects.unshift(...hudIntersected);
-      }
-    }
-    // -------------------------
 
     return intersects;
   };
