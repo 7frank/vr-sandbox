@@ -1,16 +1,19 @@
 {
-  "name": "simple-rocket-league",
-  "version": "0.9.1",
-  "description": "A-Frame based simple clone of 'rocket league'",
+  "name": "vr-sandbox",
+  "version": "0.10.0",
+  "description": "A-Frame based open world sandbox",
   "author": "Frank Reimann <frank.next@gmx.de> (https://github.com/frank1147)",
   "main": "src/js/index.js",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mkungla/aframe-webpack-boilerplate.git"
+    "url": "https://github.com/frank1147/simple-rocket-league.git"
   },
   "keywords": [
-    "rocket league",
+    "HUD",
+    "webgl",
+    "webvr",
+    "sandbox",
     "aframe"
   ],
   "scripts": {
@@ -89,6 +92,7 @@
     "aframe-click-drag-component": "^3.0.1",
     "aframe-daydream-controller-component": "^1.0.0",
     "aframe-dev-components": "^1.0.0",
+    "aframe-effects": "^0.8.0",
     "aframe-environment-component": "^1.0.0",
     "aframe-extras": "^3.13.1",
     "aframe-gridhelper-component": "^0.2.0",
