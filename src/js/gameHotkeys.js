@@ -24,7 +24,7 @@ import {exportElementUnderCursor} from './export/GLTF-exporter-utils';
 import {UndoMgr} from './utils/undo-utils';
 import {streamIn} from './utils/stream-utils';
 import {connectToServer, getSomeSampleData} from './database-utils';
-import {createSidebarMenu} from './utils/debug-gui';
+import {createSidebarMenu, createSidebarToggleIcon} from './utils/debug-gui';
 import * as _ from 'lodash';
 
 // import {Hotkeys} from '@nk/core-components/dist/bundle';
@@ -52,7 +52,7 @@ window.addEventListener('load', function () {
   addHotkeys();
 
   // depends on hotkeys
-  createSidebarMenu();
+  createSidebarToggleIcon();
 });
 
 /**
@@ -110,20 +110,24 @@ function addHotkeys () {
     var visible = !document.querySelector('#m-main-menu').object3D.visible;
     document.querySelector('#m-main-menu').object3D.visible = visible;
 
+    document.querySelector('#player-hud').object3D.visible = !visible;
+
     let state = visible ? 'mouse' : 'entity';
 
     // FIXME the cursor needs to be detached to be able to switch from mouse to entity mode
     var c = document.querySelector('[cursor]');
     c.removeAttribute('cursor');
     c.setAttribute('cursor', 'rayOrigin', state);
-    // c.setAttribute('cursor', 'showLine', visible);
+
+    // toggle cursor visiblility
+    c.setAttribute('visible', !visible);
 
     // FIXME
     // var l = document.querySelector('[look-controls]');
     // c.removeAttribute('look-controls');
     //  c.setAttribute('look-controls', 'pointerLockEnabled', !visible);
 
-    toast('cursor rayOrigin: ' + state);
+    // toast('cursor rayOrigin: ' + state);
   }, 100));
 
   // FIXME menu is working suboptimally
@@ -143,10 +147,10 @@ function addHotkeys () {
 
   /* alert("we can 'R' but not move");
 
-        $('a-scene').setAttribute('cursor-focus', true);
-        sphere = document.activeElement;
-        sphere.addEventListener('keyup', (...args) => console.log('key', args, args[0].which));
-        */
+          $('a-scene').setAttribute('cursor-focus', true);
+          sphere = document.activeElement;
+          sphere.addEventListener('keyup', (...args) => console.log('key', args, args[0].which));
+          */
 
   // ----------------------------------------------
   // FIXME controls are overloaded and will work despite these wasd controls below not being active

@@ -61,6 +61,8 @@ import {UndoMgr} from './utils/undo-utils';
 import './utils/raycaster-performance-util';
 import {attachClipboard} from './clipboard';
 
+import 'aframe-effects';
+
 import registerClickDrag from 'aframe-click-drag-component';
 registerClickDrag(AFRAME);
 

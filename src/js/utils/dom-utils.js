@@ -3,12 +3,14 @@ import $ from 'jquery';
 /**
  * simple replacement for jquery("<div>") e.g.
  * TODO only jquery does create the entity as expected. every other implementation doesnt initialise the components
- * @param domstring
+ *  @param {string} domstring
  * @returns {*|Node|exports.TreeWalkerImpl.firstChild|null}
  */
 
 export
 function createHTML (html) {
+  if (typeof html != 'string') throw new Error('invalid type');
+
   return $(html).get(0);
 }
 /*

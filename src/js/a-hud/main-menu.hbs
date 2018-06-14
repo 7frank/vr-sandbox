@@ -1,20 +1,21 @@
-<a-plane visible="false" id="m-main-menu" position="0 0 -10.1" scale="1 1 1" height="1" width="1"
-         material="transparent:true;opacity:0.0;color:lightgrey">
+<a-entity position="0 0 -10.1" scale="1 1 1" height="1" width="1">
 
-    <!--
-
-    <a-text value="Main-Menu" align='center' opacity="0.3" width="1.8" transparent="true"></a-text>
-    <a-text value="- toggle pressing F3 -" align='center' opacity="0.6" transparent="true"
-            position="0 -.1 0" scale=".1 .1 .1"></a-text>
+    <a-circle position="-1.65 0 0" scale="1 1 1" radius="2" segments="90"
+             material="transparent:false;opacity:1;color:grey"></a-circle>
 
 
+    <a-text value="VR-Sandbox" align='center' opacity="0.3" width="1.8" transparent="true"
+            position="0 -.3 0"></a-text>
+    <a-text value="- toggle menu by pressing F2 -" align='center' opacity="0.6" transparent="true"
+            position="0 -.4 0" scale=".1 .1 .1"></a-text>
 
+    <a-text value="v. 0.9.1" align='center' opacity="0.6" transparent="true"
+            position="0 -.45 0" scale=".1 .1 .1"></a-text>
 
-    -->
 
 
     <a-sphere gui-border="opacity:0.3" src="#earth" segments-height="36" segments-width="72"
-              position="-2.4 0 0"
+              position="-2.35 0 0"
               scale="1 1 1"
               radius="2"
               material="normalMap:#earth-normal-map">
@@ -45,11 +46,14 @@
             ></a-text>
         </a-plane>
 
-        <template>[{key:1,value:"Start"},{key:1,value:"Info"},{key:1,value:"Config"}]</template>
+        <template>[{key:1,value:"Start"},{key:1,value:"Config"},{key:1,value:"About"},{key:1,value:"T-o-S"}]</template>
     </nk-list-view>
 
 
-</a-plane>
+</a-entity>
+
+
+
 
 
 

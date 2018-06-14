@@ -1,5 +1,18 @@
 <!-- note: for now, the preloaded get attached manually via js to be able to reload the full scene which is changes in the near future (jan/18) -->
-<a-scene renderer-listener networked-scene="room: basic;debug: true;" light="shadowMapType: basic"
+
+<script type="not-js" id="funky" data-diffuse>
+
+    void $main(inout vec4 c, vec4 o, vec2 uv, float d){
+        c.rgb = sin(c.gbr + time) * o.bgr;
+    }
+
+</script>
+
+<!--  effects="film" film="sIntensity:0.4" FIXME not working can't reliably remove effects again -->
+
+<a-scene
+
+         renderer-listener networked-scene="room: basic;debug: true;" light="shadowMapType: basic"
          visible="true"
          id="aframe-project"
          cursor-focus

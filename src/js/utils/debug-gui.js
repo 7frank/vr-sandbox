@@ -126,7 +126,7 @@ function createMenuSelect () {
 export function createSidebarMenu () {
   let style = `
     position: absolute;
-    top: 0em;
+    top: 1em;
     right: 0em;
         width: 15%;
     `;
@@ -149,6 +149,27 @@ export function createSidebarMenu () {
 
   var menus = createMenuSelect();
   parent.append(menus);
+
+  document.querySelector('body').append(parent);
+  return parent;
+}
+
+export function createSidebarToggleIcon () {
+  let style = `
+    position: absolute;
+    top: 0em;
+    right: 0em;   
+    `;
+
+  function toggleEl (el) {
+    el.style.display = el.style.display == 'none' ? 'block' : 'none';
+  }
+
+  let parent = createHTML(`<div style="${style}">💡</div>`);
+  var instance;
+  parent.addEventListener('click', () => {
+    if (!instance) { instance = createSidebarMenu(); } else { toggleEl(instance); }
+  });
 
   document.querySelector('body').append(parent);
 }
