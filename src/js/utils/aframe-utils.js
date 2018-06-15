@@ -131,11 +131,11 @@ export function getDirectionForEntity (entity) {
   return direction;
 
   /* var pos = o3d.position;
-                      var up = o3d.up;
-                      var quaternion = o3d.quaternion;
-                      var direction = new THREE.Vector3().copy(up);
-                      direction.applyQuaternion(quaternion);
-                      return direction; */
+                        var up = o3d.up;
+                        var quaternion = o3d.quaternion;
+                        var direction = new THREE.Vector3().copy(up);
+                        direction.applyQuaternion(quaternion);
+                        return direction; */
 }
 
 /**
@@ -349,7 +349,7 @@ export function getSignedAngle (v1, v2, normalVector) {
  * @param {boolean} fixYPosition - If true will calculate the offset to set the object y axis as if it stood on a ground.
  */
 
-export function scaleEntity (el, size, name = 'mesh', axis = 'y', fixYPosition = true) {
+export function scaleEntity (el, size, name = 'mesh', axis = 'y', fixYPosition = true, centerEntity = true) {
   // console.log('scaleEntity', arguments);
   var mesh = el.getObject3D(name);
 
@@ -361,11 +361,11 @@ export function scaleEntity (el, size, name = 'mesh', axis = 'y', fixYPosition =
     var mesh = el.getObject3D(name);
     if (!mesh) return;// not the mesh we are waiting for
 
-    // var bb = new THREE.Box3();
-    // bb.setFromObject(mesh);
-    // console.log('scaleEntity:onMeshLoaded', mesh);
     var bb = new Box3Ext();
     // TODO check these parameters and why only they are working (excluding invisible meshes will result in math errors)
+    // TODO also mesh needs parent  which it shouldn't need?
+    // if below then the offset of the globe will be ok but the tire in sample dlg is missing
+    // bb.setFromObject(mesh, mesh, false, false);
     bb.setFromObject(mesh, mesh.parent, false, false);
 
     var sphere = bb.getBoundingSphere();
@@ -373,22 +373,30 @@ export function scaleEntity (el, size, name = 'mesh', axis = 'y', fixYPosition =
     mesh.boundingBox = bb;
     mesh.boundingSphere = sphere;
 
-    // console.log('scaleEntity:boundingbox', bb, sphere);
-
     var newScale;
 
     if (axis == 'xyz') {
       newScale = _.round(size / sphere.radius * 2, 2);
     } else {
       let distance = bb.max[axis[0]] - bb.min[axis[0]];
-      // console.log('scaleEntity:distance', distance);
+
       newScale = _.round(size / distance, 2);
     }
 
-    // console.log('scaleEntity:factor', newScale);
     el.setAttribute('scale', `${newScale} ${newScale} ${newScale}`);
+
+    // center the entity also
+    // TODO this and the yFix could be a separate function depending on one bbox generated only
+    if (centerEntity) {
+      let center = bb.getCenter();
+      mesh.position.x -= center.x;
+      mesh.position.y -= center.y;
+      mesh.position.z -= center.z;
+    }
     //  put on level ground
-    if (fixYPosition) { mesh.position.y = -bb.min.y; }
+    if (fixYPosition) {
+      mesh.position.y = -bb.min.y;
+    }
   }
 }
 
@@ -496,7 +504,6 @@ export function renderAtPlayer (el, target = document.querySelector('a-scene')) 
   // target.appendChild(el);
   UndoMgr.addHTMLElementToTarget(el, target);
 
-  // FIXME
   scaleEntity(el, 1);
 }
 
