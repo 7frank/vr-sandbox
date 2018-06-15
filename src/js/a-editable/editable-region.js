@@ -65,7 +65,8 @@ AFRAME.registerComponent('editable-region', {
     width: {type: 'number', default: 100},
     depth: {type: 'number', default: 100},
     loadDistance: {type: 'number', default: 70}, // TODO changing parameters doesn't work as intended, see below
-    unloadDistance: {type: 'number', default: 150}
+    unloadDistance: {type: 'number', default: 150},
+    defaultMaterial: {type: 'boolean', default: true}
   },
   init: function () {
     this.mInitialized = false;
@@ -145,7 +146,7 @@ AFRAME.registerComponent('editable-region', {
     this.el.setAttribute('static-body', true);
     this.el.setAttribute('shadow', 'cast: false; receive: true');
     this.el.setAttribute('bb', true);
-    this.el.setAttribute('material', 'opacity: 1; transparent: true;color: white;src:#grid-colorized;repeat:10 10');
+    if (this.data.defaultMaterial) { this.el.setAttribute('material', 'opacity: 1; transparent: true;color: white;src:#grid-colorized;repeat:10 10'); }
 
     //  this.el.setAttribute('physics', 'debug: true');
 

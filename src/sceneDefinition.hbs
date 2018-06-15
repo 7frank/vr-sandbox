@@ -17,8 +17,9 @@
          id="aframe-project"
          cursor-focus
          physics="debug: false"> <!-- TODO evaluate local region based physics -->
-    <!--<a-camera class="player" static-body="shape:sphere;sphereRadius:1" ></a-camera>-->
-
+    <!-- Default lighting also injected by A-Frame. -->
+    <a-entity light="type: ambient; color: #BBB"></a-entity>
+    <a-entity light="type: directional; color: #cc9; intensity: 0.4" position="-1 .1 0"></a-entity>
 
     <a-assets>
         {{> asssetsDefinition}}
@@ -32,9 +33,17 @@
 
 
 
-    <!-- TODO keep distance to player -->
-    <a-entity scale="2 2 2" dummy-raycaster
+    <!-- TODO keep distance relative to player -->
+   <!-- <a-entity scale="2 2 2" dummy-raycaster
               environment="preset: contact; ground:none;dressing:none;dressingAmount:0"></a-entity>
+-->
+
+    <a-assets>
+        <img id="sky-large" src="assets/images/skybox/sky-large.jpg">
+      <!--  <img id="sky-medium" src="assets/images/skybox/sky-medium.jpg"> -->
+    </a-assets>
+    <a-sky src="#sky-large"></a-sky>
+
 
 
     <a-sound src="src: url(assets/audio/22 Monkey Fight Menu.mp3)" autoplay="true" loop="true" volume=0.7
@@ -61,7 +70,7 @@
 
     <a-box position="0 0 100" editable-region="src:assets/demo/region/rocket-league.html"></a-box>
 
-    <a-box position="100 0 -100" editable-region="src:assets/demo/region/sample-heightmap.html"></a-box>
+    <a-box position="100 0 -100" editable-region="src:assets/demo/region/sample-heightmap.html;defaultMaterial:false" material="visible:false"></a-box>
     <a-box position="100 0 0" id="Environment Physics"
            editable-region="src:assets/demo/region/contest-medieval2.html"></a-box>
     <a-box position="100 0 100" id="wood" editable-region="src:assets/demo/region/proc-wood.html"></a-box>
@@ -75,13 +84,15 @@
     <a-box position="-300 0 100"    editable-region="src:assets/demo/region/404.html"></a-box>
 
     <a-box position="-400 0 -100" id="Car Physics" editable-region="src:assets/demo/region/physics.html"></a-box>
-
+    <a-box position="-400 0 0" id="Configurator" editable-region="src:assets/demo/region/product-config.html;defaultMaterial:false" ></a-box>
 
 
 
 
     <a-plane game-object-limbo shadow="cast: false; receive: false"
-             src="/assets/images/grids/Soccer-Football-Field-Lines.jpg" position="0 -100 0" rotation="-90 0 0"
+             src="/assets/images/grids/grass.jpg"
+             material="repeat: 20 20"
+             position="0 -100 0" rotation="-90 0 0"
              width="10000" height="10000" color="#7BC8A4" static-body></a-plane>
 
 

@@ -102,13 +102,13 @@ AFRAME.registerComponent('gui-list-view', {
 
     if (addedItems.length > 0) {
       addedItems.forEach(item => this.vm.addItem(item));
-    //  console.log('addedItems', addedItems, this.vm.$data);
+      //  console.log('addedItems', addedItems, this.vm.$data);
     }
     // removed entries
 
     if (removedItems.length > 0) {
       removedItems.forEach(item => this.vm.removeItem(item));
-    //  console.log('removedItems', removedItems);
+      //  console.log('removedItems', removedItems);
     }
 
     // ------
@@ -118,7 +118,11 @@ AFRAME.registerComponent('gui-list-view', {
     }
     // update selectedIndex
     // console.log(oldData, this.data);
-    if (oldData.selectedIndex != this.data.selectedIndex) { if (this.vm.$data.selectedIndex != this.data.selectedIndex) { this.vm.$data.selectedIndex = this.data.selectedIndex; } }
+    if (oldData.selectedIndex != this.data.selectedIndex) {
+      if (this.vm.$data.selectedIndex != this.data.selectedIndex) {
+        this.vm.$data.selectedIndex = this.data.selectedIndex;
+      }
+    }
   },
   computeBoundingBox: function () {
     this.bb = new THREE.Box3();
@@ -239,9 +243,12 @@ AFRAME.registerComponent('gui-list-view', {
     }
   },
   remove () {
-    this.vm.$el.removeChild(this.vm.$el);
-    this.vm.$el.removeChild(this.minArrow);
-    this.vm.$el.removeChild(this.maxArrow);
+    if (this.vm) {
+      this.vm.$el.removeChild(this.minArrow);
+      this.vm.$el.removeChild(this.maxArrow);
+      this.vm.$el.parentElement.removeChild(this.vm.$el);
+      this.vm = null;
+    }
   }
 
 });
@@ -281,7 +288,9 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
         this.$data.items = items;
       },
       addItem: function (item) {
-        if (this.$data.items.indexOf(item) == -1) { this.$data.items.push(item); }
+        if (this.$data.items.indexOf(item) == -1) {
+          this.$data.items.push(item);
+        }
       },
       removeItem: function (item) {
         this.$data.items.splice(this.$data.items.indexOf(item), 1);
@@ -337,14 +346,14 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
     },
     watch: {
       /* items: {
-                                      handler: function (val, oldVal) {
-                                        // TODO not watching all the time
-                                        // console.log('watch.items', val, oldVal);
+                                            handler: function (val, oldVal) {
+                                              // TODO not watching all the time
+                                              // console.log('watch.items', val, oldVal);
 
-                                        //  debouncedUpdate(this);
-                                      },
-                                      deep: false // TODO might interfere with recursive objects
-                                    }, */
+                                              //  debouncedUpdate(this);
+                                            },
+                                            deep: false // TODO might interfere with recursive objects
+                                          }, */
       selectedIndex: {
         handler: function (val, oldVal) {
           // console.log('watch', arguments);
