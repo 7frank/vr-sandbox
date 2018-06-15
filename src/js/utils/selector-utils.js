@@ -33,6 +33,9 @@ import {createNamespace, namespaceExists, namespaceInfo} from './namespace';
  *  @returns {THREE.Object3D[]}
  */
 
+// regex to replace all occurences of faulty string
+const dot60Pattern = new RegExp('%60', 'g');
+
 export function querySelectorAll (object3D, selector, debug = false) {
   if (typeof object3D != 'object') throw new Error('first param must be a THREE.Obejct3D');
   if (typeof selector != 'string') throw new Error('second param must be a proper css-selector string');
@@ -258,6 +261,7 @@ export function querySelectorAll (object3D, selector, debug = false) {
                 // TODO "" encoded to `%60%60` somewhere which might or might not become a problem
                 if (typeof rightSide == 'string') {
                   rightSide = '`' + encodeURI(rightSide) + '`';
+                  rightSide = rightSide.replace(dot60Pattern, '');
                 }
               }
             }
