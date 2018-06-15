@@ -14,8 +14,9 @@ import {Box3Ext} from '../../three/Box3Ext';
  * - grid animate current positions to grid positions
  * - horizontal-list
  * - vertical-list
- * - bin-stacking
- *
+ * - bin-stacking (probably is going into separate layout component)
+ * TODO if list contains more elements than defined to be visible n items should be preloaded as well as when end of list is reached new elements should popin
+ * Note: recycle existing entities
  */
 
 var console = Logger.getLogger('gui-list-view');

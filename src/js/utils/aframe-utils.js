@@ -7,6 +7,7 @@ import {UndoMgr} from './undo-utils';
 import {streamIn} from './stream-utils';
 import {createHTML} from './dom-utils';
 import {createNamespace, namespaceExists} from './namespace';
+import {Box3Ext} from '../three/Box3Ext';
 
 /**
  * @deprecated this won't work with elements from different regions TODO getWorldPosition should be used in some way
@@ -130,11 +131,11 @@ export function getDirectionForEntity (entity) {
   return direction;
 
   /* var pos = o3d.position;
-                    var up = o3d.up;
-                    var quaternion = o3d.quaternion;
-                    var direction = new THREE.Vector3().copy(up);
-                    direction.applyQuaternion(quaternion);
-                    return direction; */
+                      var up = o3d.up;
+                      var quaternion = o3d.quaternion;
+                      var direction = new THREE.Vector3().copy(up);
+                      direction.applyQuaternion(quaternion);
+                      return direction; */
 }
 
 /**
@@ -223,7 +224,11 @@ export function toast (msg, duration = 2000, action = 'Ok') {
     }
   };
 
-  if (el) { renderToast(); } else { setTimeout(() => toast(msg, duration, action), 500); }
+  if (el) {
+    renderToast();
+  } else {
+    setTimeout(() => toast(msg, duration, action), 500);
+  }
 }
 
 /**
@@ -335,44 +340,55 @@ export function getSignedAngle (v1, v2, normalVector) {
   return angle;
 }
 
-export function scaleEntity (el, size) {
-  /*
-        */
-  var mesh = el.getObject3D('mesh');
+/**
+ *
+ * @param {HTMLElement} el
+ * @param {number} size - The target size  of the axis.
+ * @param {string} [name] - The name of the mesh we are waiting to complete loading.
+ * @param {string} [axis] - The axis to compare to can be x,y,z for only one axis like y for target-height == 'size' or 'xyz' for the maximum radius to account for.
+ * @param {boolean} fixYPosition - If true will calculate the offset to set the object y axis as if it stood on a ground.
+ */
+
+export function scaleEntity (el, size, name = 'mesh', axis = 'y', fixYPosition = true) {
+  // console.log('scaleEntity', arguments);
+  var mesh = el.getObject3D(name);
 
   if (mesh) onMeshLoaded();
   else el.addEventListener('model-loaded', onMeshLoaded);
 
   function onMeshLoaded () {
-    var mesh = el.getObject3D('mesh');
+    // Note:Object3D not a mesh
+    var mesh = el.getObject3D(name);
+    if (!mesh) return;// not the mesh we are waiting for
 
-    var bb = new THREE.Box3();
-    bb.setFromObject(mesh);
-    console.log('boundingbox', bb);
+    // var bb = new THREE.Box3();
+    // bb.setFromObject(mesh);
+    // console.log('scaleEntity:onMeshLoaded', mesh);
+    var bb = new Box3Ext();
+    // TODO check these parameters and why only they are working (excluding invisible meshes will result in math errors)
+    bb.setFromObject(mesh, mesh.parent, false, false);
+
     var sphere = bb.getBoundingSphere();
 
-    var newScale = _.round(size / sphere.radius * 2, 2);
+    mesh.boundingBox = bb;
+    mesh.boundingSphere = sphere;
 
+    // console.log('scaleEntity:boundingbox', bb, sphere);
+
+    var newScale;
+
+    if (axis == 'xyz') {
+      newScale = _.round(size / sphere.radius * 2, 2);
+    } else {
+      let distance = bb.max[axis[0]] - bb.min[axis[0]];
+      // console.log('scaleEntity:distance', distance);
+      newScale = _.round(size / distance, 2);
+    }
+
+    // console.log('scaleEntity:factor', newScale);
     el.setAttribute('scale', `${newScale} ${newScale} ${newScale}`);
-
-    // TODO put on level ground
-    var sphereHeight = sphere.radius * 2;
-    var boxHeight = bb.max.y - bb.min.y;
-    var posYScale = boxHeight / sphereHeight * newScale;
-    var cy = bb.getCenter().y;
-    var ty = cy - bb.min.y;
-
-    // set to about ground level
-    /* el.object3D.translate(0, -1 * bb2.min.y,0);
-                console.log(el.object3D.position);
-                console.log(0, sphere.radius * newScale, 0);
-
-                */
-    // ToooooOoo late... too stupid *n8* oOoOoo
-    // el.object3D.translateY(sphere.radius * newScale / 2);
-    el.object3D.position.y = ty * newScale * 2;
-
-    console.log(el.object3D.position);
+    //  put on level ground
+    if (fixYPosition) { mesh.position.y = -bb.min.y; }
   }
 }
 

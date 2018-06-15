@@ -1,13 +1,14 @@
 <a-entity visible="false" id="sample-config-menu" position="0 0 0" height="1" width="1">
 
-
-    <a-rounded position="-.95 -.475 -.1" scale=".95 .95 .95" height="1" width="2" radius="0.05" opacity="0.9"
+<a-entity scale=".9 .9 .9">
+    <a-rounded position="-.95 -.475 -20" scale=".95 .95 .95" height="1" width="2" radius="0.05" opacity="0.9"
                color="grey"></a-rounded>
 
 
     <a-entity scale=".17 .17 .17" position="0 -.1 0" simple-dialog>
         This is going to be a configuration menu. Until then you will only see variants of the 'nk-list-view' -
-        component.
+        component. It can easily be configured using A-Frame components like 'a-circle' or 'a-preview-mesh'. List views
+        may be navigated by a pointer device or via customizable (F1) keyboard shortcuts.
     </a-entity>
 
 
@@ -38,7 +39,9 @@
         >
 
         </a-plane>
-        <template>[{key:1,value:""},{key:1,value:""},{key:1,value:""},{key:1,value:""},{key:1,value:""},{key:1,value:""},{key:1,value:""}]</template>
+        <template>
+            [{key:1,value:""},{key:1,value:""},{key:1,value:""},{key:1,value:""},{key:1,value:""},{key:1,value:""},{key:1,value:""}]
+        </template>
     </nk-list-view>
 
 
@@ -70,27 +73,29 @@
     </nk-list-view>
 
 
-    <nk-list-view overflow="true" position="-.6 -.275 0" scale=".3 .3 .3" order-as="grid: 2 5 .5 .25">
+    <nk-list-view overflow="true" position="-.6 -.275 -10" scale=".3 .3 .3" order-as="grid: 2 5 .5 .25">
         <a-plane gui-border
                  v-for="(item, index) in items"
                  opacity="0.1"
                  :color="selectedIndex==index?'blue':'grey'"
                  :position="setPositionFromIndex(index,10,1,2,1)"
-                    width="2"
+                 width="2"
                  @focus="onItemClicked(index)"
                  @interaction-pick.stop="onItemClicked(index)">
 
-            <!-- repeat:indefinite -->
-            <a-entity mesh-preview
+            <a-entity :mesh-preview="{'part-selector':item.part,selector:item.selector,scalingFactor:item.scaling}"
                       @focus="onItemClicked(index)"
-                      :scale="item.scale?item.scale:'.8 .8 .8'"
-                      :position="item.position?item.position:'0 0 0'"
+                      position='0 -.4 10'
                       :animation__rotate="selectedIndex==index?'property: rotation; from:0 0 0; to: 0 360 0; dur: 5000; easing: linear;loop:true':null">
             </a-entity>
         </a-plane>
-        <template>[{key:1,value:"red",scale:".5 .5 .5",position:"0 -.4 0"},{key:1,value:"blue",position:"0 -.4 0",scale:".5 .5 .5"},{key:1,value:"yellow",position:"0 -.4 0",scale:".5 .5 .5"}]
+        <template>[
+            {key:1,value:"red",scaling:.8},
+            {key:2,value:"blue",scaling:.8,part:'.Mesh:where(children.length==0)'},
+            {key:3,value:"yellow",scaling:.8,selector:"a-sphere"}
+            ]
         </template>
     </nk-list-view>
-
+</a-entity>
 
 </a-entity>

@@ -21,7 +21,7 @@ AFRAME.registerComponent('hud-main-menu', {
       data: this.data,
       methods: {
         onStartClick: function (e) {
-          alert('start');
+          // alert('start');
         }
       }
     });
@@ -34,7 +34,8 @@ AFRAME.registerComponent('hud-main-menu', {
       switch (detail.value) {
         case 'Start':showMenu(hud, 'player-hud'); break;
         case 'Config':showMenu(hud, 'sample-config-menu'); break;
-        case 'About':showMenu(hud, 'flow-test-menu'); break;
+        case 'About':showMenu(hud, 'about-menu'); break;
+        case 'ToS':showMenu(hud, 'flow-test-menu'); break;
       }
 
       console.log('list picked', arguments);
