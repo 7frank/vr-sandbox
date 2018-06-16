@@ -191,6 +191,7 @@ AFRAME.registerComponent('gui-list-view', {
     // console.log('gui list view init');
     // read <template> tag and interpret it as json data
     var tplData = this.el.querySelector('template');
+    console.log('guilistview tpl data', tplData);
     if (tplData) {
       var parsed = jsonic(tplData.innerHTML);
 
@@ -205,6 +206,7 @@ AFRAME.registerComponent('gui-list-view', {
 
     // query for itemFactory at entity
     var itemFactoryTpl = this.el.querySelector(':nth-child(1)');
+    console.log('guilistview itemFactoryTpl', itemFactoryTpl);
     if (itemFactoryTpl) {
       var parsed = itemFactoryTpl.outerHTML;
 

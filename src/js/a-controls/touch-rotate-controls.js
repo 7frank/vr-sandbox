@@ -9,7 +9,7 @@ import * as _ from 'lodash';
 
 AFRAME.registerComponent('touch-rotate-controls', {
 
-  schema: {},
+  schema: {distance: {type: 'vec2', default: [0, Infinity]}},
 
   init: function () {
     // have a camera of the controls
@@ -20,12 +20,21 @@ AFRAME.registerComponent('touch-rotate-controls', {
     this.mControls = new THREE.OrbitControls(cameraContainer, this.el.sceneEl.renderer.domElement);
     this.mControls.enablePan = false;
 
+    this.mControls.minDistance = this.data.distance.x;
+    this.mControls.maxDistance = this.data.distance.y;
+
     // TODO not 100% working when rotating and zooming (keeps stuck)
     // should not be enabled if user does not interact
     // TODO touch pointer controls too ..
-    this.el.addEventListener('focus', () => { this.mControls.enabled = true; });
-    this.el.addEventListener('mousemove', () => { this.mControls.enabled = true; });
-    this.el.addEventListener('mouseout', () => { this.mControls.enabled = false; });
+    this.el.addEventListener('focus', () => {
+      this.mControls.enabled = true;
+    });
+    this.el.addEventListener('mousemove', () => {
+      this.mControls.enabled = true;
+    });
+    this.el.addEventListener('mouseleave', () => {
+      this.mControls.enabled = false;
+    });
   },
   tick: function () {
     let cam = this.mControls.object;

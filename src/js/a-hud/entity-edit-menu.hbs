@@ -1,8 +1,8 @@
-<a-entity visible="false" id="config-hud" entity-edit-menu>
-<!--
+<a-entity  id="ente2" >
+
     <a-hexagon></a-hexagon>
     <a-entity position="0 .3 -10">
-        <a-sphere touch-rotate-controls="distance:0.1 6" position="0 0 0" radius="0.4" theta-length="180"
+        <a-sphere ref="sphere"  touch-rotate-controls="distance:0.1 6" position="0 0 0" radius="0.4" theta-length="180"
                   material="side:back;opacity:.1;transparent:true;depthWrite:false">
 
             <a-entity ref="preview" position="0 -.2 0" rotation="0 90 0" mesh-preview="selector:#bikeModel;scalingFactor:1"
@@ -45,5 +45,5 @@
             ]
         </template>
     </nk-list-view>
- -->
+
 </a-entity>
