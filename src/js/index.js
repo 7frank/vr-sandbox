@@ -62,6 +62,7 @@ import './utils/raycaster-performance-util';
 import {attachClipboard} from './clipboard';
 
 import './a-preview';
+import './a-controls/touch-rotate-controls';
 
 import 'aframe-effects';
 import {toast} from './utils/aframe-utils';

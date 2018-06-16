@@ -1,40 +1,47 @@
 <a-entity visible="false" id="config-hud">
 
-<a-hexagon></a-hexagon>
+    <a-hexagon></a-hexagon>
+    <a-entity position="0 .3 -10">
+        <a-sphere touch-rotate-controls position="0 0 0" radius="0.4" theta-length="180"
+                  material="side:back;opacity:.1;transparent:true">
+
+            <a-entity  position="0 -.2 0" rotation="0 90 0" mesh-preview="selector:#bikeModel;scalingFactor:1"
+                      scale=".4 .4 .4"
+                      animation__rotate="property: rotation; from:0 0 0; to: 0 360 0; dur: 5000; easing: linear;loop:true;startEvents:focus,mouseenter;stopEvents:blur,mouseleave;">
+            </a-entity>
+
+        </a-sphere>
+    </a-entity>
 
 
-<a-entity rotation="0 90 0" mesh-preview="selector:#bikeModel;scalingFactor:1"
-          position="0 .1 -10" scale=".4 .4 .4"
-          animation__rotate="property: rotation; from:0 0 0; to: 0 360 0; dur: 5000; easing: linear;loop:true;startEvents:focus,mouseenter;stopEvents:blur,mouseleave;">
-</a-entity>
 
+    <nk-list-view overflow="true" position="-.6 -.2 -10" scale=".2 .2 .2" order-as="grid: 2 5 .5 .25">
+        <a-plane gui-border
+                 v-for="(item, index) in items"
+                 opacity="0.1"
+                 :color="selectedIndex==index?'blue':'grey'"
+                 :position="setPositionFromIndex(index,4,2,2,1)"
+                 width="2"
+                 @focus="onItemClicked(index)"
+                 @interaction-pick.stop="onItemClicked(index)">
 
-<nk-list-view overflow="true" position="-.6 -.2 -10" scale=".2 .2 .2"  order-as="grid: 2 5 .5 .25">
-    <a-plane gui-border
-             v-for="(item, index) in items"
-             opacity="0.1"
-             :color="selectedIndex==index?'blue':'grey'"
-             :position="setPositionFromIndex(index,4,2,2,1)"
-             width="2"
-             @focus="onItemClicked(index)"
-             @interaction-pick.stop="onItemClicked(index)">
+            <a-entity class="bike-parts"
+                      :mesh-preview="{'part-selector':item.part,selector:item.selector,scalingFactor:item.scaling}"
+                      @focus="onItemClicked(index)"
+                      position='0 -.4 0'
+                      :animation__rotate="selectedIndex==index?'property: rotation; from:0 0 0; to: 0 360 0; dur: 5000; easing: linear;loop:true':null">
+            </a-entity>
+        </a-plane>
+        <template>[
+            {key:1,value:"bike",scaling:.8,selector:'#bikeModel'},
+            {key:2,value:"frame",scaling:.8,selector:'#bikeModel',part:":where(name='Cadru1')"},
+            {key:3,value:"seat",scaling:.8,selector:'#bikeModel',part:":where(name='Sa')"},
+            {key:4,value:"waterbottle",scaling:.8,selector:'#bikeModel',part:":where(name='BidonRosu')"},
+            {key:5,value:"handlebars",scaling:.8,selector:'#bikeModel',part:":where(name='Ghidon')"},
+            {key:6,value:"...",scaling:.8,selector:'#bikeModel',part:":where(name='SabotFataS')"}
 
-        <a-entity class="bike-parts" :mesh-preview="{'part-selector':item.part,selector:item.selector,scalingFactor:item.scaling}"
-                  @focus="onItemClicked(index)"
-                  position='0 -.4 0'
-                  :animation__rotate="selectedIndex==index?'property: rotation; from:0 0 0; to: 0 360 0; dur: 5000; easing: linear;loop:true':null">
-        </a-entity>
-    </a-plane>
-    <template>[
-        {key:1,value:"bike",scaling:.8,selector:'#bikeModel'},
-        {key:2,value:"frame",scaling:.8,selector:'#bikeModel',part:":where(name='Cadru1')"},
-        {key:3,value:"seat",scaling:.8,selector:'#bikeModel',part:":where(name='Sa')"},
-        {key:4,value:"waterbottle",scaling:.8,selector:'#bikeModel',part:":where(name='BidonRosu')"},
-        {key:5,value:"handlebars",scaling:.8,selector:'#bikeModel',part:":where(name='Ghidon')"},
-        {key:6,value:"...",scaling:.8,selector:'#bikeModel',part:":where(name='SabotFataS')"}
-
-        ]
-    </template>
-</nk-list-view>
+            ]
+        </template>
+    </nk-list-view>
 
 </a-entity>

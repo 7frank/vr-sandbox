@@ -60,8 +60,7 @@ AFRAME.registerComponent('mesh-preview', {
 
     const loadModel = () => {
       let els = document.querySelectorAll(this.data.selector).toArray();
-      // console.log('selector result', this.data.selector, els);
-      // TODO have a placeholder while loading
+
       if (els.length == 0 || els[0].object3D.children.length == 0) {
         setTimeout(loadModel, 500);
         return;
