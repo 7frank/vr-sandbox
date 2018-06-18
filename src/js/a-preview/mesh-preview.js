@@ -85,7 +85,7 @@ AFRAME.registerComponent('mesh-preview', {
         model = selectedObjects[0];
       }
 
-      var newModel = model.clone(true);
+      var newModel = model.clone();
       newModel.position.set(0, 0, 0); // reset position of cloned root
       newModel.scale.set(1, 1, 1);
       newModel.quaternion.set(0, 0, 0, 1);// TODO sometimes we might want to retain the rotations

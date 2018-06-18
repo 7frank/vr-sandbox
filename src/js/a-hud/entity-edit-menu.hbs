@@ -15,21 +15,21 @@
 
 
 
-    <nk-list-view ref="listview" overflow="true" position="-.6 -.2 -10" scale=".2 .2 .2" order-as="grid: 2 5 .5 .25">
+    <nk-list-view ref="listview" overflow="true" position="-.75 -.3 -10" scale=".18 .18 .18" order-as="grid: 2 5 .5 .25">
         <a-plane gui-border
-                 v-for="(item, index) in getVisibleItems(-1,1)"
+                 v-for="(item, index) in getVisibleItems(-2,2)"
                  opacity="0.1"
                  :color="isSelected(index)?'blue':'grey'"
-                 :position="setPositionFromIndex(index,4,2,2,1)"
+                 :position="setPositionFromIndex(index,5,2,2,1)"
                  width="2"
                  @focus="onItemClicked(index)"
                  @interaction-pick.stop="onItemSelected(index)"
                  @interaction-talk.stop="onItemClicked(index)"
         >
-
+            <a-entity  v-if="isSelected(index)"  light="type: directional; color: #cc9; intensity: 0.4" position="0 1 0"></a-entity>
             <a-entity class="bike-parts"
                       :mesh-preview="{'part-selector':item.part,selector:item.selector,scalingFactor:item.scaling}"
-                      @focus="onItemClicked(index)"
+
                       position='0 -.4 0'
                       :animation__rotate="isSelected(index)?'property: rotation; from:0 0 0; to: 0 360 0; dur: 5000; easing: linear;loop:true':null">
             </a-entity>
