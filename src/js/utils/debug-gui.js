@@ -145,6 +145,8 @@ export function createSidebarMenu () {
     top: 1em;
     right: 0em;
         width: 15%;
+        height: 80vh;
+    overflow-y: auto;
     `;
 
   let parent = createHTML(`<div style="${style}"></div>`);

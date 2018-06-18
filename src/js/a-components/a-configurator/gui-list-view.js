@@ -108,13 +108,11 @@ AFRAME.registerComponent('gui-list-view', {
 
     if (addedItems.length > 0) {
       addedItems.forEach(item => this.vm.addItem(item));
-      //  console.log('addedItems', addedItems, this.vm.$data);
     }
     // removed entries
 
     if (removedItems.length > 0) {
       removedItems.forEach(item => this.vm.removeItem(item));
-      //  console.log('removedItems', removedItems);
     }
 
     // ------
@@ -123,7 +121,6 @@ AFRAME.registerComponent('gui-list-view', {
       this.initViewModel();
     }
     // update selectedIndex
-    // console.log(oldData, this.data);
     if (oldData.selectedIndex != this.data.selectedIndex) {
       if (this.vm.$data.selectedIndex != this.data.selectedIndex) {
         this.vm.$data.selectedIndex = this.data.selectedIndex;
@@ -194,10 +191,9 @@ AFRAME.registerComponent('gui-list-view', {
     this.vm.setItems(items);
   },
   init: function () {
-    // console.log('gui list view init');
     // read <template> tag and interpret it as json data
     var tplData = this.el.querySelector('template');
-    console.log('guilistview tpl data', tplData);
+    console.log('template', tplData);
     if (tplData) {
       var parsed = jsonic(tplData.innerHTML);
 
@@ -212,12 +208,11 @@ AFRAME.registerComponent('gui-list-view', {
 
     // query for itemFactory at entity
     var itemFactoryTpl = this.el.querySelector(':nth-child(1)');
-    console.log('guilistview itemFactoryTpl', itemFactoryTpl);
+    console.log('itemFactory', itemFactoryTpl);
     if (itemFactoryTpl) {
       var parsed = itemFactoryTpl.outerHTML;
 
       if (parsed.length > 0) {
-        //   console.log('parsed', parsed);
         this.data.itemFactory = parsed; // FIXME when update is called from setting settAttr("items",[]) the previous itemFactory is used
       } else {
         console.error('invalid itemFactory');
@@ -230,7 +225,6 @@ AFRAME.registerComponent('gui-list-view', {
     this.initViewModel();
   },
   initViewModel: function () {
-    // console.log('initViewModel');
     // remove previous vm
     if (this.vm) {
       this.vm.$el.parentElement.removeChild(this.vm.$el);
@@ -384,7 +378,7 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
 
         if (upper < mCount - 1) upper = lower + mCount - 1;
 
-        console.log('lowerupper', 'index', mIndex, 'mCount', mCount, 'len', len, lower, upper);
+        //  console.log('lowerupper', 'index', mIndex, 'mCount', mCount, 'len', len, lower, upper);
 
         // set selectedOffset to show correct selected item
         this.$data.selectedOffset = lower;
@@ -397,14 +391,14 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
     },
     watch: {
       /* items: {
-                                                        handler: function (val, oldVal) {
-                                                          // TODO not watching all the time
-                                                          // console.log('watch.items', val, oldVal);
+                                                              handler: function (val, oldVal) {
+                                                                // TODO not watching all the time
+                                                                // console.log('watch.items', val, oldVal);
 
-                                                          //  debouncedUpdate(this);
-                                                        },
-                                                        deep: false // TODO might interfere with recursive objects
-                                                      }, */
+                                                                //  debouncedUpdate(this);
+                                                              },
+                                                              deep: false // TODO might interfere with recursive objects
+                                                            }, */
       selectedIndex: {
         handler: function (val, oldVal) {
           // console.log('watch', arguments);
