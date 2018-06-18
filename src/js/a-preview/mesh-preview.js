@@ -25,6 +25,7 @@ AFRAME.registerComponent('mesh-preview', {
     this.el.removeObject3D('preview-mesh');
     if (this.vm) {
       this.vm.$el.parentElement.removeChild(this.vm.$el);
+
       this.vm = null;
     }
     this.createPreview();
@@ -76,7 +77,7 @@ AFRAME.registerComponent('mesh-preview', {
         if (subQueryResult.length > 0) {
           model = subQueryResult[0];
         } else {
-          this.vm.$el.innerHTML = `<a-text value="part error"></a-text>`;
+          this.vm.$el.innerHTML = `<a-text value="part error"  text="align: center;anchor: center;" ></a-text>`;
           return;
         }
       } else {
