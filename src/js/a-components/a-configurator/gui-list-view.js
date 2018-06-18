@@ -17,6 +17,12 @@ import {Box3Ext} from '../../three/Box3Ext';
  * - bin-stacking (probably is going into separate layout component)
  * TODO if list contains more elements than defined to be visible n items should be preloaded as well as when end of list is reached new elements should popin
  * Note: recycle existing entities
+ *
+ * --------------------------------------
+ * partially visible list-views :
+ * - to do so alter default templates
+ * - (1) replace "for...in items" with "for ... in visibleItems(lowerDelta,upperDelta)" where lower- and upperDelta are numbers like -2,2 for 2 items below the current selection and 2 after the current selection are visible
+ * - (2) replace parts where selectedIndex is compared to index with isSelected(index)
  */
 
 var console = Logger.getLogger('gui-list-view');
@@ -61,7 +67,7 @@ AFRAME.registerPrimitive('nk-list-view', {
  *  TODO also create a component with  additional items recursion (most simple treeview)
  * TODO set container size to wrap around buttons to be able to grab events
  *
- *
+ * TODO have some default emitters for change and selected events .. on the other hands this might interfere with the customization
  *
  */
 
@@ -256,8 +262,7 @@ AFRAME.registerComponent('gui-list-view', {
 });
 
 // ----------------------------------
-// FIXME don't use objects directly but rather use their indexes and return the items when selection changes
-// have a non-intrusive listener for items changes to update vm
+// TODO have a non-intrusive listener for items changes to update vm
 export function createListView (items, {itemFactory, containerFactory, arrowFactory}, direction = 'column', overflow = false, invertControls = false) {
   if (!items) {
     items = [{key: '1', value: 'hello'}, {key: '2', value: 'hello'}, {key: '3', value: 'hello'}, {
@@ -282,7 +287,8 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
 
     data: {
       items: items,
-      selectedIndex: -1
+      selectedIndex: -1,
+      selectedOffset: 0 // the offset for the visible items
     },
 
     methods: {
@@ -299,6 +305,7 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
       },
       onItemClicked: function (index) {
         if (index != undefined) {
+          index += this.$data.selectedOffset; // fixes visible offset
           this.$data.selectedIndex = index;
 
           console.log('onItemClicked0', index);
@@ -318,6 +325,7 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
       },
       onItemSelected: function (index) {
         if (index != undefined) {
+          index += this.$data.selectedOffset; // fixes visible offset
           this.$data.selectedIndex = index;
 
           console.log('onItemSelected0', index);
@@ -342,20 +350,61 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
 
         return '' + _.round(xScale * x, 4) + ' ' + _.round(yScale * y, 4) + ' 0';
       },
+      isSelected: function (index) {
+        return this.$data.selectedIndex - this.$data.selectedOffset == index;
+      },
+      /**
+             * returns the items that should be visible relative to the selectedIndex
+             * @param lowerDelta - the last n items before the index
+             * @param upperdelta - the next n items after the index
+             */
+      getVisibleItems: function (lowerDelta = -2, upperDelta = 2) {
+        // validate that it has the selectedIndex visible or else it does not make sense
+        if (lower > 0) throw new Error('must be <= zero');
+        if (upper < 0) throw new Error('must be >= zero');
+
+        // `this` points to the vm instance
+        let mIndex = this.$data.selectedIndex;
+        if (mIndex < 0) mIndex = 0;
+
+        let mCount = upperDelta - lowerDelta + 1;
+        let len = this.$data.items.length - 1;
+        // TODO if overflow==true
+
+        // if overflow==false
+        let lower = mIndex + lowerDelta;
+        if (lower < 0) lower = 0;
+
+        let upper = mIndex + upperDelta;
+        if (upper > len) upper = len;
+
+        // make at least count elements visible
+        // TODO
+        if (lower > len - mCount) lower = upper - (mCount - 1);
+
+        if (upper < mCount - 1) upper = lower + mCount - 1;
+
+        console.log('lowerupper', 'index', mIndex, 'mCount', mCount, 'len', len, lower, upper);
+
+        // set selectedOffset to show correct selected item
+        this.$data.selectedOffset = lower;
+
+        return this.$data.items.slice(lower, upper + 1);
+      },
       setPosition: function (x = 0, y = 0, z = 0) {
         return '' + x + ' ' + y + ' ' + z;
       }
     },
     watch: {
       /* items: {
-                                            handler: function (val, oldVal) {
-                                              // TODO not watching all the time
-                                              // console.log('watch.items', val, oldVal);
+                                                        handler: function (val, oldVal) {
+                                                          // TODO not watching all the time
+                                                          // console.log('watch.items', val, oldVal);
 
-                                              //  debouncedUpdate(this);
-                                            },
-                                            deep: false // TODO might interfere with recursive objects
-                                          }, */
+                                                          //  debouncedUpdate(this);
+                                                        },
+                                                        deep: false // TODO might interfere with recursive objects
+                                                      }, */
       selectedIndex: {
         handler: function (val, oldVal) {
           // console.log('watch', arguments);
