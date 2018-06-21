@@ -4,10 +4,65 @@ import template from './entity-edit-menu.hbs';
 import {showMenu} from '../utils/debug-gui';
 import * as _ from 'lodash';
 
-import TWEEN from '@tweenjs/tween.js';
 import {querySelectorAll} from '../utils/selector-utils';
 import {getWorldDirection, getWorldPosition} from '../utils/aframe-utils';
+import ZoomUtil from '../utils/ZoomUtils';
 import {AnimationFactory} from '../utils/animation-utils';
+
+// ---------------------------------
+// var prevTween;
+var prevAnimation;
+window.o = new THREE.Vector3();
+
+// FIXME not working.. disable touchrotate controls before debugging
+function zoomToPos (targetCamera, controls, meshDetails) {
+  if (prevAnimation) prevAnimation.stop();
+  var targetPosition = meshDetails.relativePosition.clone();
+  console.log('zoomTo orig', targetPosition);
+  targetPosition.multiply(meshDetails.mesh.scale);
+
+  let distance = meshDetails.radius * meshDetails.mesh.scale.length() * 2;
+
+  // TODO not working with the bike model ads its positions are not relative but absolute
+  //    let dir = getWorldDirection(meshDetails.mesh);
+  // position.multiplyScalar(0.1);
+  //   position.add(dir);
+
+  let newCameraPosition = targetPosition.clone().add(new THREE.Vector3(0, 0, 1));
+
+  console.log('zoomTo', targetPosition);
+
+  prevAnimation = ZoomUtil.moveToPosition(newCameraPosition, targetCamera, targetPosition, distance, undefined, (...args) => {
+    controls.update();
+  });
+}
+
+function moveObjectToPosition (obj3d, targetPos) {
+  let prevAnimation = AnimationFactory({position: obj3d.position});
+  prevAnimation.animate({position: targetPos}, 400);
+}
+
+/**
+ * query for a object3d and then for a specific part within it
+ * @param o
+ * @returns {*}
+ */
+
+function getMesh (o) {
+  let els = document.querySelectorAll(o.selector).toArray();
+
+  if (els.length == 0) return null; //
+
+  if (o.part == undefined) o.part = '.Mesh';
+
+  // console.log(o.selector, '---', o.part);
+
+  let subQueryResult = querySelectorAll(els[0], o.part);
+
+  return subQueryResult[0];
+}
+
+// ---------------------------------
 
 AFRAME.registerComponent('entity-edit-menu', {
   schema: {},
@@ -23,17 +78,17 @@ AFRAME.registerComponent('entity-edit-menu', {
 
     // FIXME vuejs does not like to interact this way.. either it declines @focus or items
     /* this.vm = new Vue({
-                el: el,
-                // template: template(),
-                data: this.data,
-                methods: {
-                  onStartClick: function (e) {
-                    // alert('start');
-                  }
-                }
-              });
-              this.el.append(this.vm.$el);
-          */
+                        el: el,
+                        // template: template(),
+                        data: this.data,
+                        methods: {
+                          onStartClick: function (e) {
+                            // alert('start');
+                          }
+                        }
+                      });
+                      this.el.append(this.vm.$el);
+                  */
     this.el.append(el);
 
     // fix vue bug meanwhile use refs for bindings
@@ -43,71 +98,32 @@ AFRAME.registerComponent('entity-edit-menu', {
       return obj;
     }, {});
 
-    // var prevTween;
-    var prevAnimation;
-
-    function zoomToPos (targetCamera, controls, meshDetails) {
-      // if (prevTween) prevTween.stop();
-
-      if (prevAnimation) prevAnimation.stop();
-
-      // var position = new THREE.Vector3(_.random(1, 20) / 10, _.random(1, 20) / 10, _.random(1, 20) / 10);
-      window.ooo = meshDetails;
-
-      // console.error('mesh', meshDetails);
-      var position = meshDetails.relativePosition.clone();
-      let dir = getWorldDirection(meshDetails.mesh);
-
-      position.multiply(meshDetails.mesh.scale);
-      position.multiplyScalar(0.1);
-      // position.add(dir);
-
-      console.error('zoomTo', position);
-      // controls.target.copy(position);
-      // controls.update();
-
-      prevAnimation = AnimationFactory({position: targetCamera.position});
-      prevAnimation.animate({position}, 400, function onComplete () { }, function onUpdate (...args) { controls.update(); });
-    }
-
-    function getMesh (o) {
-      let els = document.querySelectorAll(o.selector).toArray();
-
-      if (o.part == undefined) o.part = '.Mesh';
-
-      // console.log(o.selector, '---', o.part);
-
-      let subQueryResult = querySelectorAll(els[0], o.part);
-
-      // --------
-
-      // console.log('getMesh positions', getWorldPosition(els[0].object3D), getWorldPosition(subQueryResult[0]));
-      // let relativePosition = getWorldPosition(els[0].object3D).sub(getWorldPosition(subQueryResult[0]));
-
-      // let relativePosition = els[0].object3D.getWorldPosition().sub(subQueryResult[0].getWorldPosition());
-
-      // FIXME only the bounding box does hold distinct vecotrs about position mesh.position is the same for every one of them
-      let relativePosition = subQueryResult[0].geometry.boundingSphere.center.clone();
-
-      // -----
-      // console.log('relativePosition', relativePosition);
-      return {mesh: subQueryResult[0], relativePosition};
-    }
-
-    // TODO use ZoomHelper(other repo) for better usability and performance
-    // TODO it should be possible to get the result of a selection of the list view this wa
-    // list view component should probably have some default emtters for change and selected
+    // TODO list view component should probably have some default emitters for change and selected
     // selected is not emitted the same way change is (change is working)
 
     refs.listview.addEventListener('selected', ({detail}) => {
-      let meshDetails = getMesh(detail);
+      /* let meshDetails = getMesh(detail);
 
-      let targetCamera = refs.sphere.getObject3D('touch-rotate-controls-camera');
+                  let targetCamera = refs.sphere.getObject3D('touch-rotate-controls-camera');
+                  let targetControls = refs.sphere.components['touch-rotate-controls'].mControls;
+                  zoomToPos(targetCamera, targetControls, meshDetails, refs.preview.object3D);
+                  */
 
-      let targetControls = refs.sphere.components['touch-rotate-controls'].mControls;
-      window.oooo = targetControls;
+      let mesh = getMesh(detail);
+      if (mesh) {
+        let relativePosition = mesh.geometry.boundingSphere.center.clone();
+        console.log('actual position', relativePosition);
+      }
 
-      zoomToPos(targetCamera, targetControls, meshDetails);
+      // window.move = (pos) => moveObjectToPosition(refs.preview.object3D, AFRAME.utils.coordinates.parse(pos));
+
+      if (detail.position) {
+        let pos = AFRAME.utils.coordinates.parse(detail.position);
+        console.log('zoom to', pos);
+
+        // TODO use sphere instead but that is currently controlled by touch-rotate-controls
+        moveObjectToPosition(refs.preview.object3D, pos);
+      } else console.log("can't zoom to pos position not found in data");
     });
   }
 

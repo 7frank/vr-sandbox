@@ -1,6 +1,7 @@
 import TWEEN from '@tweenjs/tween.js';
 import {querySelectorAll} from './selector-utils';
 import {getWorldPosition} from './aframe-utils';
+import {AnimationFactory} from './animation-utils';
 
 /**
  * static helper for smooth navigation within 3D space
@@ -52,15 +53,15 @@ export default class ZoomUtil {
      * @param {THREE.Vector3} cameraTargetPosition - instanceof THREE.Vector3 containing the position the camera is looking at.
      * @param {number} cameraDistanceToMesh - The distance to the target position the camera will stop at.
      * @param {callback} onComplete -  a callback function that is triggered when the animation phase has ended and the camera is at the target location
+     * @param {callback} onUpdate -  a callback function that is triggered each animation frame when in transition
      */
   static moveToPosition (position, camera, cameraTargetPosition, cameraDistanceToMesh = 400, onComplete = function () {
+  }, onUpdate = function () {
   }) {
     var mTimeout;
 
-    var vec3Start = camera.el.object3D.position;
-
-    var isComplete1 = false;
-    var isComplete2 = false;
+    // var vec3Start = camera.el.object3D.position;
+    var vec3Start = camera.position;
 
     //  var vec3End = new THREE.Vector3();
     //  vec3End.setFromMatrixPosition(mesh.matrixWorld);
@@ -83,37 +84,10 @@ export default class ZoomUtil {
 
     // -------------------------------------
 
-    // change distance to target
-    var tween = new TWEEN.Tween(vec3Start)
-      .to(alteredVecEnd, 400)
-      /* .onUpdate(function () {
-        console.log('updating', arguments, vec3Start, this);
-      }) */
-      .onComplete(function () {
-        onComplete.bind(this)();
-        cancelAnimationFrame(mTimeout);
-        isComplete1 = true;
-      })
-      .start();
+    let prevAnimation = AnimationFactory({position: camera.position, target: cameraTargetPosition});
+    prevAnimation.animate({position: alteredVecEnd, target: vec3End}, 400, onComplete, onUpdate);
 
-    // lookat target
-    var tween2 = new TWEEN.Tween(cameraTargetPosition)
-      .to(vec3End, 400).onComplete(function () {
-        isComplete2 = true;
-      })
-      .onUpdate(function () {
-        camera.el.object3D.lookAt(new THREE.Vector3(cameraTargetPosition.x, cameraTargetPosition.y, cameraTargetPosition.z));
-      })
-      .start();
-
-    requestAnimationFrame(animate);
-
-    function animate (time) {
-      if (isComplete1 && isComplete2) return;
-
-      mTimeout = requestAnimationFrame(animate);
-      tween.update(time);
-      tween2.update(time);
-    }
+    // ------------------------------------
+    return prevAnimation;
   }
 }

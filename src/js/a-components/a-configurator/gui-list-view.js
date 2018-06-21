@@ -96,7 +96,7 @@ AFRAME.registerComponent('gui-list-view', {
     invert: {type: 'boolean', default: false}, // whether to invert the controls
     orientation: {type: 'string', default: 'column'}, // the orientation of the controls up/down== row left/right==column
     arrowsVisible: {type: 'boolean', default: true},
-    arrowFactory: {type: 'string', default: `<a-triangle></a-triangle>`}, // TODO if defined add arrow at start and end
+    arrowFactory: {type: 'string', default: `<a-triangle material="opacity:0.3;transparent:true;"></a-triangle>`}, // TODO if defined add arrow at start and end
     containerFactory: {type: 'string', default: `<a-entity></a-entity>`}, // html string that relies on vue attributes
     itemFactory: {type: 'string', default: listViewItemFactory}// html string that relies on vue attributes
   },
@@ -133,6 +133,8 @@ AFRAME.registerComponent('gui-list-view', {
     return this.bb;
   },
   addArrows: function () {
+    console.log('adding arrows');
+
     if (!this.minArrow) {
       this.minArrow = createHTML(this.data.arrowFactory);
       this.minArrow.mPos = this.minArrow.object3D.position.clone();
@@ -152,7 +154,7 @@ AFRAME.registerComponent('gui-list-view', {
     // using aabb in relative coordinate system instead of default Box3 will result in correct rotation
     var box = new Box3Ext();
     box.setFromObject(this.el.object3D, this.el.object3D, true, true);
-
+    console.log('arrow box', box);
     let {min, max} = box;
 
     let z = (max.z - min.z) / 2;
@@ -180,9 +182,12 @@ AFRAME.registerComponent('gui-list-view', {
     this.minArrow.object3D.position.copy(this.minArrow.mPos.clone().add(min));
     this.maxArrow.object3D.position.copy(this.maxArrow.mPos.clone().add(max));
 
-    let scaleArrow = max.y - min.y;
+    // TODO scaling of arrows is wrong
+    /*  let scaleArrow =  this.data.orientation != 'column' ? max.y - min.y : max.x - min.x;
     this.minArrow.object3D.scale.x = scaleArrow;
     this.maxArrow.object3D.scale.x = scaleArrow;
+
+    */
 
     this.vm.$el.append(this.minArrow);
     this.vm.$el.append(this.maxArrow);

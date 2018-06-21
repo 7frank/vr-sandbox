@@ -9,7 +9,7 @@ import * as _ from 'lodash';
 
 AFRAME.registerComponent('touch-rotate-controls', {
 
-  schema: {distance: {type: 'vec2', default: [0, Infinity]}},
+  schema: {distance: {type: 'vec2', default: '0, Infinity'}},
 
   init: function () {
     // have a camera of the controls
@@ -38,8 +38,11 @@ AFRAME.registerComponent('touch-rotate-controls', {
   },
   tick: function () {
     let cam = this.mControls.object;
+
+    // TODO
+    // if (this.mControls.enablePan) { this.el.object3D.position.copy(this.mControls.target); }
     this.el.object3D.quaternion.copy(cam.quaternion);
-    let scale = 1 / cam.position.length();
+    let scale = 1 / (cam.position.length() - this.mControls.target.length());
     // let scale = cam.zoom ? cam.zoom : 1;
     this.el.object3D.scale.set(scale, scale, scale);
   }

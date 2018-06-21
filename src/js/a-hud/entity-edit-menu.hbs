@@ -2,7 +2,8 @@
 
     <a-hexagon></a-hexagon>
     <a-entity position="0 .3 -10">
-        <a-sphere ref="sphere"  touch-rotate-controls="distance:0.1 6" position="0 0 0" radius="0.4" theta-length="180"
+        <!-- touch-rotate-controls="distance:0.1 6" -->
+        <a-sphere ref="sphere"  touch-rotate-controls position="0 0 0" radius="0.4" theta-length="180"
                   material="side:back;opacity:.1;transparent:true;depthWrite:false">
 
             <a-entity ref="preview" position="0 -.2 0" rotation="0 90 0" mesh-preview="selector:#bikeModel;scalingFactor:1"
@@ -22,7 +23,7 @@
                  :color="isSelected(index)?'blue':'grey'"
                  :position="setPositionFromIndex(index,5,2,2,1)"
                  width="2"
-                 @focus="onItemClicked(index)"
+                 @focus="onItemHover(index)"
                  @interaction-pick.stop="onItemSelected(index)"
                  @interaction-talk.stop="onItemClicked(index)"
         >
@@ -37,11 +38,11 @@
 
 
         <template>[
-            {key:1,value:"bike",scaling:.8,selector:'#bikeModel'},
-            {key:2,value:"frame",scaling:.8,selector:'#bikeModel',part:":where(name='Cadru1')"},
-            {key:3,value:"seat",scaling:.8,selector:'#bikeModel',part:":where(name='Sa')"},
-            {key:4,value:"waterbottle",scaling:.8,selector:'#bikeModel',part:":where(name='BidonRosu')"},
-            {key:5,value:"handlebars",scaling:.8,selector:'#bikeModel',part:":where(name='Ghidon')"},
+            {key:1,value:"bike",scaling:.8,selector:'#bikeModel',position:"0 -0.2 0"},
+            {key:2,value:"frame",scaling:.8,selector:'#bikeModel',part:":where(name='Cadru1')",position:"0 -0.3 0"},
+            {key:3,value:"seat",scaling:.8,selector:'#bikeModel',part:":where(name='Sa')",position:"-.1 -.4 0"},
+            {key:4,value:"waterbottle",scaling:.8,selector:'#bikeModel',part:":where(name='BidonRosu')",position:"-.05 -.3 0"},
+            {key:5,value:"handlebars",scaling:.8,selector:'#bikeModel',part:":where(name='Ghidon')",position:"0.17 -0.35 0"},
             {key:6,value:"...",scaling:.8,selector:'#bikeModel',part:":where(name='SabotFataS')"},
 
             {key:1,value:"...",scaling:.8,selector:'#bikeModel',part:":where(name='Ghidon2')"},
