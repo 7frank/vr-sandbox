@@ -6,7 +6,8 @@ AFRAME.registerPrimitive('a-hud', {
   defaultComponents: {
     'hud-hud': {}
   },
-  mappings: {defaultLight: 'hud-hud.defaultLight',
+  mappings: {
+    defaultLight: 'hud-hud.defaultLight',
     'camera-mode': 'hud-hud.camera',
     'size': 'hud-hud.size',
     'aspect': 'hud-hud.aspect'
@@ -63,7 +64,6 @@ AFRAME.registerComponent('hud-hud', {
       var light = new THREE.AmbientLight(0xFFFFFF); // soft white light
       scene.add(light);
     }
-    var renderer = this.mRenderer;
 
     scene.add(this.el.object3D.parent);
 
@@ -82,7 +82,8 @@ AFRAME.registerComponent('hud-hud', {
       this.resizeHUD();
     }
   },
-  renderHUD: function () {
+  renderHUD: function (evt) {
+    let args = evt.detail;
     // ------------
 
     let ac = this.mRenderer.autoClear;
@@ -97,7 +98,11 @@ AFRAME.registerComponent('hud-hud', {
 
     this.el.object3D.visible = true;
 
-    this.mRenderer.render(undefined, this.mScene, camera);
+    let [srcScene, srcCam, ...rest] = args;
+
+    this.mScene.__suppress_render_events__ = true;
+    this.mRenderer.render(this.mScene, camera, ...rest);
+    this.mScene.__suppress_render_events__ = null;
 
     this.el.object3D.visible = false;
 
@@ -166,8 +171,6 @@ AFRAME.registerComponent('hud-hud', {
     } else {
       this.resizeHUD_Perspective();
     }
-
-    // ------------------------------------
   },
   /**
      *

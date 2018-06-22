@@ -1,4 +1,3 @@
-
 /**
  * Injects THREE::Renderer.render with event emitters for before-render and after-render
  * which the user can start listening to.
@@ -20,20 +19,21 @@ AFRAME.registerComponent('renderer-listener', {
 
     /**
          *
-         * @param token - a token to distinguish between normal render pass and our second
-         *
+         *  Note: if the first param (the scene) contains an attribute __suppress_render_events__ == true no additional events are emitted.. this can be use to create a render pass that listeners may wait for
          * @param args - the usual render parameters of the renderer ( scene, camera, renderTarget, forceClear)
          */
     var that = this;
-    this.mRenderer.render = function (token, ...args) {
+    this.mRenderer.render = function (...args) {
+      let token = args[0].__suppress_render_events__;
+
       var res;
-      if (token instanceof THREE.Scene) {
-        that.el.emit('before-render');
-        res = renderFunction.call(this, token, ...args);
-        that.el.emit('after-render');
+      if (token) {
+        res = renderFunction.call(this, ...args);
       } else {
         // handle second render pass without emitting events
+        that.el.emit('before-render', args);
         res = renderFunction.call(this, ...args);
+        that.el.emit('after-render', args);
       }
 
       return res;
