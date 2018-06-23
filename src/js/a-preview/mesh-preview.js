@@ -18,12 +18,14 @@ AFRAME.registerComponent('mesh-preview', {
     this.createPreview();
   },
   remove: function () {
-    this.el.removeObject3D('preview-mesh');
+    if (this.vm) { this.vm.$el.removeObject3D('preview-mesh'); }
   },
   update: function () {
     // TODO optimize by only removing if selectors changed
-    this.el.removeObject3D('preview-mesh');
+
     if (this.vm) {
+      this.vm.$el.removeObject3D('preview-mesh');
+
       this.vm.$el.parentElement.removeChild(this.vm.$el);
 
       this.vm = null;

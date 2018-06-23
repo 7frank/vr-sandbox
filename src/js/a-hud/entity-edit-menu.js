@@ -117,6 +117,11 @@ AFRAME.registerComponent('entity-edit-menu', {
       selectedPart = mesh;
       window.selectedPart = selectedPart;
 
+      // show other list views
+      refs.materials.setAttribute('visible', true);
+
+      // refs.alternativeMeshes.setAttribute('visible', true);
+
       if (mesh) {
         let relativePosition = mesh.geometry.boundingSphere.center.clone();
         console.log('actual position', relativePosition);
@@ -154,6 +159,24 @@ AFRAME.registerComponent('entity-edit-menu', {
         selectedPart.material.needsUpdate = true;
       } else {
         console.log('mesh not selected or has no material');
+      }
+    });
+
+    // ---
+
+    refs.alternativeMeshes.addEventListener('selected', (evt) => {
+      console.log('alternativeMeshes', selectedPart);
+
+      if (selectedPart) {
+        selectedPart.material.visible = !selectedPart.material.visible;
+
+        let mesh = getMesh(evt.detail).clone();
+
+        let pos = selectedPart.geometry.boundingSphere.center.clone();
+        let pos2 = mesh.geometry.boundingSphere.center.clone();
+        console.log('p1+2', pos, pos2, mesh);
+        mesh.position.copy(pos2.sub(pos));
+        selectedPart.parent.add(mesh);
       }
     });
   }

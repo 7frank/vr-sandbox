@@ -145,7 +145,7 @@ export function createSidebarMenu () {
     top: 1em;
     right: 0em;
         width: 15%;
-        height: 80vh;
+        max-height: 80vh;
     overflow-y: auto;
     `;
 
