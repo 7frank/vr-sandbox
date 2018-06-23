@@ -63,12 +63,20 @@ import {attachClipboard} from './clipboard';
 
 import './a-preview';
 import './a-controls/touch-rotate-controls';
+import './a-controls/c-controls';
 
 import 'aframe-effects';
 import {toast} from './utils/aframe-utils';
-import registerClickDrag from 'aframe-click-drag-component';
-registerClickDrag(AFRAME);
 
+/**
+ index.js?d30a:7 Uncaught TypeError: Invalid attempt to destructure non-iterable instance
+ at eval (index.js?d30a:7)
+ at HTMLDocument.onTouchEnd (index.js?d30a:542)
+ */
+// Note:click drag throws error when using daydream-controls ()
+// import registerClickDrag from 'aframe-click-drag-component';
+// registerClickDrag(AFRAME);
+console.error('component click-drag no longer working');
 // TODO log per instance of global active inactive
 // Logger.setState(true);
 // if we really want to have a partially global object for debugging this should go into a separate file then..

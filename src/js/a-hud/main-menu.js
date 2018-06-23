@@ -38,7 +38,7 @@ AFRAME.registerComponent('hud-main-menu', {
         case 'ToS':showMenu(hud, 'flow-test-menu'); break;
       }
 
-      console.log('list picked', arguments);
+      console.error('list picked', arguments);
     });
 
     this.vm.$el.append(listEl);

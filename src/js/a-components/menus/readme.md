@@ -1,4 +1,8 @@
 * have some menu structures
-    * list-model
-        * selection
+    * gui-list-view
+        list view component (refactor)
+    * scrollbar 
+        * relies on arrows when refactored
+    * arrows
+        * 
         
