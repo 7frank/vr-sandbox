@@ -16,6 +16,42 @@
 
 
 
+    <nk-list-view arrows="false" ref=materials  scale=".1 .1 .1" position="-.85 .4 0" overflow="false">
+        <a-sphere
+                 v-for="(item, index) in getVisibleItems(0,15)"
+                 opacity="1"
+                 :src="item.src?'#'+item.src:null"
+                 :color="isSelected(index)?'blue':item.color"
+                 :position="setPositionFromIndex(index,4,5,1,-1)"
+                 radius=".45"
+                 @focus="onItemHover(index)"
+                 @interaction-pick.stop="onItemSelected(index)"
+                 @interaction-talk.stop="onItemClicked(index)"
+        >
+            <a-sphere v-if="isSelected(index)" radius=".5" opacity="0.6" color="white" material="side:back"></a-sphere>
+        </a-sphere>
+        <template>[
+            {key:1,color:"white",src:""},  {key:1,color:"red",src:""},{key:1,color:"yellow",src:""},{key:1,color:"slateblue",src:""},
+            {key:1,color:"white",src:"github"},  {key:1,color:"red",src:"github"}, {key:1,color:"yellow",src:"github"},{key:1,color:"slateblue",src:"github"},
+            {key:1,color:"white",src:"sky-texture"},  {key:1,color:"red",src:"sky-texture"},   {key:1,color:"yellow",src:"sky-texture"},  {key:1,color:"slateblue",src:"sky-texture"},
+            {key:1,color:"white",src:"ground-texture"}, {key:1,color:"red",src:"ground-texture"}, {key:1,color:"yellow",src:"ground-texture"},  {key:1,color:"slateblue",src:"ground-texture"},
+
+            {key:1,color:"white",src:"grid-colorized"},  {key:1,color:"red",src:"grid-colorized"}, {key:1,color:"yellow",src:"grid-colorized"},{key:1,color:"slateblue",src:"grid-colorized"},
+            {key:1,color:"white",src:"earth"}, {key:1,color:"red",src:"earth"},   {key:1,color:"yellow",src:"earth"}, {key:1,color:"slateblue",src:"earth"},
+            {key:1,color:"white",src:"boxTexture"},  {key:1,color:"red",src:"boxTexture"}, {key:1,color:"yellow",src:"boxTexture"},{key:1,color:"slateblue",src:"boxTexture"}
+
+
+            ]
+        </template>
+    </nk-list-view>
+
+
+
+
+    <a-entity ref="scrollbar" simple-scrollbar scale=".5 .5 .5" position="0 -.45 0"
+              @change="onScrollbarChange"
+    ></a-entity>
+
     <nk-list-view ref="listview" overflow="true" position="-.75 -.3 -10" scale=".18 .18 .18" order-as="grid: 2 5 .5 .25">
         <a-plane gui-border
                  v-for="(item, index) in getVisibleItems(-2,2)"
