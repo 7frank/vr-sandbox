@@ -17,7 +17,7 @@ import {Box3Ext} from '../../three/Box3Ext';
  * - bin-stacking (probably is going into separate layout component)
  * TODO if list contains more elements than defined to be visible n items should be preloaded as well as when end of list is reached new elements should popin
  * Note: recycle existing entities
- *
+
  * --------------------------------------
  * partially visible list-views :
  * - to do so alter default templates
@@ -302,45 +302,41 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
       removeItem: function (item) {
         this.$data.items.splice(this.$data.items.indexOf(item), 1);
       },
+      onThat: function (index, evtName = 'none') {
+        var data = this.$data.items[this.$data.selectedIndex];
+
+        var that = this.$refs.listView.childNodes[this.$data.selectedIndex];
+
+        console.log('onItem', evtName, data, that);
+
+        var caption = that ? that.getAttribute('value') : '-1'; // TODO improve usability of list view
+
+        if (this.$data.selectedIndex > -1) {
+          if (evtName != 'none') { this.$el.emit(evtName, data); }
+        }
+      },
       onItemClicked: function (index) {
         if (index != undefined) {
           index += this.$data.selectedOffset; // fixes visible offset
           this.$data.selectedIndex = index;
 
-          console.log('onItemClicked0', index);
           return;
         }
-        var data = this.$data.items[this.$data.selectedIndex];
 
-        var that = this.$refs.listView.childNodes[this.$data.selectedIndex];
-
-        console.log('onItemClicked', data, that);
-
-        var caption = that ? that.getAttribute('value') : '-1'; // TODO improve usability of list view
-
-        if (this.$data.selectedIndex > -1) {
-          this.$el.emit('change', data);
-        }
+        this.onThat(index, 'change');
       },
       onItemSelected: function (index) {
         if (index != undefined) {
           index += this.$data.selectedOffset; // fixes visible offset
           this.$data.selectedIndex = index;
 
-          console.log('onItemSelected0', index);
           //    return;
         }
-        var data = this.$data.items[this.$data.selectedIndex];
 
-        var that = this.$refs.listView.childNodes[this.$data.selectedIndex];
-
-        console.log('onItemSelected', data, that);
-
-        var caption = that ? that.getAttribute('value') : '-1'; // TODO improve usability of list view
-
-        if (this.$data.selectedIndex > -1) {
-          this.$el.emit('selected', data);
-        }
+        this.onThat(index, 'selected');
+      },
+      onItemHover: function (index) {
+        this.onThat(index, 'hover');
       },
 
       setPositionFromIndex: function (index, xMax, yMax, xScale = 1, yScale = 1) {
