@@ -12,15 +12,34 @@ import {createHTML} from '../../utils/dom-utils';
 AFRAME.registerComponent('gui-material-list', {
   schema: {
     items: {type: 'array', default: []},
-    selectors: {type: 'array', default: ['a-scene']}
+    selectors: {type: 'array', default: ['a-scene']},
+    dimensions: {type: 'array', default: [10, 2, 1, 1]},
+    limit: {type: 'array', default: []} // default: [-3, 3]
   },
   init: function () {
     // --------------------
 
-    this.mList = createHTML(`<nk-list-view  order-as="grid: 2 5 .5 .25">
+    if (this.data.limit.length > 0) {
+      this.mList = createHTML(`<nk-list-view arrows="false" order-as="grid: 2 5 .5 .25">
+        <a-rounded  
+              v-for="(item, index) in getVisibleItems(${this.data.limit.join(',')})"
+               :position="setPositionFromIndex(index,${this.data.dimensions.join(',')})"
+              :value="index"      
+            
+              width="0.9" 
+              height="0.9"
+              radius=".2" 
+              font-family="Arial" 
+              :material="item.material"
+              @interaction-pick.stop="onItemClicked(index)"         
+              ><a-rounded v-if="isSelected(index)" position="0 0 -0.01" color="white" material="shader: flat;"></a-rounded></a-rounded>   
+                </nk-list-view>  
+            `);
+    } else {
+      this.mList = createHTML(`<nk-list-view arrows="false" order-as="grid: 2 5 .5 .25">
         <a-rounded  
               v-for="(item, index) in items"
-               :position="setPositionFromIndex(index,10,2,1,1)"
+               :position="setPositionFromIndex(index,${this.data.dimensions.join(',')})"
               :value="index"      
             
               width="0.9" 
@@ -30,8 +49,9 @@ AFRAME.registerComponent('gui-material-list', {
               :material="item.material"
               @interaction-pick.stop="onItemClicked(index)"         
               ><a-rounded v-if="selectedIndex==index" position="0 0 -0.01" color="white" material="shader: flat;"></a-rounded></a-rounded>   
-    </nk-list-view>  
-`);
+                </nk-list-view>  
+            `);
+    }
 
     this.el.append(this.mList);
 
@@ -59,11 +79,11 @@ AFRAME.registerComponent('gui-material-list', {
     // ---------------------------------------
 
     /* app.$el.addEventListener('change', (e) => {
-      e.stopPropagation();
-      this.el.emit('change', {material: e.detail.value});
-    });
+          e.stopPropagation();
+          this.el.emit('change', {material: e.detail.value});
+        });
 
-    */
+        */
 
     this.mList.addEventListener('change', (e) => {
       e.stopPropagation();
