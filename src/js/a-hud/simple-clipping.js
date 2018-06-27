@@ -8,6 +8,10 @@
  * FIXME does not show listview when only attached to preview
  * FIXME does not clip preview if listview items have clipping
  * FIXME also if attached to preview the pv ca't be rotated or scaled
+ *
+ *
+ * https://stackoverflow.com/questions/45611247/local-clipping-of-planes-based-on-local-axis
+ *
  */
 
 import {getPlayer} from '../game-utils';
@@ -15,6 +19,11 @@ import {getWorldDirection, getWorldPosition} from '../utils/aframe-utils';
 import {querySelectorAll} from '../utils/selector-utils';
 import * as _ from 'lodash';
 import {FPSCtrl} from '../utils/fps-utils';
+
+// ---------------------------------------
+// ---------------------------------------
+// ---------------------------------------
+// ---------------------------------------
 
 AFRAME.registerComponent('simple-clipping', {
   dependencies: ['material'],
@@ -95,8 +104,5 @@ AFRAME.registerComponent('simple-clipping', {
     right.copy(this.mPlanes.right);
     right.constant = this.data.dimensions.w;
     right.applyMatrix4(worldMatrix);
-
-    let position = getWorldPosition(getPlayer().object3D);
-    let dir = getWorldDirection(getPlayer().object3D);
   }
 });

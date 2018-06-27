@@ -6,19 +6,28 @@ import {scaleEntity} from '../utils/aframe-utils';
 /**
  * A component that renders parts of an entity or mesh inside a preview element.
  * This can be used to create lists of selectable parts.
+ *
+ *
+ * TODO use the cache option
+ *
+ *
  */
 
 AFRAME.registerComponent('mesh-preview', {
   schema: {
     scalingFactor: {type: 'number', default: 1},
     selector: {type: 'string', default: 'a-simple-car'},
-    'part-selector': {type: 'string', default: null}// the sub-selector for a certain part of an entity {@link AFRAME.nk.querySelectorAll}
+    'part-selector': {type: 'string', default: null}, // the sub-selector for a certain part of an entity {@link AFRAME.nk.querySelectorAll}
+    'clone-material': {type: 'boolean', default: true},
+    'use-cache': {type: 'boolean', default: true} // TODO one use case for cache would be the listview where only some elemnts are visible and aremanipulated by the user resulting in themesh to reload when navigating through the list
   },
   init: function () {
     this.createPreview();
   },
   remove: function () {
-    if (this.vm) { this.vm.$el.removeObject3D('preview-mesh'); }
+    if (this.vm) {
+      this.vm.$el.removeObject3D('preview-mesh');
+    }
   },
   update: function () {
     // TODO optimize by only removing if selectors changed
@@ -52,8 +61,8 @@ AFRAME.registerComponent('mesh-preview', {
       data: this.data,
       methods: {
         /* onContainerClick: function (e) {
-                                            AFRAME.nk.toast('clicked container');
-                                        } */
+                                                    AFRAME.nk.toast('clicked container');
+                                                } */
       }
     });
 
@@ -88,6 +97,11 @@ AFRAME.registerComponent('mesh-preview', {
       }
 
       var newModel = model.clone();
+      if (newModel.material && this.data['clone-material']) {
+        newModel.material = newModel.material.clone();
+        newModel.material.needsUpdate = true;
+      }
+
       newModel.position.set(0, 0, 0); // reset position of cloned root
       newModel.scale.set(1, 1, 1);
       newModel.quaternion.set(0, 0, 0, 1);// TODO sometimes we might want to retain the rotations

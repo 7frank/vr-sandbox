@@ -3,7 +3,7 @@
     <a-hexagon></a-hexagon>
     <a-entity position="0 .3 -10">
         <!-- touch-rotate-controls="distance:0.1 6" -->
-        <a-sphere ref="sphere"  touch-rotate-controls position="0 0 0" radius="0.4" theta-length="180"
+        <a-sphere  ref="sphere" simple-clipping touch-rotate-controls position="0 0 0" radius="0.4" theta-length="180"
                   material="side:back;opacity:.1;transparent:true;depthWrite:false">
 
             <a-entity ref="preview"
@@ -18,7 +18,7 @@
 
 
 
-    <nk-list-view arrows="false" ref=materials  scale=".1 .1 .1" position="-.85 .4 0" overflow="false" visible="false">
+    <nk-list-view  arrows="false" ref=materials  scale=".1 .1 .1" position="-.85 .4 0" overflow="false" visible="false">
         <a-sphere
                  v-for="(item, index) in getVisibleItems(0,15)"
                  opacity="1"
@@ -91,8 +91,9 @@
               @change="onScrollbarChange"
     ></a-entity>
 
-    <nk-list-view ref="listview" overflow="true" position="-.65 -.3 -10" scale=".16 .16 .16" order-as="grid: 2 5 .5 .25">
-        <a-plane gui-border
+    <nk-list-view ref="listview"  overflow="true" position="-.65 -.3 -10" scale=".16 .16 .16" order-as="grid: 2 5 .5 .25">
+        <a-plane simple-clipping="dimensions:.5 1 .5 1"
+                 gui-border
                  v-for="(item, index) in getVisibleItems(-2,2)"
                  opacity="0.1"
                  :color="isSelected(index)?'blue':'grey'"
