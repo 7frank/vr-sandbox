@@ -717,3 +717,20 @@ async function loadTexture (url) {
     );
   });
 }
+
+/**
+ * clones array or single material of mesh AND removes clipping planes
+ * @param mesh
+ * @param recursive - TODO
+ * @returns {null}
+ */
+
+export function cloneMeshMaterial (mesh, recursive = true, removeClippingPlanes = true) {
+  if (!mesh.material) return null;
+
+  const doClone = (material) => { let cloned = material.clone(); cloned.needsUpdate = true; cloned.clippingPlanes = removeClippingPlanes ? null : cloned.clippingPlanes; return cloned; };
+
+  if (_.isArray(mesh.material)) { return mesh.material.map(doClone); }
+
+  return doClone(mesh.material);
+}

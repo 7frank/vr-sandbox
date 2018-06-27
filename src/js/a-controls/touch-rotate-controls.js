@@ -9,7 +9,10 @@ import * as _ from 'lodash';
 
 AFRAME.registerComponent('touch-rotate-controls', {
 
-  schema: {distance: {type: 'vec2', default: '0, Infinity'}},
+  schema: {
+    distance: {type: 'vec2', default: '0, Infinity'},
+    enablePan: {type: 'boolean', default: false}
+  },
 
   init: function () {
     // have a camera of the controls
@@ -18,7 +21,7 @@ AFRAME.registerComponent('touch-rotate-controls', {
     this.el.setObject3D('touch-rotate-controls-camera', cameraContainer);
 
     this.mControls = new THREE.OrbitControls(cameraContainer, this.el.sceneEl.renderer.domElement);
-    this.mControls.enablePan = false;
+    this.mControls.enablePan = this.data.enablePan;
 
     this.mControls.minDistance = this.data.distance.x;
     this.mControls.maxDistance = this.data.distance.y;

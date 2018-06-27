@@ -1,16 +1,18 @@
 /**
  * This component provides clipping of certain areas and objects. In other words it replicates the css "overflow:none" behaviour.
+ * https://stackoverflow.com/questions/45611247/local-clipping-of-planes-based-on-local-axis
+ * Note: planes are in world coords and are recomputed each tick
+ *
  * TODO use the bounding box if dimensions are not provided
  * TODO have a system instead of a component for the gui as every udlr-planes will share its normals with each others gui elements planes
  * TODO handle nesting (currently clipping planes are overridden by parent instances of the same component)
  * TODO also it overrides any other implementations of clipping
- *  Note: planes are in world coords and are recomputed each tick
+ *
  * FIXME does not show listview when only attached to preview
  * FIXME does not clip preview if listview items have clipping
- * FIXME also if attached to preview the pv ca't be rotated or scaled
  *
+ * FIXME material of preview has the same clipping planes as the cloned one
  *
- * https://stackoverflow.com/questions/45611247/local-clipping-of-planes-based-on-local-axis
  *
  */
 
@@ -20,16 +22,12 @@ import {querySelectorAll} from '../utils/selector-utils';
 import * as _ from 'lodash';
 import {FPSCtrl} from '../utils/fps-utils';
 
-// ---------------------------------------
-// ---------------------------------------
-// ---------------------------------------
-// ---------------------------------------
-
 AFRAME.registerComponent('simple-clipping', {
   dependencies: ['material'],
   schema: {
     dimensions: {type: 'vec4', default: '.5 .5 .5 .5'}, // top left bottom right
-    debug: {type: 'boolean', default: false}
+    debug: {type: 'boolean', default: false},
+    recursive: {type: 'boolean', default: true}
   },
   init: function () {
     let material = this.el.components.material.material;
@@ -47,18 +45,27 @@ AFRAME.registerComponent('simple-clipping', {
     let dummy = new THREE.Plane(new THREE.Vector3(0, 0, 0), 0);
 
     material.clippingPlanes = [dummy.clone(), dummy.clone(), dummy.clone(), dummy.clone()];
+    material.clippingPlanes.map(cp => cp.uuid = THREE.Math.generateUUID());
+    material.clippingPlanes.uuid = THREE.Math.generateUUID();
+
     material.clipShadows = true;
 
     // update materials clipping planes of child elements on a timer
     // TODO queries are to cpu consuming .. have alternative approach for updating materials
-    this.clippingScript = new FPSCtrl(10, () => {
-      let materials = querySelectorAll(this.el, ':where(material)');
-      // add clipping planes to child element materials
-      _.each(materials, mesh => {
-        mesh.material.clippingPlanes = material.clippingPlanes;
-        mesh.material.clipShadows = true;
-      });
-    }).start();
+    if (this.data.recursive) {
+      this.clippingScript = new FPSCtrl(10, () => {
+        let materials = querySelectorAll(this.el, ':where(material)');
+        let material = this.el.components.material.material;
+        if (window.mdebug) {
+          console.log(material.clippingPlanes.uuid, [this.el, materials, material.clippingPlanes]);
+        }
+        // add clipping planes to child element materials
+        _.each(materials, mesh => {
+          mesh.material.clippingPlanes = material.clippingPlanes;
+          mesh.material.clipShadows = true;
+        });
+      }).start();
+    }
 
     this.mMaterialPlanes = material.clippingPlanes;
 
@@ -83,7 +90,9 @@ AFRAME.registerComponent('simple-clipping', {
     // ---------------------------------------
   },
   remove: function () {
-    this.clippingScript.stop();
+    if (this.clippingScript) {
+      this.clippingScript.stop();
+    }
   },
   tick: function () {
     let worldMatrix = this.el.object3D.matrixWorld;

@@ -1,7 +1,7 @@
 import {createHTML} from '../utils/dom-utils';
 import Vue from 'vue/dist/vue.esm';
 import {querySelectorAll} from '../utils/selector-utils';
-import {scaleEntity} from '../utils/aframe-utils';
+import {cloneMeshMaterial, scaleEntity} from '../utils/aframe-utils';
 
 /**
  * A component that renders parts of an entity or mesh inside a preview element.
@@ -97,9 +97,11 @@ AFRAME.registerComponent('mesh-preview', {
       }
 
       var newModel = model.clone();
-      if (newModel.material && this.data['clone-material']) {
-        newModel.material = newModel.material.clone();
-        newModel.material.needsUpdate = true;
+      if (this.data['clone-material']) {
+        newModel.material = cloneMeshMaterial(newModel);
+
+        // let materialComponent = this.el.components.material;
+        // if (materialComponent)materialComponent.material = newModel.material;
       }
 
       newModel.position.set(0, 0, 0); // reset position of cloned root
