@@ -34,3 +34,4 @@ import './listeners/raycaster-listener';
 import './hexagon';
 
 import './menus';
+import './pointer';

@@ -31,7 +31,7 @@
                  @interaction-pick.stop="onItemSelected(index)"
                  @interaction-talk.stop="onItemClicked(index)"
         >
-            <a-sphere v-if="isSelected(index)" radius=".5" opacity="0.6" color="white" material="side:back"></a-sphere>
+            <a-sphere v-if="isSelected(index)||isHovered(index)" radius=".5" opacity="0.6" color="white" material="side:back"></a-sphere>
         </a-sphere>
         <template>[
             {key:1,color:"white",src:""},  {key:1,color:"red",src:""},{key:1,color:"yellow",src:""},{key:1,color:"slateblue",src:""},
@@ -98,7 +98,7 @@
                  opacity="0.3"
                  :color="isSelected(index)?'blue':isHovered(index)?'slateblue':'grey'"
                  :position="setPositionFromIndex(index,5,2,2,1)"
-                 
+
                  width="2"
                  @focus="onItemHover(index)"
                  @interaction-pick.stop="onItemSelected(index)"

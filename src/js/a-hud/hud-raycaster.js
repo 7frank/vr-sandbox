@@ -8,21 +8,15 @@ AFRAME.registerComponent('hud-raycaster', {
   dependencies: ['hud-hud'],
   schema: {},
   init: function () {
-    this.mMouse = new THREE.Vector2();
-
     var renderer = this.el.sceneEl.renderer;
-
-    // TODO this should be part of a more general pacakge providing recurring results per tick
-    document.addEventListener('mousemove', (e) => {
-      this.mMouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
-      this.mMouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
-    }, false);
 
     this.mHud = this.el.components['hud-hud'];
     this.mRayCaster = new THREE.Raycaster();
   },
   getIntersected: _.throttle(function () {
-    this.mRayCaster.setFromCamera(this.mMouse, this.mHud.mCamera);
+    let mousePosition = this.el.sceneEl.systems.pointer.position;
+
+    this.mRayCaster.setFromCamera(mousePosition, this.mHud.mCamera);
     let recursiveFlag = true;
 
     let intersected = this.mRayCaster.intersectObjects(this.el.object3D.children, recursiveFlag);
@@ -36,7 +30,7 @@ AFRAME.registerComponent('hud-raycaster', {
           window.ooo = this.intersectedEls;
         } */
     return this.intersected;
-  }, 50),
+  }, 5),
   tick: function () {
     this.getIntersected();
   }

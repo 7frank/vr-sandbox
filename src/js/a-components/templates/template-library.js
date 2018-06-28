@@ -186,14 +186,12 @@ AFRAME.registerComponent('template-droppable', {
 
     // this.mCursor = document.querySelector('[cursor]').components.cursor;
 
-    this.rayHelper = raycasterHelper(20);
+    this.rayHelper = raycasterHelper(this.el, 20);
   },
   remove: function () {
     this.el.removeEventListener('click', this._someClick);
 
     this.el.remove(this.mPreview);
-
-    this.rayHelper.stop();
   },
   update: function (oldData) {
     if (oldData.template != this.data.template) {
@@ -323,38 +321,22 @@ AFRAME.registerComponent('template-removable', {
 
 /**
  * FIXME performance and stuff
+ * TODO this is probably redundant by using the raycaster or cursor cmoponent and filtering intersections  for regions
  *
  * @returns {render}
  */
-function raycasterHelper (interval = 20) {
+function raycasterHelper (el, interval = 20) {
   var raycaster = new THREE.Raycaster();
-  var mouse = new THREE.Vector2();
   var intersects;
-
-  function onMouseMove (event) {
-    // calculate mouse position in normalized device coordinates
-    // (-1 to +1) for both components
-
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-  }
-
-  var throttledMove = _.throttle(onMouseMove, interval);
-
-  window.addEventListener('mousemove', throttledMove, false);
-
-  // window.requestAnimationFrame(render);
 
   return {
     cast: _.throttle(function render (camera, elements, recursive = false) {
-      raycaster.setFromCamera(mouse, camera);
+      let mousePosition = el.sceneEl.systems.pointer.position;
+      raycaster.setFromCamera(mousePosition, camera);
       intersects = raycaster.intersectObjects(elements, recursive);
 
       return intersects[0];
-    }, interval),
-    stop: function () {
-      window.removeEventListener('mousemove', throttledMove);
-    }
+    }, interval)
   };
 }
 

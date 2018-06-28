@@ -142,7 +142,7 @@ AFRAME.registerComponent('entity-edit-menu', {
       console.log('scrollbar changed', detail);
 
       // FIXME this should be possble by setAttribute("selected-index",2) but the gui-list-view is rebould faulty instead
-      if (refs.listview.components['gui-list-view'].vm) { refs.listview.components['gui-list-view'].vm.$data.selectedIndex = detail.position; }
+      if (refs.listview.components['gui-list-view']) { refs.listview.components['gui-list-view'].vm.$data.selectedIndex = detail.position; }
     });
     // ----------------------
 
