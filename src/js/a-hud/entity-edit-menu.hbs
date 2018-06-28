@@ -54,7 +54,7 @@
         <a-plane gui-border
                  v-for="(item, index) in getVisibleItems(0,1)"
                  opacity="0.1"
-                 :color="isSelected(index)?'blue':'grey'"
+                 :color="isSelected(index)?'blue':isHovered(index)?'slateblue':'grey'"
                  :position="setPositionFromIndex(index,3,1,2,1)"
 
                  width="2"
@@ -96,9 +96,9 @@
                  gui-border
                  v-for="(item, index) in getVisibleItems(-2,2)"
                  opacity="0.3"
-                 :color="isSelected(index)?'blue':'grey'"
+                 :color="isSelected(index)?'blue':isHovered(index)?'slateblue':'grey'"
                  :position="setPositionFromIndex(index,5,2,2,1)"
-
+                 
                  width="2"
                  @focus="onItemHover(index)"
                  @interaction-pick.stop="onItemSelected(index)"
@@ -110,7 +110,7 @@
                       :mesh-preview="{'part-selector':item.part,selector:item.selector,scalingFactor:item.scaling}"
 
                       position='0 -.4 2'
-                      :animation__rotate="isSelected(index)?'property: rotation; from:0 0 0; to: 0 360 0; dur: 5000; easing: linear;loop:true':null">
+                      :animation__rotate="isSelected(index)||isHovered(index)?'property: rotation; from:0 0 0; to: 0 360 0; dur: 5000; easing: linear;loop:true':null">
             </a-entity>
         </a-plane>
 

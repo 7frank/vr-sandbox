@@ -286,6 +286,7 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
 
     data: {
       items: items,
+      hoveredIndex: -1,
       selectedIndex: -1,
       selectedOffset: 0 // the offset for the visible items
     },
@@ -336,6 +337,11 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
         this.onThat(index, 'selected');
       },
       onItemHover: function (index) {
+        if (index != undefined) {
+          index += this.$data.selectedOffset; // fixes visible offset
+          this.$data.hoveredIndex = index;
+        }
+
         this.onThat(index, 'hover');
       },
 
@@ -347,6 +353,9 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
       },
       isSelected: function (index) {
         return this.$data.selectedIndex - this.$data.selectedOffset == index;
+      },
+      isHovered: function (index) {
+        return this.$data.hoveredIndex - this.$data.selectedOffset == index;
       },
       /**
              * returns the items that should be visible relative to the selectedIndex
