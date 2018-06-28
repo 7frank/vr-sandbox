@@ -28,7 +28,8 @@ function initStaticPortions (sceneEl) {
  *
  *  TODO  change visual controls when using autoplay
  *  TODO use video-positional-audio sound component
- *  NOTE: be careful when overloading meda-events .. play and pause are excluded from forwarding but there mmight be other intereferences when triggering others on container element (this.el)
+ *  FIXME does interfere with global sky
+ *  NOTE: be careful when overloading media-events .. play and pause are excluded from forwarding but there might be other interferences when triggering others on container element (this.el)
  */
 
 AFRAME.registerComponent('simple-video-player', {

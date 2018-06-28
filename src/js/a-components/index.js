@@ -35,3 +35,5 @@ import './hexagon';
 
 import './menus';
 import './pointer';
+
+import './sky-transition';
