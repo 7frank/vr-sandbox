@@ -2,18 +2,17 @@ import ObservableArray from 'observable-array';
 import * as _ from 'lodash';
 
 /**
- * TODO this should be a simple observable array that emmits some crud events on changes
+ * A simple observable array that emits a change event
+ * TODO allow simple CRUD via setters?
  */
 
 AFRAME.registerComponent('data-array', {
   schema: {items: {default: ObservableArray()},
-    maxItemCount: {type: 'number', default: 0} // can be set when loading data arrays to hint how many values there are to come
+    maxItemCount: {type: 'number', default: -1} // can be set when loading data arrays to hint how many values there are to come
   },
   init: function () {
-    // TODO for aggregation of events it might be good to have detail:{data,added,removed}
-    // or a stack containing all changes to the array from the last time change was called via throttle
     this.data.items.on('change', (event) => {
-      // map observable array! in case the array gets altered which would break like in case hen we use vue for the gui-list-view
+      // map observable array! is used in case the array gets altered which would break functionality. like  when we use vue for the gui-list-view
       this.el.emit('data-change', {
         items: _.map(this.data.items, i => i),
         type: event.type,
@@ -327,7 +326,7 @@ AFRAME.registerComponent('sample-preview-datasource', {
 
     ];
 
-    console.log('sample-preview-datasource pushing data every 30ms');
+    console.log('sample-preview-datasource pushing data every 1000ms');
     var i = 0;
 
     dataArrayData.maxItemCount = data.length;

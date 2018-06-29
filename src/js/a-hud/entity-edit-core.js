@@ -6,13 +6,14 @@ import {querySelectorAll} from '../utils/selector-utils';
 
 import ZoomUtil from '../utils/ZoomUtils';
 import {AnimationFactory} from '../utils/animation-utils';
+import * as _ from 'lodash';
 
 /**
  * FIXME not working.. disable touchrotate controls before debugging
  */
 var prevAnimation;
-export
-function zoomToPos (targetCamera, controls, meshDetails) {
+
+export function zoomToPos (targetCamera, controls, meshDetails) {
   if (prevAnimation) prevAnimation.stop();
   var targetPosition = meshDetails.relativePosition.clone();
   console.log('zoomTo orig', targetPosition);
@@ -39,8 +40,7 @@ function zoomToPos (targetCamera, controls, meshDetails) {
  * @param obj3d
  * @param targetPos
  */
-export
-function moveObjectToPosition (obj3d, targetPos) {
+export function moveObjectToPosition (obj3d, targetPos) {
   let prevAnimation = AnimationFactory({position: obj3d.position});
   prevAnimation.animate({position: targetPos}, 400);
 }
@@ -50,8 +50,7 @@ function moveObjectToPosition (obj3d, targetPos) {
  * @param o - the data object of the entity-edit-menu component
  * @returns {*}
  */
-export
-function getMesh (o) {
+export function getMesh (o) {
   let els = document.querySelectorAll(o.selector).toArray();
 
   if (els.length == 0) return null; //
@@ -63,4 +62,19 @@ function getMesh (o) {
   let subQueryResult = querySelectorAll(els[0], o.part);
 
   return subQueryResult[0];
+}
+
+/**
+ *
+ * @param el
+ * @param selector
+ * @returns {*}
+ */
+export
+function getMapOfElementsBySelectorAttrValue (el, selector = '[ref]') {
+  let params = el.querySelectorAll(selector).toArray();
+  return _.reduce(params, function (obj, param) {
+    obj[param.getAttribute('ref')] = param;
+    return obj;
+  }, {});
 }

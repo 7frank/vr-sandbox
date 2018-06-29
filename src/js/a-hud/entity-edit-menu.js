@@ -4,7 +4,7 @@ import template from './entity-edit-menu.hbs';
 import {showMenu} from '../utils/debug-gui';
 import * as _ from 'lodash';
 
-import {getMesh, moveObjectToPosition} from './entity-edit-core';
+import {getMapOfElementsBySelectorAttrValue, getMesh, moveObjectToPosition} from './entity-edit-core';
 
 // ---------------------------------
 
@@ -38,16 +38,9 @@ AFRAME.registerComponent('entity-edit-menu', {
     this.el.append(el);
 
     // fix vue bug meanwhile use refs for bindings
-    let params = el.querySelectorAll(['[ref]']).toArray();
-    let refs = _.reduce(params, function (obj, param) {
-      obj[param.getAttribute('ref')] = param;
-      return obj;
-    }, {});
+    let refs = getMapOfElementsBySelectorAttrValue(el, ['[ref]']);
 
     // ----------------------
-    // TODO list view component should probably have some default emitters for change and selected
-    // selected is not emitted the same way change is (change is working)
-
     refs.listview.addEventListener('selected', ({detail}) => {
       /* let meshDetails = getMesh(detail);
 
@@ -87,7 +80,7 @@ AFRAME.registerComponent('entity-edit-menu', {
     refs.scrollbar.addEventListener('change', ({detail}) => {
       console.log('scrollbar changed', detail);
 
-      // FIXME this should be possble by setAttribute("selected-index",2) but the gui-list-view is rebould faulty instead
+      // FIXME this should be possible by setAttribute("selected-index",2) but the gui-list-view is rebuild faulty instead
       if (refs.listview.components['gui-list-view']) {
         refs.listview.components['gui-list-view'].vm.$data.selectedIndex = detail.position;
       }
@@ -109,7 +102,7 @@ AFRAME.registerComponent('entity-edit-menu', {
       }
     });
 
-    // ---
+    // ---------------------------------------
 
     refs.alternativeMeshes.addEventListener('selected', (evt) => {
       console.log('alternativeMeshes', selectedPart);

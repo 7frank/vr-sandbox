@@ -218,9 +218,6 @@ AFRAME.registerComponent('editable-actor', {
       } else {
         stopEditingTextarea();
       }
-
-      // FIXME there should be one toast object notifying the user
-      $('<a-toast message="This is a toast" action="Got it"></a-toast>').appendTo('a-scene');
     });
   }
 
