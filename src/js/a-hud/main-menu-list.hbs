@@ -5,9 +5,9 @@
 
              :position="setPosition(-4+4*Math.cos(0.05*index/items.length*2*Math.PI-Math.PI*0.0),4*Math.sin(0.05*index/items.length*2*Math.PI-Math.PI*0.0))"
              material="transparent:true;opacity:0.3;"
-             :color="selectedIndex==index?'blue':'white'"
+             :color="isHovered(index)?'blue':'white'"
              height=".21"
-             @focus="onItemClicked(index)"
+             @focus="onItemHover(index)"
              @interaction-pick.stop="onItemSelected(index)"
              @interaction-talk.stop="onItemClicked(index)"
     >
@@ -15,7 +15,7 @@
                 :value="item.value"
                 material="transparent:true;opacity:0.3;"
                 color="lightgrey"
-                @focus="onItemClicked(index)"
+                @focus="onItemHover(index)"
                 @interaction-pick.stop="onItemSelected(index)"
                 @interaction-talk.stop="onItemClicked(index)"
         ></a-text>

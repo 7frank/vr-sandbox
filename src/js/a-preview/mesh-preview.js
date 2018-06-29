@@ -15,7 +15,7 @@ import {cloneMeshMaterial, scaleEntity} from '../utils/aframe-utils';
 
 AFRAME.registerComponent('mesh-preview', {
   schema: {
-    scalingFactor: {type: 'number', default: 1},
+    scalingFactor: {type: 'number', default: 1}, // TODO have an additional option => cover contain where scaling is deendent on size of mesh and container
     selector: {type: 'string', default: 'a-simple-car'},
     'part-selector': {type: 'string', default: null}, // the sub-selector for a certain part of an entity {@link AFRAME.nk.querySelectorAll}
     'clone-material': {type: 'boolean', default: true},
@@ -99,6 +99,11 @@ AFRAME.registerComponent('mesh-preview', {
       var newModel = model.clone();
       if (this.data['clone-material']) {
         newModel.material = cloneMeshMaterial(newModel);
+
+        // FIXME cloning materials will prevent the bug with mesh review but will make materials not settable in config dialog
+        newModel.traverse(function (o) {
+          o.material = cloneMeshMaterial(o);
+        });
 
         // let materialComponent = this.el.components.material;
         // if (materialComponent)materialComponent.material = newModel.material;

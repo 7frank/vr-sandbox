@@ -14,6 +14,9 @@
  * FIXME material of preview has the same clipping planes as the cloned one
  *
  *
+ *  FIXME sample-config-dialog tearing ... maybe hud is one frame behind ?
+ *  FIXME sample-config-dialog not clipping car
+ *
  */
 
 import {getPlayer} from '../game-utils';
@@ -27,7 +30,7 @@ AFRAME.registerComponent('simple-clipping', {
   schema: {
     dimensions: {type: 'vec4', default: '.5 .5 .5 .5'}, // top left bottom right
     debug: {type: 'boolean', default: false},
-    recursive: {type: 'boolean', default: true}
+    recursive: {type: 'boolean', default: true} // TODO recursive should be a selector targeting only specific elements
   },
   init: function () {
     let material = this.el.components.material.material;
@@ -52,20 +55,14 @@ AFRAME.registerComponent('simple-clipping', {
 
     // update materials clipping planes of child elements on a timer
     // TODO queries are to cpu consuming .. have alternative approach for updating materials
-    if (this.data.recursive) {
-      this.clippingScript = new FPSCtrl(10, () => {
-        let materials = querySelectorAll(this.el, ':where(material)');
-        let material = this.el.components.material.material;
-        if (window.mdebug) {
-          console.log(material.clippingPlanes.uuid, [this.el, materials, material.clippingPlanes]);
-        }
-        // add clipping planes to child element materials
-        _.each(materials, mesh => {
-          mesh.material.clippingPlanes = material.clippingPlanes;
-          mesh.material.clipShadows = true;
-        });
-      }).start();
-    }
+
+    /*  if (this.data.recursive) {
+          this.clippingScript = new FPSCtrl(100, () => {
+
+            this.doClipping()
+
+          }).start();
+        } */
 
     this.mMaterialPlanes = material.clippingPlanes;
 
@@ -113,5 +110,19 @@ AFRAME.registerComponent('simple-clipping', {
     right.copy(this.mPlanes.right);
     right.constant = this.data.dimensions.w;
     right.applyMatrix4(worldMatrix);
+
+    this.doClipping();
+  },
+  doClipping: function () {
+    let materials = querySelectorAll(this.el, ':where(material)');
+    let material = this.el.components.material.material;
+    if (window.mdebug) {
+      console.log(material.clippingPlanes.uuid, [this.el, materials, material.clippingPlanes]);
+    }
+    // add clipping planes to child element materials
+    _.each(materials, mesh => {
+      mesh.material.clippingPlanes = material.clippingPlanes;
+      mesh.material.clipShadows = true;
+    });
   }
 });

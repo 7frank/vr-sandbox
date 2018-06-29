@@ -74,7 +74,9 @@
 
 
     <nk-list-view overflow="true" position="-.6 -.275 -10" scale=".3 .3 .3" order-as="grid: 2 5 .5 .25">
-        <a-plane gui-border
+        <a-plane
+
+                 gui-border
                  v-for="(item, index) in items"
                  opacity="0.1"
                  :color="selectedIndex==index?'blue':'grey'"
