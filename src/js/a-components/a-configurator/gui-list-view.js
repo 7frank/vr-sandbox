@@ -50,6 +50,7 @@ AFRAME.registerPrimitive('nk-list-view', {
 
   mappings: {
     items: 'gui-list-view.items',
+    datasource: 'gui-list-view.datasource',
     'selected-index': 'gui-list-view.selectedIndex', // the id of the currently selected array entry
     'required-keys': 'gui-list-view.requiredKeys',
     overflow: 'gui-list-view.overflow',
@@ -98,7 +99,8 @@ AFRAME.registerComponent('gui-list-view', {
     arrowsVisible: {type: 'boolean', default: true},
     arrowFactory: {type: 'string', default: `<a-triangle material="opacity:0.3;transparent:true;"></a-triangle>`}, // TODO if defined add arrow at start and end
     containerFactory: {type: 'string', default: `<a-entity></a-entity>`}, // html string that relies on vue attributes
-    itemFactory: {type: 'string', default: listViewItemFactory}// html string that relies on vue attributes
+    itemFactory: {type: 'string', default: listViewItemFactory}, // html string that relies on vue attributes
+    datasource: {type: 'string', default: 'template'}
   },
   update: function (oldData) {
     // new entries
@@ -133,11 +135,21 @@ AFRAME.registerComponent('gui-list-view', {
     return this.bb;
   },
   addArrows: function () {
+    if (!this.data.arrowsVisible) return;
     console.log('adding arrows');
+
+    // temporarily remove from parent for boundingbox to calculate correctly
+    if (this.vm && this.minArrow) {
+      this.vm.$el.remove(this.minArrow);
+    }
+    if (this.vm && this.maxArrow) {
+      this.vm.$el.remove(this.maxArrow);
+    }
 
     if (!this.minArrow) {
       this.minArrow = createHTML(this.data.arrowFactory);
       this.minArrow.mPos = this.minArrow.object3D.position.clone();
+
       this.minArrow.addEventListener('interaction-pick', (e) => {
         e.stopPropagation();
         this.vm.$data.selectedIndex--;
@@ -146,6 +158,7 @@ AFRAME.registerComponent('gui-list-view', {
     if (!this.maxArrow) {
       this.maxArrow = createHTML(this.data.arrowFactory);
       this.maxArrow.mPos = this.maxArrow.object3D.position.clone();
+
       this.maxArrow.addEventListener('interaction-pick', (e) => {
         e.stopPropagation();
         this.vm.$data.selectedIndex++;
@@ -178,16 +191,22 @@ AFRAME.registerComponent('gui-list-view', {
       this.minArrow.object3D.rotation.z = Math.PI;
       this.maxArrow.object3D.rotation.z = 0;
     }
+    console.log('updating arrows', min, max);
+
+    // FIXME the arrow position is not exactly at the border where it was before we introducted datasources
+    // removing and adding the arrow might have to to something with it
+    // as setting an initial position will not do
+    // set invisible instead and then visible after bbox recalc
 
     this.minArrow.object3D.position.copy(this.minArrow.mPos.clone().add(min));
     this.maxArrow.object3D.position.copy(this.maxArrow.mPos.clone().add(max));
 
     // TODO scaling of arrows is wrong
     /*  let scaleArrow =  this.data.orientation != 'column' ? max.y - min.y : max.x - min.x;
-    this.minArrow.object3D.scale.x = scaleArrow;
-    this.maxArrow.object3D.scale.x = scaleArrow;
+                                        this.minArrow.object3D.scale.x = scaleArrow;
+                                        this.maxArrow.object3D.scale.x = scaleArrow;
 
-    */
+                                        */
 
     this.vm.$el.append(this.minArrow);
     this.vm.$el.append(this.maxArrow);
@@ -196,21 +215,47 @@ AFRAME.registerComponent('gui-list-view', {
     this.vm.setItems(items);
   },
   init: function () {
-    // read <template> tag and interpret it as json data
-    var tplData = this.el.querySelector('template');
-    console.log('template', tplData);
-    if (tplData) {
-      var parsed = jsonic(tplData.innerHTML);
+    // read <template> tag and interpret it as less strict json data
+    console.log('datasource', this.data.datasource);
+    if (this.data.datasource == 'template') {
+      this.initDefaultTemplateDatasource();
+    } else {
+      let isInstance = this.data.datasource[0] == '#';
 
-      if (parsed.length >= 0) {
-        this.data.items = parsed;
+      const listenToDatasource = (datasourceEl) => {
+        datasourceEl.addEventListener('data-change', (e) => {
+          let data = e.detail.items;
+          console.log('data-change', e, data);
+          this.data.items = data;
+          if (this.vm) {
+            this.vm.$data.items = data;
+            this.addArrows();
+          }
+        });
+      };
+
+      if (isInstance) {
+        var datasourceEl = this.el.sceneEl.querySelector(this.data.datasource);
+
+        if (datasourceEl) {
+          this.data.items = datasourceEl.data.items;
+          if (this.vm) this.vm.$data.items = datasourceEl.data.items;
+          listenToDatasource(datasourceEl);
+        } else {
+          console.error('datasource instance not found ');
+        }
       } else {
-        console.error("invalid data in template must be array of objects in less strict json format (see 'jsonic')");
+        listenToDatasource(this.el);
+        this.el.setAttribute(this.data.datasource, {});
       }
-
-      tplData.parentElement.removeChild(tplData);
     }
 
+    this.initItemFactory();
+
+    // init the actual view model
+    this.initViewModel();
+  },
+  initItemFactory: function () {
     // query for itemFactory at entity
     var itemFactoryTpl = this.el.querySelector(':nth-child(1)');
     console.log('itemFactory', itemFactoryTpl);
@@ -225,9 +270,21 @@ AFRAME.registerComponent('gui-list-view', {
 
       itemFactoryTpl.parentElement.removeChild(itemFactoryTpl);
     }
+  },
+  initDefaultTemplateDatasource: function () {
+    var tplData = this.el.querySelector('template');
+    console.log('template', tplData);
+    if (tplData) {
+      var parsed = jsonic(tplData.innerHTML);
 
-    // init the actual view model
-    this.initViewModel();
+      if (parsed.length >= 0) {
+        this.data.items = parsed;
+      } else {
+        console.error("invalid data in template must be array of objects in less strict json format (see 'jsonic')");
+      }
+
+      tplData.parentElement.removeChild(tplData);
+    }
   },
   initViewModel: function () {
     // remove previous vm
@@ -243,11 +300,9 @@ AFRAME.registerComponent('gui-list-view', {
     }, this.data.orientation, this.data.overflow, this.data.invert);
     this.el.appendChild(this.vm.$el);
 
-    if (this.data.arrowsVisible) {
-      setTimeout(() => {
-        this.addArrows();
-      }, 500);
-    }
+    setTimeout(() => {
+      this.addArrows();
+    }, 500);
   },
   remove () {
     if (this.vm) {
@@ -255,6 +310,7 @@ AFRAME.registerComponent('gui-list-view', {
       this.vm.$el.removeChild(this.maxArrow);
       this.vm.$el.parentElement.removeChild(this.vm.$el);
       this.vm = null;
+      this.data.items = [];
     }
   }
 
@@ -313,7 +369,9 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
         var caption = that ? that.getAttribute('value') : '-1'; // TODO improve usability of list view
 
         if (this.$data.selectedIndex > -1) {
-          if (evtName != 'none') { this.$el.emit(evtName, data); }
+          if (evtName != 'none') {
+            this.$el.emit(evtName, data);
+          }
         }
       },
       onItemClicked: function (index) {
@@ -401,14 +459,14 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
     },
     watch: {
       /* items: {
-                                                              handler: function (val, oldVal) {
-                                                                // TODO not watching all the time
-                                                                // console.log('watch.items', val, oldVal);
+                                                                                                                    handler: function (val, oldVal) {
+                                                                                                                      // TODO not watching all the time
+                                                                                                                      // console.log('watch.items', val, oldVal);
 
-                                                                //  debouncedUpdate(this);
-                                                              },
-                                                              deep: false // TODO might interfere with recursive objects
-                                                            }, */
+                                                                                                                      //  debouncedUpdate(this);
+                                                                                                                    },
+                                                                                                                    deep: false // TODO might interfere with recursive objects
+                                                                                                                  }, */
       selectedIndex: {
         handler: function (val, oldVal) {
           // console.log('watch', arguments);
