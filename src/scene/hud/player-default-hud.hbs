@@ -1,4 +1,3 @@
-
 <a-plane visible="false" id="player-hud" click-drag compass position="0 0.4 0" scale="1 1 1" height="0.02" width="0.2"
          src="#compass-texture"
          material="transparent:true;opacity:0.7;repeat:0.25 1">
@@ -7,28 +6,27 @@
               rotation="0 0 90"></a-entity>
 
 
-
     <a-text class="player-count" value="Player Online 1" position="-0.95 .05 0" width=".6"></a-text>
 
 
-<!-- TODO online-player-datasource -->
-    <nk-list-view  arrows="false" ref=playerNames  scale="1 1 1" position=-.95 0 0" overflow="false">
-        <a-text
-                v-for="(item, index) in getVisibleItems(0,5)"
-                opacity="1"
-                :position="setPositionFromIndex(index,1,5,1,-.05)"
-                :animation="isSelected(index)?'property: rotation; from:0 0 0; to: 0 360 0; dur: 1000; easing: linear;loop:true':null"
-                width="0.6"
-                :value="item.value"
-        >
-        </a-text>
-        <template>[
-            {key:1,color:"white",value:"Me"},
-            {key:1,color:"white",value:"Other Guy"},
-            ]
-        </template>
-    </nk-list-view>
+    <!-- TODO online-player-datasource -->
+    <nk-list-view datasource="player-stats-datasource" arrows="false" ref=playerNames scale=".1 .1 .1" position="-.85 0 0"
+                  overflow="false">
 
+        <a-plane v-for="(item, index) in getVisibleItems(0,5)"
+                 opacity="0.3"
+                 :position="setPositionFromIndex(index,1,5,1,-.5)"
+                 height=".5"
+                 width="2.5"
+                 gui-border
+        >
+            <a-text
+                    position="-1 0 0"
+                    :value="item.value"
+            >
+            </a-text>
+        </a-plane>
+    </nk-list-view>
 
 
 </a-plane>

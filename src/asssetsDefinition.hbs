@@ -44,8 +44,27 @@
                 ></a-sphere>
             </a-sphere>
         </a-entity>
+
+        <a-entity class="gun">
+            <a-box
+                    position="0.51 -0.13 -0.29"
+                    scale="0.19 0.23 0.67"
+                    color="#000"
+            ></a-box>
+            <a-entity class="gun-tip"
+                      position="0.51 -0.10 -0.64"
+            ></a-entity>
+        </a-entity>
     </a-entity>
 </script>
+
+<script id="bullet-template" type="text/html">
+    <a-sphere class="bullet"
+              scale="0.1 0.1 0.1"
+              color="#fff"
+    ></a-sphere>
+</script>
+
 
 
 <script id="ball-template" type="text/html">
