@@ -22,24 +22,7 @@ AFRAME.registerComponent('gun', {
 
   createBullet: function () {
     var el = document.createElement('a-entity');
-    el.setAttribute('networked', 'template:' + this.data.bulletTemplate);
-    el.setAttribute('remove-in-seconds', 3);
-    el.setAttribute('forward', 'speed:0.3');
-    el.setAttribute('static-body', {}); // TODO can't shoot players if static body is enabled as static bodys don't emit collision
-    // beginContact endContact
-    playSound('.pew-pew');
-
-    el.addEventListener('collide', function (e) {
-      var targetEl = e.detail.body.el;
-
-      playSound('.bullet-impact');
-      toast('pewpew!!');
-      // collide with player
-      /*          if ($(targetEl).hasClass(that.data.playerClass)) {
-              console.log('simple-ball.collide player', e);
-          }
-  */
-    });
+    el.setAttribute('bullet', {bulletTemplate: this.data.bulletTemplate});
 
     var tip = getPlayer().querySelector('.gun-tip');
     el.setAttribute('position', this.getInitialBulletPosition(tip));

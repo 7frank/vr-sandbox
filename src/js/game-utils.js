@@ -1,8 +1,19 @@
 import $ from 'jquery';
 import * as CANNON from 'cannon';
 
+// the local player
 export function getPlayer () {
   return $('.player').get(0);
+}
+
+/**
+ *
+ * all players that are connected to the network
+ * FIXME performance listen to network and refresh list only on changes
+ *
+ */
+export function getPlayers () {
+  return document.querySelectorAll('[networked]').toArray().filter(a => a.components.networked.data.template == '#avatar-template');
 }
 
 /**

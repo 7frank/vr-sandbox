@@ -1,6 +1,6 @@
 AFRAME.registerComponent('forward', {
   schema: {
-    speed: {default: 0.1}
+    speed: {default: 10} // meter/second
   },
 
   init: function () {
@@ -13,13 +13,13 @@ AFRAME.registerComponent('forward', {
     console.error(this.worldDirection);
   },
 
-  tick: function () {
+  tick: function (time, delta) {
     var el = this.el;
 
     var currentPosition = el.getAttribute('position');
     var newPosition = this.worldDirection
       .clone()
-      .multiplyScalar(this.data.speed)
+      .multiplyScalar(this.data.speed * delta / 1000)
       .add(currentPosition);
     el.setAttribute('position', newPosition);
   }

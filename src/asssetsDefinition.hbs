@@ -3,6 +3,10 @@
 <!-- Avatar -->
 <script id="avatar-template" type="text/html">
     <a-entity class="avatar">
+
+        <a-entity health-bar position="0 1.5 0" look-at="src:[camera]"></a-entity>
+
+
         <a-text class="name" networked-name-tag
                 font="assets/fonts/DejaVu-sdf.fnt"  look-at="src:[camera]" color="#0f0" width=5 align="center"
                 value=""
