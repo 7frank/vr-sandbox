@@ -13,7 +13,7 @@ import {roundTo} from '../../utils/misc-utils';
 import {isShiftDown} from '../../utils/file-drag-drop-utils';
 
 import productConfigSample1 from '../a-configurator/productConfigSample1.html';
-import {getIntersectedEl} from '../../game-utils';
+import {getIntersectedEl, getPlayer, placeInFrontOfEntity} from '../../game-utils';
 
 // a list that contains template-containers to select them
 // first lets have a simple select like in fallout 4
@@ -31,7 +31,7 @@ const addRegionInteractions_createEntity = (selector, tplData) => {
   var regions = $(selector);
   _.each(regions, function (region) {
     region.setAttribute('template-droppable', true);
-    // we need to inject data directly because it is in html notationand can't be added via setAttribute
+    // we need to inject data directly because it is in html notation and can't be added via setAttribute
     region.setAttribute('template-droppable', 'template', tplData);
   });
 };
@@ -49,17 +49,6 @@ var behaviourTemplates = {
   flee: 'behaviour-attraction="speed:-1.5"',
   engage: 'behaviour-attraction="speed:0.5"'
 };
-
-AFRAME.registerComponent('wireframe', {
-  dependencies: ['material'],
-  init: function () {
-    if (this.el.components.material) {
-      this.el.components.material.material.wireframe = true;
-    } else {
-      console.warn("Can't set wireframe. Does not have material.");
-    }
-  }
-});
 
 // -----------------------------------------
 
@@ -114,7 +103,11 @@ AFRAME.registerComponent('gui-model-preview', {
       var dlg = container.find('[simple-dialog]').get(0);
       // dlg.setAttribute('simple-dialog', 'caption', `Press ${getDescriptiveTextForAction('interaction-pick')} , ${getDescriptiveTextForAction('player-move-forward')} or ${getDescriptiveTextForAction('player-move-backward')} to select an element that is shown to the right as preview. Then click on a region below your feet to place one such instance.`);
 
-      if (dlg.components['simple-dialog']) { dlg.components['simple-dialog'].vm.$data.caption = `Press ${getDescriptiveTextForAction('interaction-pick')}, ${getDescriptiveTextForAction('player-move-forward')} or ${getDescriptiveTextForAction('player-move-backward')}\n to select an element that is shown to the right as preview. Then click on a region below your feet to place one such instance. Hold "Shift" to be able to place more than one element at once.`; } else { console.error('not found, bad code :-P'); }
+      if (dlg.components['simple-dialog']) {
+        dlg.components['simple-dialog'].vm.$data.caption = `Press ${getDescriptiveTextForAction('interaction-pick')}, ${getDescriptiveTextForAction('player-move-forward')} or ${getDescriptiveTextForAction('player-move-backward')}\n to select an element that is shown to the right as preview. Then click on a region below your feet to place one such instance. Hold "Shift" to be able to place more than one element at once.`;
+      } else {
+        console.error('not found, bad code :-P');
+      }
     }, 5000);
 
     wrapper.append(container, previewWrapper);
@@ -148,20 +141,7 @@ AFRAME.registerComponent('gui-model-preview', {
 });
 
 // -----------------------------------------
-/*
-AFRAME.registerComponent('template-preview', {
-  schema: {
-    template: {type: 'string'}
-  },
 
-  init: function () {
-
-    // TODO list elements in a ring menu
-
-  }
-
-});
-*/
 /**
  * the next click on the entity this component is bound it will create the template at the intersection point.
 
@@ -267,6 +247,7 @@ AFRAME.registerComponent('template-droppable', {
     // note: for testing, make it interact with physics by default
     tplInstance.attr('dynamic-body', true);
     tplInstance.attr('configurable', true);
+    tplInstance.attr('pickable', true);
 
     // update position and write to DOM
     tplInstance.attr('position', AFRAME.utils.coordinates.stringify(targetPos));
@@ -279,42 +260,6 @@ AFRAME.registerComponent('template-droppable', {
     if (!isShiftDown()) {
       removeRegionInteractions_createEntity(mTargetRegions);
     }
-  }
-
-});
-
-// TODO hotkeys action remove-entity bind to mouse-right
-// TODO adaptive position of closeEl based on size of el
-//  how would an implementation of that work
-AFRAME.registerComponent('template-removable', {
-  schema: {},
-
-  init: function () {
-    this.closeEl = createHTML(`<a-entity simple-billboard position="0 1.5 0"><a-circle  material="side: double; color: red; transparent: true; opacity: 0.7"  radius=".1"></a-circle><a-text position="-.0775 .025 0" value="x"></a-text></a-entity>`);
-    this.el.append(this.closeEl);
-
-    this.closeEl.addEventListener('click', this.onRemoveEvent.bind(this));
-
-    var debounceHide = _.debounce(() => this.closeEl.setAttribute('visible', false), 2000);
-
-    this.el.addEventListener('focus', () => {
-      debounceHide.cancel();
-      this.closeEl.setAttribute('material', 'opacity:0.9');
-      this.closeEl.setAttribute('visible', true);
-    });
-    this.el.addEventListener('blur', () => this.closeEl.setAttribute('material', 'opacity:0.3'));
-    this.el.addEventListener('blur', debounceHide);
-  },
-  remove: function () {
-    this.closeEl.removeEventListener('click', this.onRemoveEvent.bind(this));
-  },
-  onRemoveEvent: function (event) {
-    event.stopPropagation();
-
-    // console.log('template-removable', arguments, this.data, event.detail.intersection);
-    toast('removed entity');
-
-    UndoMgr.removeHTMLElement(this.el);
   }
 
 });
@@ -339,35 +284,3 @@ function raycasterHelper (el, interval = 20) {
     }, interval)
   };
 }
-
-/**
- * add to be able to configure an entity when pressing <interaction-talk>
- *
- */
-AFRAME.registerComponent('configurable', {
-  schema: {
-    type: 'array', default: 'product-configurator'
-  },
-
-  init: function () {
-    // TODO data.parameters foreach gui-element
-
-    // el.addEventListener('interaction-talk', () => this.el.hasAttribute('product-configurator') ? this.el.removeAttribute('product-configurator') : this.el.setAttribute('product-configurator', true));
-    this.mHandler1 = () => {
-      if (!this.configMenu) {
-        this.configMenu = createHTML(productConfigSample1);
-        this.el.append(this.configMenu);
-      } else {
-        var vis = this.configMenu.getAttribute('visible');
-        this.configMenu.setAttribute('visible', !vis);
-      }
-    };
-
-    this.el.addEventListener('interaction-talk', this.mHandler1);
-  },
-  remove: function () {
-    this.el.removeEventListener('interaction-talk', this.mHandler1);
-    if (this.configMenu) { this.configMenu.parentElement.remove(this.configMenu); }
-  }
-
-});
