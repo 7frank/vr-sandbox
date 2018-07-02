@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import * as CANNON from 'cannon';
+import {getClosestEditableRegion, getWorldDirection, getWorldPosition, teleportPhysicsBody} from './utils/aframe-utils';
 
 // the local player
 export function getPlayer () {
@@ -33,21 +34,43 @@ export function getIntersectedEl () {
   return c.intersectedEl;
 }
 
+/**
+ *
+ * @param el - must be attached to a parentEl
+ * @param targetEl
+ * @param distance
+ */
+export function placeInFrontOfEntity (el, targetEl, distance = 5, maintainSameY = true) {
+  let pos = getWorldPosition(targetEl.object3D);
+  let dir = getWorldDirection(targetEl.object3D);
+
+  // TODO relative to regions and targetEl
+  if (maintainSameY) {
+    dir.y = 0;
+    dir.normalize();
+  }
+
+  let targetPos = pos.clone(pos).add(dir.multiplyScalar(-distance));
+
+  if (el.body != null && el.body.position != null) {
+    teleportPhysicsBody(el.body, targetPos);
+  } else el.setAttribute('position', targetPos);
+}
+
 // FIXME
 export function getBall () {
   return $('.ball').get(0);
 }
 
-export
-function playerKickBall () {
+export function playerKickBall () {
   var player = getPlayer();
   var ball = getBall();
 
   /* el.body.applyImpulse(
-                                                                          // impulse  new CANNON.Vec3(0, 1, 0),
-                                                                          // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
-                                                                        );
-                                                                        */
+                                                                            // impulse  new CANNON.Vec3(0, 1, 0),
+                                                                            // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
+                                                                          );
+                                                                          */
   var p = player.body.position;
   var b = ball.body.position;
 
@@ -59,14 +82,13 @@ function playerKickBall () {
   }
 }
 
-export
-function activateJetpack () {
+export function activateJetpack () {
   var player = getPlayer();
   /* el.body.applyImpulse(
-                                                                          // impulse  new CANNON.Vec3(0, 1, 0),
-                                                                          // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
-                                                                        );
-                                                                        */
+                                                                            // impulse  new CANNON.Vec3(0, 1, 0),
+                                                                            // world position  new CANNON.Vec3().copy(el.getComputedAttribute('position'))
+                                                                          );
+                                                                          */
   var el = player; // partially works with ball but not with player body as it seems
   el.body.applyImpulse(new CANNON.Vec3(0, 1, 0), new CANNON.Vec3(0, -1, 0)); // new CANNON.Vec3().copy(el.getComputedAttribute('position')));
 }

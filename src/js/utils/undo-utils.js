@@ -1,83 +1,103 @@
 import UndoManager from 'undo-manager';
 import * as _ from 'lodash';
 
-var undoManager = new UndoManager();
+var undoManagerMap = {};
 
-export var UndoMgr = {
+export var UndoMgr = getUndoManager('default');
 
-  /**
-     * Convenience function for adding an entity to another entity.
-     * @param el
-     * @param target
-     */
-  addHTMLElementToTarget: function (el, target) {
-    var oldParentEL;
+/**
+ *
+ * @param name
+ * @returns {*}
+ */
 
-    function addElement () {
-      oldParentEL = el.parentElement;
-      target.appendChild(el);
-    }
+export
+function getUndoManager (name) {
+  console.log(undoManagerMap);
+  if (undoManagerMap[name]) return undoManagerMap[name];
 
-    undoManager.add({
-      undo: function () {
-        if (oldParentEL) {
-          oldParentEL.appendChild(el);
-        } else {
-          target.removeChild(el);
-        }
-      },
-      redo: addElement
-    });
+  var undoManager = new UndoManager();
 
-    addElement();
-  },
+  var mUndoMgr = {
 
-  removeHTMLElement: function (el) {
-    var oldParentEL;
+    /**
+         * Convenience function for adding an entity to another entity.
+         * @param el
+         * @param target
+         */
+    addHTMLElementToTarget: function (el, target) {
+      var oldParentEL;
 
-    function removeElement () {
-      oldParentEL = el.parentElement;
-      el.parentElement.remove(el);
-    }
+      function addElement () {
+        oldParentEL = el.parentElement;
+        target.appendChild(el);
+      }
 
-    undoManager.add({
-      undo: function () {
-        if (oldParentEL) {
-          oldParentEL.appendChild(el);
-        }
-      },
-      redo: removeElement
-    });
+      undoManager.add({
+        undo: function () {
+          if (oldParentEL) {
+            oldParentEL.appendChild(el);
+          } else {
+            target.removeChild(el);
+          }
+        },
+        redo: addElement
+      });
 
-    removeElement();
-  },
-  /**
-     * Puts attribute changes of a HTMLElement onto the undo stack.
-     * @param {HTMLElement} el - The target for the undo/redo.
-     * @param {object} attributes - A map containing attributes that should be changed via setAttribute.
-     * @param {object} [oldAttributes] - A map containing attributes that will be used for the undo step. Note: If left undefined, 'oldAttributes' will be retrieved from the 'attributes' keys.
-     */
-  addHTMLAttributes: function (el, attributes, oldAttributes) {
-    if (!oldAttributes) {
-      oldAttributes = _.mapValues(attributes, (attr, key) => el.getAttribute(key));
-    }
+      addElement();
+    },
 
-    const addAttrs = (attributes) => () => _.each(attributes, (attr, key) => (attr != null) ? el.setAttribute(key, attr) : el.removeAttribute(key));
-    this.add({
-      redo: addAttrs(attributes),
-      undo: addAttrs(oldAttributes)
+    removeHTMLElement: function (el) {
+      var oldParentEL;
 
-    });
+      function removeElement () {
+        oldParentEL = el.parentElement;
+        el.parentElement.remove(el);
+      }
 
-    addAttrs(attributes)();
-  },
-  add: function ({undo, redo}) {
-    if (!undo) throw new Error('undo not defined');
-    if (!redo) throw new Error('redo not defined');
+      undoManager.add({
+        undo: function () {
+          if (oldParentEL) {
+            oldParentEL.appendChild(el);
+          }
+        },
+        redo: removeElement
+      });
 
-    undoManager.add({undo, redo});
-  },
-  undo: () => undoManager.undo(),
-  redo: () => undoManager.redo()
+      removeElement();
+    },
+    /**
+         * Puts attribute changes of a HTMLElement onto the undo stack.
+         * @param {HTMLElement} el - The target for the undo/redo.
+         * @param {object} attributes - A map containing attributes that should be changed via setAttribute.
+         * @param {object} [oldAttributes] - A map containing attributes that will be used for the undo step. Note: If left undefined, 'oldAttributes' will be retrieved from the 'attributes' keys.
+         */
+    addHTMLAttributes: function (el, attributes, oldAttributes) {
+      if (!oldAttributes) {
+        oldAttributes = _.mapValues(attributes, (attr, key) => el.getAttribute(key));
+      }
 
-};
+      const addAttrs = (attributes) => () => _.each(attributes, (attr, key) => (attr != null) ? el.setAttribute(key, attr) : el.removeAttribute(key));
+      this.add({
+        redo: addAttrs(attributes),
+        undo: addAttrs(oldAttributes)
+
+      });
+
+      addAttrs(attributes)();
+    },
+    add: function ({undo, redo}) {
+      if (!undo) throw new Error('undo not defined');
+      if (!redo) throw new Error('redo not defined');
+
+      undoManager.add({undo, redo});
+    },
+    undo: () => undoManager.undo(),
+    redo: () => undoManager.redo()
+
+  };
+
+  undoManagerMap[name] = mUndoMgr;
+
+  return mUndoMgr;
+}
