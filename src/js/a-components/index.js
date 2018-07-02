@@ -16,7 +16,7 @@ import './lod-terrain/cdlod-terrain';
 import './proctree';
 import './world-map';
 import './cursor-wheel-listener';
-import './templates/template-library';
+import './templates';
 import './camera-layers';
 import './networked-name-tag';
 import './transform-controls';

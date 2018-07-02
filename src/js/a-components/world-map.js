@@ -175,7 +175,9 @@ AFRAME.registerComponent('world-map', {
 
       // ----------------------------------
 
-      renderer.render(undefined, bufferScene, camera, bufferTexture);
+      bufferScene.__suppress_render_events__ = true;
+      renderer.render(bufferScene, camera, bufferTexture);
+      bufferScene.__suppress_render_events__ = null;
     }, this);
 
     this.updateWorldMapScript.start();

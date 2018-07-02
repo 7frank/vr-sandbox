@@ -17,14 +17,22 @@
                  opacity="0.3"
                  :position="setPositionFromIndex(index,1,5,1,-.5)"
                  height=".5"
-                 width="2.5"
+                 width="3"
                  gui-border
         >
             <a-text
-                    position="-1 0 0"
+                    position="-1.2 0 0"
                     :value="item.value"
             >
             </a-text>
+
+            <a-text
+                    position="1.2 0 0"
+                    :value="item.score"
+            >
+            </a-text>
+
+
         </a-plane>
     </nk-list-view>
 

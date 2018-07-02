@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import {
-  findClosestEntity,
+  findClosestEntity, getClosestEditableRegion,
   getDirectionForEntity,
   getPosition, getWorldPosition,
   playSound, scaleEntity,
@@ -14,7 +14,7 @@ import {ImpactGUI} from './utils/performance-utils';
 
 import {createHTML, setCenter} from './utils/dom-utils';
 import {openOptionsDialog} from './gameOptionsDialog';
-import {activateJetpack, getBall, getPlayer, playerKickBall} from './game-utils';
+import {activateJetpack, getBall, getPlayer, placeInFrontOfEntity, playerKickBall} from './game-utils';
 
 import {attachCodeEditor} from './reafactor.stuff';
 import {enterOrExitVehicle} from './car.refactor';
@@ -110,7 +110,11 @@ function addHotkeys () {
     var visible = !document.querySelector('#m-main-menu').object3D.visible;
 
     var hud = document.querySelector('[hud-hud]');
-    if (visible) { showMenu(hud, 'm-main-menu'); } else { showMenu(hud, 'player-hud'); }
+    if (visible) {
+      showMenu(hud, 'm-main-menu');
+    } else {
+      showMenu(hud, 'player-hud');
+    }
 
     let state = visible ? 'mouse' : 'entity';
 
@@ -147,10 +151,10 @@ function addHotkeys () {
 
   /* alert("we can 'R' but not move");
 
-          $('a-scene').setAttribute('cursor-focus', true);
-          sphere = document.activeElement;
-          sphere.addEventListener('keyup', (...args) => console.log('key', args, args[0].which));
-          */
+            $('a-scene').setAttribute('cursor-focus', true);
+            sphere = document.activeElement;
+            sphere.addEventListener('keyup', (...args) => console.log('key', args, args[0].which));
+            */
 
   // ----------------------------------------------
   // FIXME controls are overloaded and will work despite these wasd controls below not being active
@@ -318,6 +322,23 @@ function addHotkeys () {
   });
   Hotkeys().on(ACTIONS.redo, function () {
     UndoMgr.redo();
+  });
+
+  // TODO glitches out when reloading multiple times
+  var templateEditor = createHTML(`<a-entity><a-entity gui-model-preview position="-1 4 0" scale="1 1 1"  simple-billboard></a-entity></a-entity>`);
+  Hotkeys.register('toggle-template-editor', 'shift+tab', {
+    category: 'editing'
+  });
+  Hotkeys().on('toggle-template-editor', function () {
+    let scene = document.querySelector('a-scene');
+    let region = getClosestEditableRegion(scene);
+
+    if (templateEditor.parentElement == null) {
+      region.appendChild(templateEditor);
+      placeInFrontOfEntity(templateEditor, getPlayer(), 5);
+    } else {
+      templateEditor.parentElement.removeChild(templateEditor);
+    }
   });
 
   // debugging

@@ -9,14 +9,14 @@ AFRAME.registerComponent('player-stats-datasource', {
 
     document.body.addEventListener('connected', (evt) => {
       let clientId = evt.detail.clientId;
-      let mData = {key: -1, value: 'Me', clientId};
+      let mData = {key: -1, value: 'Me', clientId, score: 0};
 
       observableDataArray.push(mData);
     });
 
     document.body.addEventListener('clientConnected', function (evt) {
       let clientId = evt.detail.clientId;
-      let mData = {key: -1, value: clientId, clientId};
+      let mData = {key: -1, value: clientId, clientId, score: 0};
 
       observableDataArray.push(mData);
     });

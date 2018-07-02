@@ -4,16 +4,6 @@
     <script src="socket.io/socket.io.js"></script>
     <script src="lib/easyrtc.js"></script>
     <script src="https://unpkg.com/networked-aframe@^0.4.0/dist/networked-aframe.min.js"></script>
-    <!--
-    <script src="https://unpkg.com/aframe-randomizer-components@^3.0.1/dist/aframe-randomizer-components.min.js"></script>
-    <script src="https://unpkg.com/aframe-particle-system-component@1.0.5/dist/aframe-particle-system-component.min.js"></script>
-
-    -->
-
-    <!-- bootstrap for preloader -->
-    <!-- <link rel="stylesheet" href="https://cdn.rawgit.com/thomaspark/bootswatch/gh-pages/slate/bootstrap.min.css" /> -->
-
-
     <script src="/assets/js/spawn-in-circle.component.js"></script>
 
 
@@ -75,30 +65,7 @@
 
 </script>
 
-<!-- endof scripts for network sample -->
 
-<!--<a-scene id="aframe-project">
-  {{> entity/default-sphere}}
-    {{> entity/default-cylinder}}
-    {{> entity/default-plane}}
-    {{> entity/custom-box}}
-    {{> sky/default-sky}}
-    {{> camera/default-camera}}
-
-
-    <a-sphere position="1 1.25 -1" radius="1.25" color="#ffffff"></a-sphere>
-    </a-scene>
--->
-
-
-<!-- default scene which is currently needed to load aframe  LEAVE EMPTY-->
-<!-- TODO reduce redundancy with sceneDefinition.hbs-->
-<!--<a-scene networked-scene="room: basic;debug: true;" light="shadowMapType: basic"
-         visible="true"
-         id="aframe-project"
-         physics="debug: false">
-</a-scene>
--->
 
 {{> ../sceneDefinition}}
 
@@ -224,5 +191,26 @@ body{background-color:slategrey}
 
 
 <div class="goal-info-text">GOAL!!!</div>
+<style>
+    .ci-icon {
+
+        display:none;
+
+        position:absolute;
+        top:10px;
+        left:10px;
+        width:100px;
+        height:100px;
+        background:url(/assets/company/CI-Logo.svg);
+
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+
+    }
+
+
+</style>
+<div class="ci-icon"></div>
 
 
