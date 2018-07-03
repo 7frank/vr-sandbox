@@ -87,7 +87,7 @@ AFRAME.registerComponent('editable-region', {
       var meshes = AFRAME.nk.querySelectorAll(obj, '.Mesh');
 
       for (var obj of meshes) {
-        if (typeof obj.deltaTimes == 'object') return; //
+        if (typeof obj.deltaTimes === 'object') return; //
 
         obj.deltaTimes = [];
 

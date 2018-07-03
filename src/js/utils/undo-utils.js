@@ -28,7 +28,7 @@ export function getUndoManager (name) {
       var oldParentEL;
 
       if (!position) position = el.getAttribute('position');
-      else if (typeof position != 'string') { position = AFRAME.utils.coordinates.stringify(position); }
+      else if (typeof position !== 'string') { position = AFRAME.utils.coordinates.stringify(position); }
 
       function addElement () {
         oldParentEL = el.parentElement;

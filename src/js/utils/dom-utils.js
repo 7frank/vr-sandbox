@@ -9,7 +9,7 @@ import $ from 'jquery';
 
 export
 function createHTML (html) {
-  if (typeof html != 'string') throw new Error('invalid type');
+  if (typeof html !== 'string') throw new Error('invalid type');
 
   return $(html).get(0);
 }

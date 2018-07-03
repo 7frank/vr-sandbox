@@ -66,7 +66,7 @@ export function playAnimation (el, animationName, tCrossfade) {
  * @constructor
  */
 export function AnimationFactory (origObject) {
-  if (typeof origObject == 'undefined') throw new Error('must be an object');
+  if (typeof origObject === 'undefined') throw new Error('must be an object');
 
   // https://github.com/tweenjs/tween.js/issues/78
   // Flatten/Deflate an object
@@ -137,7 +137,7 @@ export function AnimationFactory (origObject) {
         cancelAnimationFrame(mTimeout);
 
         stopped = true;
-        if (typeof onComplete == 'function') {
+        if (typeof onComplete === 'function') {
           onComplete.bind(origObject)();
         }
       }
@@ -151,7 +151,7 @@ export function AnimationFactory (origObject) {
           for (let key in values) {
             returnValue(that, values, key);
           }
-          if (typeof onUpdate == 'function') onUpdate.bind(that)();
+          if (typeof onUpdate === 'function') onUpdate.bind(that)();
         })
         .onComplete(onFinish).onStop(onFinish)
         .start();

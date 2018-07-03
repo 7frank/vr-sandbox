@@ -6,7 +6,7 @@
 import TWEEN from '@tweenjs/tween.js';
 
 export default function AnimationMixin (origObject) {
-  if (typeof origObject == 'undefined') throw new Error('must be an object');
+  if (typeof origObject === 'undefined') throw new Error('must be an object');
 
   // https://github.com/tweenjs/tween.js/issues/78
   // Flatten/Deflate an object
@@ -84,13 +84,13 @@ export default function AnimationMixin (origObject) {
         for (let key in this) {
           returnValue(that, this, key);
         }
-        if (typeof onUpdate == 'function') onUpdate.bind(that)();
+        if (typeof onUpdate === 'function') onUpdate.bind(that)();
       })
       .onComplete(function () {
         cancelAnimationFrame(mTimeout);
 
         stopped = true;
-        if (typeof onComplete == 'function') { onComplete.bind(origObject)(); }
+        if (typeof onComplete === 'function') { onComplete.bind(origObject)(); }
       })
       .start();
 

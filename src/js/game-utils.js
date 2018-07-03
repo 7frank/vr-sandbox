@@ -7,7 +7,7 @@ import {
 
 // the local player
 export function getPlayer () {
-  return $('.player').get(0);
+  return $('#player').get(0);
 }
 
 /**

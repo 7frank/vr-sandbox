@@ -53,6 +53,7 @@ AFRAME.registerComponent('health-bar', {
        * - reset health
        * - set scoreboard
        * TODO put in separate component
+       * TODO respawn is only local .. use network
        */
     this.el.addEventListener('health-zero', ({detail}) => {
       console.log('health-zero', detail);

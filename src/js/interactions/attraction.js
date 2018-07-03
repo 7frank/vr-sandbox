@@ -33,7 +33,7 @@ AFRAME.registerComponent('behaviour-attraction', {
       default: 30
     },
     target: {
-      default: '.player' // how to model hostility maybe by class .team-1 2 3 ...
+      default: '.avatar' // how to model hostility maybe by class .team-1 2 3 ...
     }
 
   },

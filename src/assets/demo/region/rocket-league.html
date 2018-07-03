@@ -22,7 +22,7 @@
 
     <!-- movable objects: ball and cars  -->
 
-    <a-entity networked="template:#ball-template;showLocalTemplate:true;" spawn-in-circle="radius:3;"  ></a-entity>
+    <a-entity networked="template:#ball-template;attachTemplateToLocal:true;" spawn-in-circle="radius:3;"  ></a-entity>
     <a-simple-car bb type="gallardo" position="0 10.25 -15" dynamic-body="shape: box; mass: 3000" scale="4 4 4"   ></a-simple-car>
     <a-simple-car bb type="veyron"   position="0 10.25 15" dynamic-body="shape: box; mass: 3000" scale="4 4 4"   ></a-simple-car>
 

@@ -1,12 +1,18 @@
 import {createTerrain} from '../utils/terrain-utils';
 import {updateHotComponent} from '../utils/aframe-debug-utils';
+import {getPlayer} from '../game-utils';
 
 /**
  * sets the name or if none is given the networkId
  * @param name
  */
 function setLocalActorName (name) {
-  var player = document.querySelector('.player');
+  var player = getPlayer();
+
+  if (!player) {
+    setTimeout(() => setLocalActorName(name), 100);
+    return;
+  }
 
   var networked = player.components.networked;
   if (!networked) console.error("can't set local actor name... not networked");
@@ -15,7 +21,11 @@ function setLocalActorName (name) {
 
   var myNametag = player.querySelector('.name');
 
-  if (name) { myNametag.setAttribute('text', 'value', name); } else { myNametag.setAttribute('text', 'value', id); }
+  if (name) {
+    myNametag.setAttribute('text', 'value', name);
+  } else {
+    myNametag.setAttribute('text', 'value', id);
+  }
 }
 
 /**

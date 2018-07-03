@@ -37,11 +37,11 @@ import {createNamespace, namespaceExists, namespaceInfo} from './namespace';
 const dot60Pattern = new RegExp('%60', 'g');
 
 export function querySelectorAll (object3D, selector, debug = false) {
-  if (typeof object3D != 'object') throw new Error('first param must be a THREE.Obejct3D');
-  if (typeof selector != 'string') throw new Error('second param must be a proper css-selector string');
+  if (typeof object3D !== 'object') throw new Error('first param must be a THREE.Obejct3D');
+  if (typeof selector !== 'string') throw new Error('second param must be a proper css-selector string');
   if (selector == '') selector = 'selector';
   // convenience function allowing for simply dropping AFRAME elements
-  if (typeof object3D.object3D == 'object') {
+  if (typeof object3D.object3D === 'object') {
     object3D = object3D.object3D;
   }
 
@@ -105,7 +105,7 @@ export function querySelectorAll (object3D, selector, debug = false) {
     });
 
     var item = _.find(test, function (o) {
-      return typeof o == 'object';
+      return typeof o === 'object';
     });
     if (item) {
       return item;
@@ -254,12 +254,12 @@ export function querySelectorAll (object3D, selector, debug = false) {
           } else { // eval.. for lack of other reasonable options
             let leftSide = namespace[info.key];
             let rightSide = whereObject.value;
-            if (typeof leftSide == 'string') {
+            if (typeof leftSide === 'string') {
               if (leftSide == '') leftSide = '``';
               else {
                 leftSide = '`' + encodeURI(leftSide) + '`';
                 // TODO "" encoded to `%60%60` somewhere which might or might not become a problem
-                if (typeof rightSide == 'string') {
+                if (typeof rightSide === 'string') {
                   rightSide = '`' + encodeURI(rightSide) + '`';
                   rightSide = rightSide.replace(dot60Pattern, '');
                 }

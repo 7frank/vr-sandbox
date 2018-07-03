@@ -115,9 +115,10 @@ AFRAME.registerComponent('template-droppable', {
 
     setTimeout(() => {
       let instance = tplInstance.get(0);
+
       window.ooo = instance;
-      let mEl = instance.components.networked.templateEl.children[0];
-      mEl.setAttribute('template-template', {value: this.data.template});
+      // let mEl = instance.components.networked.templateEl.children[0];
+      instance.setAttribute('template-template', {value: this.data.template});
     }, 500);
 
     if (this.data.removable) {
@@ -127,7 +128,7 @@ AFRAME.registerComponent('template-droppable', {
     //
     tplInstance.attr('configurable', true);
     tplInstance.attr('pickable', true);
-    // tplInstance.attr('networked', 'template:#editable-actor-template;showLocalTemplate:true;');
+    // tplInstance.attr('networked', 'template:#editable-actor-template;attachTemplateToLocal:true;');
 
     UndoMgr.addHTMLElementToTarget(tplInstance.get(0), targetEl, targetPos);
 

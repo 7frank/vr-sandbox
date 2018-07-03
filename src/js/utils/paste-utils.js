@@ -11,7 +11,7 @@
  */
 export function retrieveImageOrTextFromClipboardAsBlob (pasteEvent, callback) {
   if (pasteEvent.clipboardData == false) {
-    if (typeof (callback) == 'function') {
+    if (typeof (callback) === 'function') {
       callback(undefined);
     }
   }
@@ -19,7 +19,7 @@ export function retrieveImageOrTextFromClipboardAsBlob (pasteEvent, callback) {
   var items = pasteEvent.clipboardData.items;
 
   if (items == undefined) {
-    if (typeof (callback) == 'function') {
+    if (typeof (callback) === 'function') {
       callback(undefined);
     }
   }
@@ -32,14 +32,14 @@ export function retrieveImageOrTextFromClipboardAsBlob (pasteEvent, callback) {
 
       var blob = items[i].getAsFile();
 
-      if (typeof (callback) == 'function') {
+      if (typeof (callback) === 'function') {
         callback(blob, 'image');
       }
     } else if (items[i].type.indexOf('text/plain') > -1) {
       // Retrieve image on clipboard as blob
 
       items[i].getAsString(function (str) {
-        if (typeof (callback) == 'function') {
+        if (typeof (callback) === 'function') {
           callback(str, 'text');
         }
       });

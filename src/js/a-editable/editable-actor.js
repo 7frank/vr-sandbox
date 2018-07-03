@@ -67,7 +67,7 @@ function startEditingTextarea () {
   // select and bring-into-view
   // open textarea
 
-  var target = findClosestEntity('.editable-actor', '.player');
+  var target = findClosestEntity('.editable-actor', '#player');
 
   if (!target) {
     console.warn('no target found ', '.editable-actor');

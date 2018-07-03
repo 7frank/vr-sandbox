@@ -4,6 +4,7 @@ import {playSound, toast} from '../../utils/aframe-utils';
 AFRAME.registerComponent('gun', {
   schema: {
     bulletTemplate: {default: '#bullet-template'},
+
     triggerKeyCode: {default: 32} // spacebar
   },
 

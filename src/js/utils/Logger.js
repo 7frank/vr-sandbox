@@ -12,7 +12,7 @@ var activeLoggerTarget;
 
 var handler = {
   get: function (target, name) {
-    if (typeof console[name] == 'function') {
+    if (typeof console[name] === 'function') {
       return function (...args) {
         target.cached.push({method: name, args});
 

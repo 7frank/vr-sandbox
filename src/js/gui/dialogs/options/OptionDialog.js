@@ -12,6 +12,7 @@ import {createCameraConfigGUI} from '../../../types/Layers';
 import { ScriptImpactObject, RaycasterImpactObject} from '../../../utils/performance-utils';
 import {createTable} from '../../Table';
 import {createOptions} from '../GeneralOptions';
+import {getPlayer} from '../../../game-utils';
 // import keenCss from 'keen-ui/dist/keen-ui.css';
 // import 'keen-ui/dist/keen-ui.css';
 Vue.use(KeenUI);
@@ -52,7 +53,7 @@ export default class OptionsDialog {
 
     var container = $('<div>').append(template);
     this.$ = container;
-    this.fillCheckboxes(container, $('.player').get(0));
+    this.fillCheckboxes(container, getPlayer());
 
     // loads the Icon plugin
   }

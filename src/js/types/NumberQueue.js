@@ -11,7 +11,7 @@ export class NumberQueue extends Queue {
      * @param {number} item - A number to enqueue.
      */
   enqueue (item) {
-    if (typeof item != 'number') throw new Error('NumberQueue only accepts numbers');
+    if (typeof item !== 'number') throw new Error('NumberQueue only accepts numbers');
 
     super.enqueue(item);
   }

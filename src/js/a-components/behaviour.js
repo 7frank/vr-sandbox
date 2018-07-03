@@ -13,7 +13,7 @@ AFRAME.registerComponent('behaviour', {
     /**
          * have some basic movement pattern that can be customised
          *
-         * e.g. behaviour="fear:.player;like:.ball"
+         * e.g. behaviour="fear:.avatar;like:.ball"
          *
          *
          *

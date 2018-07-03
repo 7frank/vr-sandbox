@@ -37,7 +37,7 @@ export function createOptions (camera) {
         }
       },
       updateLocalPlayerName: function () {
-        var playerName = document.querySelector('.player .name');
+        var playerName = document.querySelector('#player .name');
 
         var tagName = playerName.components['networked-name-tag'];
 
@@ -46,7 +46,7 @@ export function createOptions (camera) {
       },
       updateLocalPlayerMessage: function () {
         // TODO use and sync native text component instead
-        var playerName = document.querySelector('.player .say');
+        var playerName = document.querySelector('#player .say');
 
         var tag = playerName.components['networked-tag'];
 

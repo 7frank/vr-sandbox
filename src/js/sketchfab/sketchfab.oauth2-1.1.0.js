@@ -57,7 +57,7 @@ SketchfabOAuth2.prototype.connect = function (pendingCallback) {
 
         // not yet loaded. wait a little bit
         if (url == 'about:blank') {
-          if (typeof pendingCallback == 'function') {
+          if (typeof pendingCallback === 'function') {
             pendingCallback({state: 'loading'});
           }
           return;
@@ -99,7 +99,7 @@ SketchfabOAuth2.prototype.connect = function (pendingCallback) {
       } catch (e) {
         // the window has loaded the oauth page and we get cross origin exceptions thrown
         if (e.message.indexOf('cross-origin') > -1) {
-          if (typeof pendingCallback == 'function') {
+          if (typeof pendingCallback === 'function') {
             pendingCallback({state: 'pending'});
           }
         } else {

@@ -133,7 +133,7 @@ AFRAME.registerComponent('show-side', {
     var side = checkSide(this.el.object3D, this.el.sceneEl.camera.el.object3D);
 
     _(this.data.selectors)
-      .map(s => (typeof s == 'string') ? this.el.querySelectorAll(s) : s)
+      .map(s => (typeof s === 'string') ? this.el.querySelectorAll(s) : s)
       .flatten()
       .value()
       .each(function (el) {

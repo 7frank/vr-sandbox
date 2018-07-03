@@ -8,7 +8,7 @@ import {getWorldPosition} from '../utils/aframe-utils';
  * @deprecated
  */
 export function importOrLoadFromCache (dataURL) {
-  var tpl = `<a-entity class="imported-model"  networked="template:#imported-element-template;showLocalTemplate:true;">
+  var tpl = `<a-entity class="imported-model"  networked="template:#imported-element-template;attachTemplateToLocal:true;">
         
         </a-entity>`;
 
@@ -33,7 +33,7 @@ export function importOrLoadFromCache (dataURL) {
  * @returns {*}
  */
 export function createNetworkedGLTFEntity (url) {
-  var tpl = `<a-entity class="imported-model"  networked="template:#imported-element-template;showLocalTemplate:true;">
+  var tpl = `<a-entity class="imported-model"  networked="template:#imported-element-template;attachTemplateToLocal:true;">
         
         </a-entity>`;
 

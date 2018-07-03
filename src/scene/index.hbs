@@ -3,7 +3,7 @@
 
     <script src="socket.io/socket.io.js"></script>
     <script src="lib/easyrtc.js"></script>
-    <script src="https://unpkg.com/networked-aframe@^0.4.0/dist/networked-aframe.min.js"></script>
+   <!-- <script src="https://unpkg.com/networked-aframe@^0.6.1/dist/networked-aframe.min.js"></script> -->
     <script src="/assets/js/spawn-in-circle.component.js"></script>
 
 
@@ -54,7 +54,7 @@
             'rotation',
             'scale',
             {
-                selector: '.content',
+              //  selector: '.content',
                 component: 'networked-imported-model',
                 property: 'src'
             }
@@ -69,9 +69,9 @@
         components: [
             'position',
             'rotation',
-            'scale',
+            //'scale', FIXME scale not working oO
            {
-               selector: '.content',
+              // selector: '#root',
                 component: 'template-template',
                 property: 'value'
             }

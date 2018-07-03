@@ -32,7 +32,7 @@ export function getPosition (el) {
 export function setPosition (el, v) {
   var arr, v2;
 
-  if (typeof v == 'string') {
+  if (typeof v === 'string') {
     arr = v.split(' ');
 
     v2 = {x: Number(arr[0]), y: Number(arr[1]), z: Number(arr[2])};
@@ -135,11 +135,11 @@ export function getDirectionForEntity (entity) {
   return direction;
 
   /* var pos = o3d.position;
-                        var up = o3d.up;
-                        var quaternion = o3d.quaternion;
-                        var direction = new THREE.Vector3().copy(up);
-                        direction.applyQuaternion(quaternion);
-                        return direction; */
+                          var up = o3d.up;
+                          var quaternion = o3d.quaternion;
+                          var direction = new THREE.Vector3().copy(up);
+                          direction.applyQuaternion(quaternion);
+                          return direction; */
 }
 
 /**
@@ -149,9 +149,9 @@ export function getDirectionForEntity (entity) {
  * @param {number} minDistance - if the distance between selector-Element and targetSelector-Elements is bigger than minDistance the targetSelector-Element gets discarded.
  * @returns {*}
  */
-export function findClosestEntity (targetSelector, selector = '.player', minDistance = Infinity) {
-  var player = typeof selector == 'string' ? document.querySelector(selector) : selector;
-  var targets = typeof targetSelector == 'string' ? document.querySelectorAll(targetSelector) : targetSelector;
+export function findClosestEntity (targetSelector, selector = '#player', minDistance = Infinity) {
+  var player = typeof selector === 'string' ? document.querySelector(selector) : selector;
+  var targets = typeof targetSelector === 'string' ? document.querySelectorAll(targetSelector) : targetSelector;
 
   if (!targets.length) throw new Error('probably invalid targetSelector');
 
@@ -196,7 +196,7 @@ export function findClosestEntity (targetSelector, selector = '.player', minDist
 export function toast (msg, duration = 2000, action = 'Ok') {
   var el = getPlayer();
 
-  if (typeof duration != 'number') throw new Error('type mismatch: must be number');
+  if (typeof duration !== 'number') throw new Error('type mismatch: must be number');
 
   function checkToastForDeletion (el) {
     if (_.get(el, 'components.toast.label.object3D.children[0].material.opacity') == 0) {
@@ -204,12 +204,13 @@ export function toast (msg, duration = 2000, action = 'Ok') {
     }
   }
 
-  el.querySelectorAll('a-toast').forEach(el => checkToastForDeletion(el));
+  if (el) {
+    el.querySelectorAll('a-toast').forEach(el => checkToastForDeletion(el));
 
-  // ---------------------------
-  // check if a toast with the same message is already visible in which case do nothing
-  if (el.querySelector(`a-toast[message='${msg}']`)) return;
-
+    // ---------------------------
+    // check if a toast with the same message is already visible in which case do nothing
+    if (el.querySelector(`a-toast[message='${msg}']`)) return;
+  }
   const renderToast = () => {
     var actionParam = '';
     if (action) {
@@ -732,9 +733,16 @@ async function loadTexture (url) {
 export function cloneMeshMaterial (mesh, recursive = true, removeClippingPlanes = true) {
   if (!mesh.material) return null;
 
-  const doClone = (material) => { let cloned = material.clone(); cloned.needsUpdate = true; cloned.clippingPlanes = removeClippingPlanes ? null : cloned.clippingPlanes; return cloned; };
+  const doClone = (material) => {
+    let cloned = material.clone();
+    cloned.needsUpdate = true;
+    cloned.clippingPlanes = removeClippingPlanes ? null : cloned.clippingPlanes;
+    return cloned;
+  };
 
-  if (_.isArray(mesh.material)) { return mesh.material.map(doClone); }
+  if (_.isArray(mesh.material)) {
+    return mesh.material.map(doClone);
+  }
 
   return doClone(mesh.material);
 }

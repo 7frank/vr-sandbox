@@ -40,9 +40,9 @@ AFRAME.registerComponent('simple-ball', {
 
         $('.goal-info-text').fadeIn(300).fadeOut(300).fadeIn(300).fadeOut(300);
         setPosition(that.el, '0 15 0');
-        // FIXME not working for .player
+        // FIXME not working for #player
         // TODO also might not always be working if player is following vehicle
-        // setPosition($('.player').get(0), '-5 1 0');
+        // setPosition($('#player').get(0), '-5 1 0');
         $(getPlayer()).attr('position', '0 1 0');
       }
 

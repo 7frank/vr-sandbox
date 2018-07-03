@@ -54,7 +54,16 @@ window.addEventListener('load', function () {
 
   // depends on hotkeys
   createSidebarToggleIcon();
+
+  hideLocalPlayer();
 });
+
+function hideLocalPlayer (hideError) {
+  if (!hideError) { console.error('fix network local stuff'); }
+  getPlayer().querySelector('.avatar').setAttribute('visible', false);
+
+  // setTimeout(() => hideLocalPlayer(true));
+}
 
 /**
  * TODO the hotkeys might need some option (or additional flag handler) for 3d mode

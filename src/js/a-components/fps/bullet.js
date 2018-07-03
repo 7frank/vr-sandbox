@@ -15,7 +15,7 @@ AFRAME.registerComponent('bullet', {
     el.setAttribute('networked', 'template:' + this.data.bulletTemplate);
     el.setAttribute('remove-in-seconds', 3);
     el.setAttribute('forward', 'speed:' + this.data.speed);
-    el.setAttribute('static-body', {}); // TODO can't shoot players if static body is enabled as static bodys don't emit collision
+    el.setAttribute('static-body', {}); // TODO can't shoot players if static body is enabled as static bodies don't emit collision
     // beginContact endContact
     playSound('.pew-pew');
 
