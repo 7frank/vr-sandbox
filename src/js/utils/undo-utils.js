@@ -33,7 +33,7 @@ function getUndoManager (name) {
         target.appendChild(el);
       }
 
-      undoManager.add({
+      this.add({
         undo: function () {
           if (oldParentEL) {
             oldParentEL.appendChild(el);
@@ -44,7 +44,7 @@ function getUndoManager (name) {
         redo: addElement
       });
 
-      addElement();
+      // addElement();
     },
 
     removeHTMLElement: function (el) {
@@ -55,7 +55,7 @@ function getUndoManager (name) {
         el.parentElement.remove(el);
       }
 
-      undoManager.add({
+      this.add({
         undo: function () {
           if (oldParentEL) {
             oldParentEL.appendChild(el);
@@ -64,7 +64,7 @@ function getUndoManager (name) {
         redo: removeElement
       });
 
-      removeElement();
+      // removeElement();
     },
     /**
          * Puts attribute changes of a HTMLElement onto the undo stack.
@@ -84,13 +84,16 @@ function getUndoManager (name) {
 
       });
 
-      addAttrs(attributes)();
+      // addAttrs(attributes)();
     },
     add: function ({undo, redo}) {
       if (!undo) throw new Error('undo not defined');
       if (!redo) throw new Error('redo not defined');
 
       undoManager.add({undo, redo});
+
+      // call the method once
+      redo();
     },
     undo: () => undoManager.undo(),
     redo: () => undoManager.redo()

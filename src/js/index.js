@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function () {
   })
   );
 
-  var splashScreen = $('<div><div class="splash-screen-text">Loading - VR Sandbox</div></div>').addClass('splash-screen-position splash-screen  card-5');
+  var splashScreen = $('<div><div class="splash-screen-text"></div></div>').addClass('splash-screen-position splash-screen  card-5');
 
   $('body').append(splashScreen);
   setTimeout(() => addDefaultListeners(), 50);

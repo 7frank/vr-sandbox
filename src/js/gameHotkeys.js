@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import {
+  _setPosition,
   findClosestEntity, getClosestEditableRegion,
   getDirectionForEntity,
   getPosition, getWorldPosition,
@@ -14,7 +15,7 @@ import {ImpactGUI} from './utils/performance-utils';
 
 import {createHTML, setCenter} from './utils/dom-utils';
 import {openOptionsDialog} from './gameOptionsDialog';
-import {activateJetpack, getBall, getPlayer, placeInFrontOfEntity, playerKickBall} from './game-utils';
+import {activateJetpack, getBall, getPlayer, getPositionInFrontOfEntity, playerKickBall} from './game-utils';
 
 import {attachCodeEditor} from './reafactor.stuff';
 import {enterOrExitVehicle} from './car.refactor';
@@ -335,7 +336,9 @@ function addHotkeys () {
 
     if (templateEditor.parentElement == null) {
       region.appendChild(templateEditor);
-      placeInFrontOfEntity(templateEditor, getPlayer(), 5);
+      let pos = getPositionInFrontOfEntity(templateEditor, getPlayer(), 5);
+
+      _setPosition(templateEditor, pos);
     } else {
       templateEditor.parentElement.removeChild(templateEditor);
     }

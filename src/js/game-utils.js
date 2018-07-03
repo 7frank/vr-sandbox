@@ -1,6 +1,9 @@
 import $ from 'jquery';
 import * as CANNON from 'cannon';
-import {getClosestEditableRegion, getWorldDirection, getWorldPosition, teleportPhysicsBody} from './utils/aframe-utils';
+import {
+  _setPosition, getClosestEditableRegion, getWorldDirection, getWorldPosition,
+  teleportPhysicsBody
+} from './utils/aframe-utils';
 
 // the local player
 export function getPlayer () {
@@ -40,7 +43,7 @@ export function getIntersectedEl () {
  * @param targetEl
  * @param distance
  */
-export function placeInFrontOfEntity (el, targetEl, distance = 5, maintainSameY = true) {
+export function getPositionInFrontOfEntity (el, targetEl, distance = 5, maintainSameY = true) {
   let pos = getWorldPosition(targetEl.object3D);
   let dir = getWorldDirection(targetEl.object3D);
 
@@ -52,9 +55,7 @@ export function placeInFrontOfEntity (el, targetEl, distance = 5, maintainSameY 
 
   let targetPos = pos.clone(pos).add(dir.multiplyScalar(-distance));
 
-  if (el.body != null && el.body.position != null) {
-    teleportPhysicsBody(el.body, targetPos);
-  } else el.setAttribute('position', targetPos);
+  return targetPos;
 }
 
 // FIXME

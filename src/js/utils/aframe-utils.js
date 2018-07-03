@@ -42,8 +42,12 @@ export function setPosition (el, v) {
     v = v.x + ' ' + v.y + ' ' + v.z;
   }
 
+  _setPosition(el, v);
+}
+
+export function _setPosition (el, v) {
   if (el.body != null && el.body.position != null) {
-    teleportPhysicsBody(el.body, v2);
+    teleportPhysicsBody(el.body, v);
   } else el.setAttribute('position', v);
 }
 

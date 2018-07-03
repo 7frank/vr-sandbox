@@ -24,9 +24,8 @@ export const removeRegionInteractions_createEntity = (selector) => {
 };
 
 /**
- * FIXME performance and stuff
- * TODO this is probably redundant by using the raycaster or cursor cmoponent and filtering intersections  for regions
- * @deprecated
+ * FIXME performance and stuff, see if there are other simple alternatives
+ * Used for regions only
  * @returns {render}
  */
 export function raycasterHelper (el, interval = 20) {
