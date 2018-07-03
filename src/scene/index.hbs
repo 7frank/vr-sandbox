@@ -63,6 +63,28 @@
     NAF.schemas.add(importedElementSchema);
 
 
+
+    var editableActorSchema = {
+        template: '#editable-actor-template',
+        components: [
+            'position',
+            'rotation',
+            'scale',
+           {
+               selector: '.content',
+                component: 'template-template',
+                property: 'value'
+            }
+        ]
+    };
+    NAF.schemas.add(editableActorSchema);
+
+
+
+
+
+
+
 </script>
 
 

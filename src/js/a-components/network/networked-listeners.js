@@ -6,7 +6,8 @@ AFRAME.registerSystem('networked-listeners', {
   init: function () {
     // listen to own connection event
     document.body.addEventListener('connected', (evt) => {
-      console.error('connected event. clientId =', evt.detail.clientId);
+      console.warn('connected event.  =', evt);
+      console.warn('connected event. clientId =', evt.detail.clientId);
 
       toast('Online id:' + evt.detail.clientId, 10000);
     });

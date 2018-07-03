@@ -11,8 +11,7 @@ export var UndoMgr = getUndoManager('default');
  * @returns {*}
  */
 
-export
-function getUndoManager (name) {
+export function getUndoManager (name) {
   console.log(undoManagerMap);
   if (undoManagerMap[name]) return undoManagerMap[name];
 
@@ -25,12 +24,16 @@ function getUndoManager (name) {
          * @param el
          * @param target
          */
-    addHTMLElementToTarget: function (el, target) {
+    addHTMLElementToTarget: function (el, target, position) {
       var oldParentEL;
+
+      if (!position) position = el.getAttribute('position');
+      else if (typeof position != 'string') { position = AFRAME.utils.coordinates.stringify(position); }
 
       function addElement () {
         oldParentEL = el.parentElement;
         target.appendChild(el);
+        el.setAttribute('position', position);
       }
 
       this.add({

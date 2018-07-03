@@ -108,21 +108,44 @@ AFRAME.registerComponent('template-droppable', {
 
     targetPos.sub(this.el.object3D.position);
 
-    var tplInstance = $(this.data.template);
+    // TODO use template-template component
+    // var tplInstance = $(this.data.template);
+
+    var tplInstance = $('<a-entity networked="template:#editable-actor-template;"></a-entity>');
+
+    setTimeout(() => {
+      let instance = tplInstance.get(0);
+      window.ooo = instance;
+      let mEl = instance.components.networked.templateEl.children[0];
+      mEl.setAttribute('template-template', {value: this.data.template});
+    }, 500);
 
     if (this.data.removable) {
-      tplInstance.attr('template-removable', true);
+      tplInstance.attr('template-removable', {});
     }
     // note: for testing, make it interact with physics by default
-    tplInstance.attr('dynamic-body', true);
+    //
     tplInstance.attr('configurable', true);
     tplInstance.attr('pickable', true);
+    // tplInstance.attr('networked', 'template:#editable-actor-template;showLocalTemplate:true;');
+
+    UndoMgr.addHTMLElementToTarget(tplInstance.get(0), targetEl, targetPos);
 
     // update position and write to DOM
+
     tplInstance.attr('position', AFRAME.utils.coordinates.stringify(targetPos));
     tplInstance.get(0).flushToDOM();
 
-    UndoMgr.addHTMLElementToTarget(tplInstance.get(0), targetEl);
+    // FIXME this is necessary to trigger networking atm
+    //
+    var fu = tplInstance.get(0);
+    fu.removeAttribute('spawn-in-circle');
+    fu.setAttribute('spawn-in-circle', {radius: 0.01});
+
+    // FIXME network and physics might play better along in mor recent version
+    /* setTimeout(() => {
+          fu.setAttribute('dynamic-body', {});
+        }, 1000); */
 
     var mTargetRegions = getClosestEditableRegion(this.el.sceneEl);
 
@@ -132,3 +155,26 @@ AFRAME.registerComponent('template-droppable', {
   }
 
 });
+
+AFRAME.registerComponent('template-template', {
+  schema: {
+    value: {type: 'string', default: '<a-box color="red" gui-border></a-box>'}
+
+  },
+
+  init: function () {
+    this.createTemplate();
+  },
+  update: function () {
+    console.log('update template template', arguments, this);
+
+    this.createTemplate();
+  },
+  createTemplate: function () {
+    if (this.mTemplateInstance) { this.mTemplateInstance.parentElement.removeChild(this.mTemplateInstance); }
+
+    this.mTemplateInstance = createHTML(this.data.value);
+    this.el.appendChild(this.mTemplateInstance);
+  }
+}
+);
