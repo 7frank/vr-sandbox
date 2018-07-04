@@ -4,3 +4,4 @@ import './configurable';
 import './pickable';
 import './template-droppable';
 import './template-removable';
+import './toggle-ownership';

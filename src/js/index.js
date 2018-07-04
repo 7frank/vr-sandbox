@@ -66,6 +66,9 @@ import './a-controls/touch-rotate-controls';
 import './a-controls/c-controls';
 
 import 'aframe-effects';
+
+import 'aframe-randomizer-components';
+
 import {toast} from './utils/aframe-utils';
 
 /**

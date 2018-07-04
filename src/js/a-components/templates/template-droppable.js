@@ -16,6 +16,8 @@ import {UndoMgr} from '../../utils/undo-utils';
 
  */
 
+console.error('TODO video product gui video networking');
+
 AFRAME.registerComponent('template-droppable', {
   schema: {
     accept: {type: 'selector', default: '*'},
@@ -116,9 +118,12 @@ AFRAME.registerComponent('template-droppable', {
     setTimeout(() => {
       let instance = tplInstance.get(0);
 
-      window.ooo = instance;
-      // let mEl = instance.components.networked.templateEl.children[0];
-      instance.setAttribute('template-template', {value: this.data.template});
+      let alteredTemplate = createHTML(this.data.template);
+      alteredTemplate.setAttribute('toggle-ownership', '');
+      alteredTemplate.setAttribute('is-template', '');
+
+      instance.setAttribute('template-template', {value: alteredTemplate.outerHTML});
+      // instance.setAttribute('template-template', {value: this.data.template});
     }, 500);
 
     if (this.data.removable) {
@@ -127,7 +132,7 @@ AFRAME.registerComponent('template-droppable', {
     // note: for testing, make it interact with physics by default
     //
     tplInstance.attr('configurable', true);
-    tplInstance.attr('pickable', true);
+
     // tplInstance.attr('networked', 'template:#editable-actor-template;attachTemplateToLocal:true;');
 
     UndoMgr.addHTMLElementToTarget(tplInstance.get(0), targetEl, targetPos);
@@ -158,6 +163,7 @@ AFRAME.registerComponent('template-droppable', {
 });
 
 AFRAME.registerComponent('template-template', {
+  dependencies: ['pickable'],
   schema: {
     value: {type: 'string', default: '<a-box color="red" gui-border></a-box>'}
 
