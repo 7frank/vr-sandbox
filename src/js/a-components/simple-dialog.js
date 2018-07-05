@@ -12,7 +12,7 @@ AFRAME.registerComponent('simple-dialog', {
 
     if (this.el) {
       var parsed = this.el.innerHTML;
-
+      this._parsed = parsed;
       if (parsed.length > 0) {
         console.log('parsed', parsed);
         this.data.caption = parsed;
@@ -61,6 +61,9 @@ AFRAME.registerComponent('simple-dialog', {
     });
 
     this.el.append(this.vm.$el);
+  },
+  remove: function () {
+    this.el.innerHTML = this._parsed;
   }
 
 });

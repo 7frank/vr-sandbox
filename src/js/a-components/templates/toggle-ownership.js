@@ -1,4 +1,3 @@
-
 var NAF;
 /**
  * Rotate the entity every frame if you are the owner.
@@ -7,8 +6,8 @@ var NAF;
  */
 AFRAME.registerComponent('toggle-ownership', {
   schema: {
-    speed: { default: 0.01 },
-    direction: { default: 1 }
+    speed: {default: 0.01},
+    direction: {default: 1}
   },
 
   init () {
@@ -16,7 +15,9 @@ AFRAME.registerComponent('toggle-ownership', {
 
     var that = this;
     this.onKeyUp = this.onKeyUp.bind(this);
-    document.addEventListener('keyup', this.onKeyUp);
+    // document.addEventListener('keyup', this.onKeyUp);
+
+    this.el.addEventListener('interaction-pick', this.onKeyUp);
 
     NAF.utils.getNetworkedEntity(this.el).then((el) => {
       if (NAF.utils.isMine(el)) {
@@ -54,12 +55,13 @@ AFRAME.registerComponent('toggle-ownership', {
   },
 
   onKeyUp (e) {
-    if (e.keyCode !== 13 /* enter */) {
-      return;
-    }
+    /* enter */
+    /* if (e.keyCode !== 13 ) {
+        return;
+      } */
 
     if (NAF.utils.takeOwnership(this.el)) {
-      this.el.setAttribute('toggle-ownership', { direction: this.data.direction * -1 });
+      this.el.setAttribute('toggle-ownership', {direction: this.data.direction * -1});
       this.updateColor();
     }
   },
@@ -76,6 +78,11 @@ AFRAME.registerComponent('toggle-ownership', {
   tick () {
     // Only update the component if you are the owner.
     if (!NAF.utils.isMine(this.el)) {
+      return;
+    }
+
+    // only rotate one element that has focus
+    if (this.el != document.activeElement) {
       return;
     }
 

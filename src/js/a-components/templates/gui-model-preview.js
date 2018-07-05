@@ -75,9 +75,9 @@ AFRAME.registerComponent('gui-model-preview', {
       if (dlg.components['simple-dialog']) {
         dlg.components['simple-dialog'].vm.$data.caption = `Press ${getDescriptiveTextForAction('interaction-pick')}, ${getDescriptiveTextForAction('player-move-forward')} or ${getDescriptiveTextForAction('player-move-backward')}\n to select an element that is shown to the right as preview. Then click on a region below your feet to place one such instance. Hold "Shift" to be able to place more than one element at once.`;
       } else {
-        console.error('not found, bad code :-P');
+        setTimeout(initText, 100);
       }
-    }, 5000);
+    }, 100);
 
     wrapper.append(container, previewWrapper);
 
