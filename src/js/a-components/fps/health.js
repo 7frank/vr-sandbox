@@ -2,6 +2,7 @@ import {getPlayer} from '../../game-utils';
 import {playSound, toast} from '../../utils/aframe-utils';
 import {createHTML} from '../../utils/dom-utils';
 import * as _ from 'lodash';
+import { broadcastPlayerHealthChange} from '../../network-game-logic';
 
 AFRAME.registerComponent('health', {
   schema: {
@@ -45,6 +46,16 @@ AFRAME.registerComponent('health-bar', {
       let hp = _.round(detail.current / detail.max, 3);
       console.log('health-change', detail, detail.current, detail.max, hp);
 
+      // ------------------------
+      const NAF = window.NAF;
+
+      let networkedEl = this.el.closest('[networked]');
+      let clientID = NAF.utils.getNetworkId(networkedEl);
+
+      broadcastPlayerHealthChange(clientID, healthComponent.data.hp);
+
+      // ------------------------
+
       this.inner.setAttribute('width', hp);
     });
 
@@ -59,8 +70,6 @@ AFRAME.registerComponent('health-bar', {
       console.log('health-zero', detail);
       toast('u ended other guy');
 
-      this.el.closest('[networked]').removeAttribute('spawn-in-circle');
-      this.el.closest('[networked]').setAttribute('spawn-in-circle', 'radius:50');
       healthComponent.data.hp = healthComponent.data.hpMax;
       this.inner.setAttribute('width', 1);
     });

@@ -19,16 +19,19 @@ AFRAME.registerComponent('bullet', {
     // beginContact endContact
     playSound('.pew-pew');
 
-    el.addEventListener('collide', function (e) {
+    el.addEventListener('collide', (e) => {
       var targetEl = e.detail.body.el;
 
       playSound('.bullet-impact');
-
+      console.log('bullet collide with', targetEl);
       // collide with player
       /*          if ($(targetEl).hasClass(that.data.playerClass)) {
                                 console.log('simple-ball.collide player', e);
                             }
                     */
+
+      // in any case: if the bullet collides delete it
+      // this.el.parentElement.removeChild(this.el);
     });
   },
   tick: function () {
@@ -49,4 +52,5 @@ AFRAME.registerComponent('bullet', {
       }
     });
   }
+
 });

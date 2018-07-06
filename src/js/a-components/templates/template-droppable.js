@@ -165,7 +165,7 @@ AFRAME.registerComponent('template-droppable', {
 AFRAME.registerComponent('template-template', {
   dependencies: ['pickable'],
   schema: {
-    value: {type: 'string', default: '<a-box color="red" gui-border></a-box>'}
+    value: {type: 'string', default: '<a-text value="Loading.." align="center" look-at="src:[camera]"><a-plane position="0 0 -.1" scale="1 .3 .3 " color="red" opacity="0.3" gui-border></a-plane></a-text>'}
 
   },
 

@@ -71,6 +71,8 @@ import 'aframe-randomizer-components';
 
 import {toast} from './utils/aframe-utils';
 
+import {addNetworkListeners} from './network-game-logic';
+
 /**
  index.js?d30a:7 Uncaught TypeError: Invalid attempt to destructure non-iterable instance
  at eval (index.js?d30a:7)
@@ -162,4 +164,6 @@ function addDefaultListeners () {
   createDropZone(scene, onDropZoneDrop);
 
   attachClipboard();
+
+  addNetworkListeners();
 }

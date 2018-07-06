@@ -105,6 +105,9 @@ AFRAME.registerComponent('gui-model-preview', {
 
     // Note: don't append to early otherwise items wont be aligned as component only aligns on init
     $(this.el).append(wrapper);
+  },
+  remove: function () {
+    this.el.innerHTML = '';
   }
 
 });

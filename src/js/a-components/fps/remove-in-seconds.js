@@ -9,6 +9,6 @@ AFRAME.registerComponent('remove-in-seconds', {
 
   destroy: function () {
     var el = this.el;
-    el.parentNode.removeChild(el);
+    if (el.parentNode) { el.parentNode.removeChild(el); }
   }
 });

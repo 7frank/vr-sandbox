@@ -41,8 +41,8 @@ AFRAME.registerSystem('networked-listeners', {
       console.error('entityRemoved event. Entity networkId =', evt.detail);
     });
 
-    // start network
-    this.el.setAttribute('networked-scene', 'room: basic;debug: true;onConnect:__onAFrame_Network_Connect__');
+    // start network TODO audio .. adapter: easyrtc;audio: true;
+    this.el.setAttribute('networked-scene', 'room: basic;debug: true;onConnect:__onAFrame_Network_Connect__;');
   }
 });
 
