@@ -74,7 +74,12 @@
               // selector: '#root',
                 component: 'template-template',
                 property: 'value'
-            }
+            }/*, FIXME fails silently if trying to sync
+            {selector: '[is-template]',
+
+                component: 'material',
+                property: 'color'
+            }*/
         ]
     };
     NAF.schemas.add(editableActorSchema);

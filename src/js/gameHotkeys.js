@@ -24,7 +24,7 @@ import {loadSketchfabBrowser, renderGLTFOrGlbURL} from './sketchfab/sketchfab-re
 import {exportElementUnderCursor} from './export/GLTF-exporter-utils';
 import {UndoMgr} from './utils/undo-utils';
 import {streamIn} from './utils/stream-utils';
-import {connectToServer, getSomeSampleData} from './database-utils';
+import {connectToServer, queryAPI, renderRegionFromDatabase} from './database-utils';
 import {createSidebarMenu, createSidebarToggleIcon, showMenu} from './utils/debug-gui';
 import * as _ from 'lodash';
 
@@ -345,7 +345,7 @@ function addHotkeys () {
 
     if (templateEditor.parentElement == null) {
       region.appendChild(templateEditor);
-      let pos = getPositionInFrontOfEntity(templateEditor, getPlayer(), 5);
+      let pos = getPositionInFrontOfEntity(getPlayer(), 5);
 
       _setPosition(templateEditor, pos);
     } else {
@@ -394,8 +394,9 @@ function addHotkeys () {
   });
 
   Hotkeys().on('test load from server', function () {
-    getSomeSampleData().then(function (json) {
-      console.log('json', arguments);
+    queryAPI('/region').then(function (regions) {
+      console.log('regions', regions);
+      renderRegionFromDatabase(regions[0]);
     }).catch(function (e) {
       console.error(e);
     });

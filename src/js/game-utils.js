@@ -39,11 +39,11 @@ export function getIntersectedEl () {
 
 /**
  *
- * @param el - must be attached to a parentEl
+ *
  * @param targetEl
  * @param distance
  */
-export function getPositionInFrontOfEntity (el, targetEl, distance = 5, maintainSameY = true) {
+export function getPositionInFrontOfEntity (targetEl, distance = 5, maintainSameY = true) {
   let pos = getWorldPosition(targetEl.object3D);
   let dir = getWorldDirection(targetEl.object3D);
 

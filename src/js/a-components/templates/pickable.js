@@ -38,7 +38,7 @@ AFRAME.registerComponent('pickable', {
   tick: function () {
     if (this.isPickedUp) {
       // TODO use undo manager
-      let position = getPositionInFrontOfEntity(this.el, getPlayer(), 4, false);
+      let position = getPositionInFrontOfEntity(getPlayer(), 4, false);
       _setPosition(this.el, position);
     }
   },
