@@ -1,33 +1,32 @@
 import {NumberQueue} from '../types/NumberQueue';
-import {querySelectorAll} from './selector-utils';
 import {globStringToRegex} from './misc-utils';
 import * as _ from 'lodash';
 
 /**
  * @callback onFrameCallback
- * @param {object} info - An object containing additional infos for the current frame.
+ * @param {object} info - An object containing additional information of the current frame.
  * @param {number} info.time - A timestamp.
- * @param {number} info.frame - The autoinc-id of the current frame.
- * @param {self} info.script - A reference to the FPSCtrl itself.
+ * @param {number} info.frame - The auto incrementation identifier of the current frame.
+ * @param {FPSCtrl} info.script - A reference to the FPSCtrl itself.
  *
  */
 
 /**
- * A simple fps limiter. *
- * For reference on original code see https://stackoverflow.com/a/19773537
- *
- * TODO when changing fps, the frame counter will reset which might interfere with some future user logic
+ * A simple FPS - limiter.
+ * For reference to the original code see {@link https://stackoverflow.com/a/19773537}
  * Implements some additional performance measurement to keep track of frames that are really slow.
- * //TODO add additional options
- * //--like priority queues for more relevant and less important
- * //track all scripts run directly
+ *
  *
  * TODO have a rnd region option that randomizes fps to prevent many scripts to run exactly at the same time and make the rendering stutter therefor change signature
+ * TODO when changing fps, the frame counter will reset which might interfere with some future user logic
+ * TODO add additional options
+ *      -like priority queues for more relevant and less important
+ *      -track all scripts run directly
  *
  *
- * @param {number} fps - A Number indicating the frames per second 'onFrame' gets called.
- * @param {onFrameCallback} onFrame - A callback function whose first param contains  'time'-timestamp, 'frame'-number,  'script'-this.
- * @param {object} context - a context the onFrame functions gets bound.
+ * @param {number} fps - A Number indicating the times per second 'onFrame' gets called.
+ * @param {onFrameCallback} onFrame - A callback function.
+ * @param {object} [context] - A context the 'onFrame' functions gets bound to.
  * @constructor
  */
 export function FPSCtrl (fps = 30, onFrame, context) {

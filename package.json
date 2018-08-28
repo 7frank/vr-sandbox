@@ -85,6 +85,7 @@
     "@ff0000-ad-tech/debug": "^4.0.2",
     "@ff0000-ad-tech/wp-plugin-watch-offset": "^1.0.3",
     "@gladeye/aframe-preloader-component": "^1.0.2",
+    "@nk11/animation-lib": "^1.0.0",
     "@tweenjs/tween.js": "^17.2.0",
     "@vue/web-component-wrapper": "^1.2.0",
     "aframe": "^0.8.2",
@@ -202,6 +203,7 @@
     "url-loader": "^0.5.9",
     "vue": "^2.5.16",
     "webpack": "^3.12.0",
+    "webpack-bundle-analyzer": "^2.13.1",
     "webpack-bundle-size-analyzer": "^2.7.0",
     "webpack-dev-middleware": "^1.11.0",
     "webpack-hot-middleware": "^2.22.2"

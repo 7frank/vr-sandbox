@@ -396,7 +396,7 @@ function addHotkeys () {
   Hotkeys().on('test load from server', function () {
     queryAPI('/region').then(function (regions) {
       console.log('regions', regions);
-      renderRegionFromDatabase(regions[0]);
+      _.each(regions, (region, i) => renderRegionFromDatabase(region, i));
     }).catch(function (e) {
       console.error(e);
     });
