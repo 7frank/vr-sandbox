@@ -2,6 +2,8 @@ import {NumberQueue} from '../types/NumberQueue';
 import {globStringToRegex} from './misc-utils';
 import * as _ from 'lodash';
 
+import {FPSCtrl as _FPSCtrl} from '@nk11/animation-lib/src/js/animation/FPSCtrl';
+
 /**
  * @callback onFrameCallback
  * @param {object} info - An object containing additional information of the current frame.
@@ -12,119 +14,47 @@ import * as _ from 'lodash';
  */
 
 /**
- * A simple FPS - limiter.
- * For reference to the original code see {@link https://stackoverflow.com/a/19773537}
- * Implements some additional performance measurement to keep track of frames that are really slow.
- *
- *
+ * Extending the fps limiter here with a fe additional sugar
  * TODO have a rnd region option that randomizes fps to prevent many scripts to run exactly at the same time and make the rendering stutter therefor change signature
  * TODO when changing fps, the frame counter will reset which might interfere with some future user logic
  * TODO add additional options
  *      -like priority queues for more relevant and less important
  *      -track all scripts run directly
  *
- *
- * @param {number} fps - A Number indicating the times per second 'onFrame' gets called.
- * @param {onFrameCallback} onFrame - A callback function.
- * @param {object} [context] - A context the 'onFrame' functions gets bound to.
- * @constructor
+ * TODO what to do with this kind of overloading .... FPSCtrl as _FPSCtrl ?
  */
-export function FPSCtrl (fps = 30, onFrame, context) {
-  var delay = 1000 / fps, // calc. time per frame
-    time = null, // start time
-    frame = -1, // frame count
-    tref; // rAF time reference
 
-  var infoQueue = new NumberQueue(10); // store last 10 calls //TODO make size dependent on fps or calc impact differently (for low fps the impact will change slower over time)
-  var timer = new THREE.Clock(false);
+export class FPSCtrl extends _FPSCtrl {
+  /**
+     * @param {number} fps - A Number indicating the times per second 'onFrame' gets called.
+     * @param {onFrameCallback} onFrame - A callback function.
+     * @param {object} [context] - A context the 'onFrame' functions gets bound to.
+     * @constructor
+     */
 
-  var that = this;
+  constructor (fps, onFrameCallback, object) {
+    super(fps, onFrameCallback, object);
+    this.mQueue = new NumberQueue(10);
 
-  if (context != null) {
-    onFrame = onFrame.bind(context);
+    this.on('frame', () => {
+      this.mQueue.enqueue(this.mTimer.getElapsedTime());
+    });
   }
-
-  this.mContext = context;
-
-  function scriptLoop (timestamp) {
-    if (time === null) time = timestamp; // init start time
-    var seg = Math.floor((timestamp - time) / delay); // calc frame no.
-    if (seg > frame) { // moved to next frame?
-      frame = seg; // update
-
-      timer.start();
-
-      onFrame({ // callback function
-        time: timestamp,
-        frame: frame,
-        script: that
-      });
-
-      infoQueue.enqueue(timer.getElapsedTime());
-    }
-    tref = requestAnimationFrame(scriptLoop);
-  }
-
-  // play status
-  this.isPlaying = false;
-
-  // set frame-rate
-  this.frameRate = function (newfps) {
-    if (!arguments.length) return fps;
-    fps = newfps;
-    delay = 1000 / fps;
-    frame = -1;
-    time = null;
-  };
-
-  this.getCurrentFPS = function () {
-    return fps;
-  };
-
-  // enable starting/pausing of the object
-  this.start = function () {
-    if (!this.isPlaying) {
-      this.isPlaying = true;
-      tref = requestAnimationFrame(scriptLoop);
-    }
-    return this;
-  };
-
-  // circumvent fps limit
-  // alter 'time' so the next time lop gets called the next frame will be updated
-  this.forceNext = function () {
-    time -= delay;
-    return this;
-  };
-
-  this.pause = function () {
-    if (this.isPlaying) {
-      cancelAnimationFrame(tref);
-      this.isPlaying = false;
-      time = null;
-      frame = -1;
-    }
-    return this;
-  };
-
-  this.stop = function () {
-    return this.pause();
-  };
 
   /**
      * Returns the average time(in milliseconds) it took to compute the target function.
      * @returns {{averageTime: number, target: *}}
      */
-  this.getPerformanceInfo = function () {
-    var tAvg = infoQueue.getAverage() * 1000;
+  getPerformanceInfo () {
+    var tAvg = this.mQueue.getAverage() * 1000;
     return {
       averageTime: tAvg,
-      fps: fps,
-      impact: this.isPlaying ? tAvg * fps : 0, // returns average mSeconds per second
-      target: onFrame,
+      fps: this.mMaxFPS,
+      impact: this.isPlaying ? tAvg * this.mMaxFPS : 0, // returns average mSeconds per second
+      target: this.mFunction,
       context: this.mContext ? this.mContext : null
     };
-  };
+  }
 }
 
 /**
