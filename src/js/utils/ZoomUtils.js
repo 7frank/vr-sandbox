@@ -1,7 +1,7 @@
 import TWEEN from '@tweenjs/tween.js';
 import {querySelectorAll} from './selector-utils';
 import {getWorldPosition} from './aframe-utils';
-import {AnimationFactory} from './animation-utils';
+import {Animation} from './animation-utils';
 
 /**
  * static helper for smooth navigation within 3D space
@@ -84,7 +84,7 @@ export default class ZoomUtil {
 
     // -------------------------------------
 
-    let prevAnimation = AnimationFactory({position: camera.position, target: cameraTargetPosition});
+    let prevAnimation = new Animation({position: camera.position, target: cameraTargetPosition});
     prevAnimation.animate({position: alteredVecEnd, target: vec3End}, 400, onComplete, onUpdate);
 
     // ------------------------------------

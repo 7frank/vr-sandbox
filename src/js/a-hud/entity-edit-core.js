@@ -4,36 +4,11 @@
 
 import {querySelectorAll} from '../utils/selector-utils';
 
-import ZoomUtil from '../utils/ZoomUtils';
-import {AnimationFactory} from '../utils/animation-utils';
 import * as _ from 'lodash';
 
-/**
- * FIXME not working.. disable touchrotate controls before debugging
- */
+import {Animation} from '@nk11/animation-lib/src/js/animation/Animation';
+
 var prevAnimation;
-
-export function zoomToPos (targetCamera, controls, meshDetails) {
-  if (prevAnimation) prevAnimation.stop();
-  var targetPosition = meshDetails.relativePosition.clone();
-  console.log('zoomTo orig', targetPosition);
-  targetPosition.multiply(meshDetails.mesh.scale);
-
-  let distance = meshDetails.radius * meshDetails.mesh.scale.length() * 2;
-
-  // TODO not working with the bike model ads its positions are not relative but absolute
-  // let dir = getWorldDirection(meshDetails.mesh);
-  // position.multiplyScalar(0.1);
-  // position.add(dir);
-
-  let newCameraPosition = targetPosition.clone().add(new THREE.Vector3(0, 0, 1));
-
-  console.log('zoomTo', targetPosition);
-
-  prevAnimation = ZoomUtil.moveToPosition(newCameraPosition, targetCamera, targetPosition, distance, undefined, (...args) => {
-    controls.update();
-  });
-}
 
 /**
  *
@@ -41,7 +16,8 @@ export function zoomToPos (targetCamera, controls, meshDetails) {
  * @param targetPos
  */
 export function moveObjectToPosition (obj3d, targetPos) {
-  let prevAnimation = AnimationFactory({position: obj3d.position});
+  if (prevAnimation) prevAnimation.stop();
+  prevAnimation = new Animation({position: obj3d.position});
   prevAnimation.animate({position: targetPos}, 400);
 }
 
