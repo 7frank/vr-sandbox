@@ -1,14 +1,15 @@
 import TWEEN from '@tweenjs/tween.js';
 import {querySelectorAll} from './selector-utils';
 import {getWorldPosition} from './aframe-utils';
-import {Animation} from './animation-utils';
+
+import {Animation} from '@nk11/animation-lib/src/js/animation/Animation';
 
 /**
  * static helper for smooth navigation within 3D space
  *
  * TODO refactor.... the look-at animation is flawed
  * TODO also provide better options duration, pause,play, stop, etc and dont make it static anymore
- *
+ * @deprecated refactor/extend and/ or use animation-lib instead
  */
 
 export default class ZoomUtil {

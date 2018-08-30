@@ -16,3 +16,6 @@
     * kliemansland-vr
     * rb-land
 * have a donate option or patreon to see how monetization would go
+
+
+*  TODO see {@link https://www.npmjs.com/package/mixwith} for some more improvements of code
