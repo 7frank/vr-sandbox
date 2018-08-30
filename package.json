@@ -69,6 +69,8 @@
     "diff-dom": "^2.4.0",
     "easyrtc": "^1.1.0",
     "enumify": "^1.0.4",
+    "express-http-proxy": "^1.2.0",
+    "http-proxy-middleware": "^0.19.0",
     "pretty": "^2.0.0",
     "proctree": "^0.1.1",
     "socket.io": "^2.1.1",

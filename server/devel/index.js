@@ -108,10 +108,27 @@ app.use(publicPath, function (req, res, next) {
 
 //-----------------------------------------
 
+
+/**
+ * TODO
+ */
+var proxy = require('express-http-proxy');
+
+app.use('/strapi', proxy('localhost:1337', {
+    proxyReqPathResolver: function(req) {
+
+
+        return require('url').parse(req.url).path;
+    }
+}));
+
+
+
 console.log("--------------------------")
 console.log("publicPath:", publicPath)
 console.log("outputPath:", outputPath)
 /* serving static assets*/
+
 
 console.log("public path:", outputPath)
 
