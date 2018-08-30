@@ -1,0 +1,40 @@
+<a-entity id="region-select-menu"  visible="false">
+
+    <nk-list-view position="0 0 0"
+                  order-as="grid: 2 5 .5 .25"
+                  scale=".1 .1 .1"
+                  orientation="column"
+                  arrows="false"
+                  datasource="region-ds"
+    >
+
+
+        <a-plane
+                 gui-border
+                 v-for="(item, index) in getVisibleItems(-2,2)"
+                 opacity="0.3"
+                 :color="isSelected(index)?'blue':isHovered(index)?'slateblue':'grey'"
+                 :position="setPositionFromIndex(index,5,2,2,1)"
+
+                 width="2"
+                 @focus="onItemHover(index)"
+                 @interaction-pick.stop="onItemSelected(index)"
+                 @interaction-talk.stop="onItemClicked(index)"
+                 :selected="isSelected(index)?true:null"
+        >
+
+            <img v-if="item.value.url" :id="item.value.id" :src="item.value.url">
+
+            <a-image v-if="item.value.url" position="0 1 0" :src="'#' + item.value.id"></a-image>
+
+          
+           <!-- <a-entity v-if="!item.value.url"  material="shader: line-dashed; color: 0.3 0.3 0.3" line="start: 0, 1, 0; end: 2 0 -5; color: red"
+                      line__2="start: -2, 4, 5; end: 0 4 -3; color: green"></a-entity>
+            -->
+            <a-entity  v-if="isSelected(index)"  light="type: directional; color: #cc9; intensity: 0.7" position="1 1 0"></a-entity>
+
+        </a-plane>
+    </nk-list-view>
+
+
+</a-entity>

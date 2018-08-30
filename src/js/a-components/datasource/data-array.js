@@ -14,6 +14,7 @@ AFRAME.registerComponent('data-array', {
     this.data.items = ObservableArray();
     this.data.items.on('change', (event) => {
       // map observable array! is used in case the array gets altered which would break functionality. like  when we use vue for the gui-list-view
+
       this.el.emit('data-change', {
         items: _.map(this.data.items, i => i),
         type: event.type,

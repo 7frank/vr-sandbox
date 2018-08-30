@@ -33,6 +33,7 @@ AFRAME.registerComponent('hud-main-menu', {
 
       switch (detail.value) {
         case 'Start':showMenu(hud, 'player-hud'); break;
+        case 'Load':showMenu(hud, 'region-select-menu'); break;
         case 'Config':showMenu(hud, 'sample-config-menu'); break;
         case 'About':showMenu(hud, 'about-menu'); break;
         case 'ToS':showMenu(hud, 'flow-test-menu'); break;
