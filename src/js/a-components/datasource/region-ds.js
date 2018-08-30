@@ -1,5 +1,22 @@
 import * as _ from 'lodash';
-import {convertRegionInfoToThumbInfo} from '../../database-utils';
+
+import {config} from '../../../js/database-utils';
+
+export function convertRegionInfoToThumbInfo (region, i = 0) {
+  let content = region.data;
+  let thumb = region.thumbnail;
+  thumb = _.assignIn({}, thumb);
+
+  if (!thumb) thumb = {id: ''};
+
+  if (thumb.url) {
+    thumb.url = config.url + thumb.url;
+  }
+
+  return thumb;
+}
+
+// --------------------------------------------
 
 AFRAME.registerComponent('region-ds', {
   dependencies: ['rest-ds'],
@@ -19,7 +36,7 @@ AFRAME.registerComponent('region-ds', {
 
     this.el.addEventListener('data-change', (event) => {
       _.each(event.detail.items, (entry, i) => {
-        event.detail.items[i] = {key: i, value: convertRegionInfoToThumbInfo(entry.value)};
+        event.detail.items[i] = {key: 'item' + i, value: convertRegionInfoToThumbInfo(entry.value)};
       });
     });
   }

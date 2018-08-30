@@ -2,11 +2,10 @@ import {Logger} from '../../utils/Logger';
 import {createHTML} from '../../utils/dom-utils';
 import Vue from 'vue/dist/vue.esm';
 
-import {forceStopPlayerMovement, suppressedThrottle, throttleFinally} from '../../utils/misc-utils';
+import {forceStopPlayerMovement, throttleFinally} from '../../utils/misc-utils';
 
 import * as _ from 'lodash';
 import {jsonic} from 'jsonic';
-import {getCompoundBoundingBox, getWorldPosition} from '../../utils/aframe-utils';
 import {Box3Ext} from '../../three/Box3Ext';
 
 /**
@@ -203,10 +202,10 @@ AFRAME.registerComponent('gui-list-view', {
 
     // TODO scaling of arrows is wrong
     /*  let scaleArrow =  this.data.orientation != 'column' ? max.y - min.y : max.x - min.x;
-                                        this.minArrow.object3D.scale.x = scaleArrow;
-                                        this.maxArrow.object3D.scale.x = scaleArrow;
+                                            this.minArrow.object3D.scale.x = scaleArrow;
+                                            this.maxArrow.object3D.scale.x = scaleArrow;
 
-                                        */
+                                            */
 
     this.vm.$el.append(this.minArrow);
     this.vm.$el.append(this.maxArrow);
@@ -450,7 +449,7 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
 
         // set selectedOffset to show correct selected item
         this.$data.selectedOffset = lower;
-
+        console.log(mIndex, lower, upper + 1);
         return this.$data.items.slice(lower, upper + 1);
       },
       setPosition: function (x = 0, y = 0, z = 0) {
@@ -459,14 +458,14 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
     },
     watch: {
       /* items: {
-                                                                                                                    handler: function (val, oldVal) {
-                                                                                                                      // TODO not watching all the time
-                                                                                                                      // console.log('watch.items', val, oldVal);
+                                                                                                                          handler: function (val, oldVal) {
+                                                                                                                            // TODO not watching all the time
+                                                                                                                            // console.log('watch.items', val, oldVal);
 
-                                                                                                                      //  debouncedUpdate(this);
-                                                                                                                    },
-                                                                                                                    deep: false // TODO might interfere with recursive objects
-                                                                                                                  }, */
+                                                                                                                            //  debouncedUpdate(this);
+                                                                                                                          },
+                                                                                                                          deep: false // TODO might interfere with recursive objects
+                                                                                                                        }, */
       selectedIndex: {
         handler: function (val, oldVal) {
           // console.log('watch', arguments);
