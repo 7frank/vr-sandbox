@@ -17,9 +17,11 @@ export function queryAPI (route) {
   return streamIn(baseURL + route).then(response => response.json());
 }
 
-export function renderRegionFromDatabase (region, i = 0) {
+export function renderRegionFromDatabase (region) {
+  console.log('renderRegionFromDatabase', region);
+
   let content = region.data;
-  let thumb = region.thumbnail;
+  /* let thumb = region.thumbnail;
 
   if (!thumb) thumb = {id: ''};
 
@@ -32,9 +34,11 @@ export function renderRegionFromDatabase (region, i = 0) {
     `;
   getPlayer().sceneEl.appendChild(createHTML(assetsTemplate));
 
+    <a-image position="0 1 0" src="${'#' + thumb.id}"></a-image>
+*/
+
   let template = `
-    <a-entity position="0 1 0" id="dbRegion1">
-        <a-image position="0 1 0" src="${'#' + thumb.id}"></a-image>
+    <a-entity position="0 1 0" class="db-region">  
         ${content}
     </a-entity>
     `;
@@ -43,9 +47,11 @@ export function renderRegionFromDatabase (region, i = 0) {
 
   let position = getPositionInFrontOfEntity(getPlayer(), 5);
 
-  position.z += i * 5;
+  // position.z += i * 5;
 
   _setPosition(regionInstance, position);
 
   getPlayer().sceneEl.appendChild(regionInstance);
 }
+// FIXME at least use events for global elements like this one
+global.sandbox = {loadRegion: renderRegionFromDatabase};

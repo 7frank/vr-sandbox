@@ -5,15 +5,16 @@ import {config} from '../../../js/database-utils';
 export function convertRegionInfoToThumbInfo (region, i = 0) {
   let content = region.data;
   let thumb = region.thumbnail;
-  thumb = _.assignIn({}, thumb);
 
-  if (!thumb) thumb = {id: ''};
+  thumb = _.assignIn({id: ''}, thumb);
 
-  if (thumb.url) {
+  if (thumb.url && !_.startsWith(thumb.url, config.url)) {
     thumb.url = config.url + thumb.url;
-  }
 
-  return thumb;
+    region.thumbnail = thumb;
+  } else { region.thumbnail = thumb; }
+
+  return region;
 }
 
 // --------------------------------------------
@@ -36,7 +37,7 @@ AFRAME.registerComponent('region-ds', {
 
     this.el.addEventListener('data-change', (event) => {
       _.each(event.detail.items, (entry, i) => {
-        event.detail.items[i] = {key: 'item' + i, value: convertRegionInfoToThumbInfo(entry.value)};
+        event.detail.items[i] = {key: i, value: convertRegionInfoToThumbInfo(entry.value)};
       });
     });
   }

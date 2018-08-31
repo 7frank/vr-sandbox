@@ -21,6 +21,8 @@
 
 
 
+                 @click="emit('sandbox.loadRegion',item.value)"
+
                  @focus="onItemHover(index)"
                  @interaction-pick.stop="onItemSelected(index)"
                  @interaction-talk.stop="onItemClicked(index)"
@@ -30,18 +32,18 @@
 
 
 
-            <a-image v-if="item.value.url"
+            <a-image v-if="item.value.thumbnail&&item.value.thumbnail.url"
                      material="depthTest:false"
                      :animation__rotation="isSelected(index)?'property: rotation; from:0 0 0; to: 0 360 0; dur: 2000; easing: linear;loop:true':null"
                      :animation__rotation_stop="!isSelected(index)?'property: rotation; to: 0 0 0; dur: 1000; easing: easeOutElastic;loop:false':null"
 
                      position="0 0 0"
-                     :src="item.value.url"
+                     :src="item.value.thumbnail.url"
 
                      @interaction-pick.stop="onItemSelected(index)"
             ></a-image>
 
-            <a-text  :value="item.value.name" align='center' opacity="0.3" width="1.8" transparent="true"
+            <a-text  v-if="item.value.thumbnail" :value="item.value.thumbnail.name" align='center' opacity="0.3" width="1.8" transparent="true"
                      position="0 .6 0"></a-text>
 
 
