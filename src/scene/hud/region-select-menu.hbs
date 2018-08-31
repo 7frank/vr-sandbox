@@ -1,8 +1,8 @@
 <a-entity id="region-select-menu"  visible="false" >
 
-    <nk-list-view position="-.5 .3 0"
+    <nk-list-view position="-.5 .25 0"
                   order-as="grid: 2 5 .5 .25"
-                  scale=".25 .25 .25"
+                  scale=".45 .45 .45"
                   orientation="column"
                   arrows="false"
                   datasource="region-ds"
@@ -11,13 +11,15 @@
 
 <!-- FIXME when setPositionFromIndex(index,5,2,2,1)"  the current selected element is not as intended, also selecting elements does not work wheen visible min <0-->
         <a-plane
-                 gui-border
-                 v-for="(item, index) in getVisibleItems(0,8)"
+
+                 v-for="(item, index) in getVisibleItems(0,5)"
                  opacity="0.3"
                  :color="isSelected(index)?'blue':isHovered(index)?'slateblue':'grey'"
-                 :position="setPositionFromIndex(index,3,3,2,-1)"
+                 :position="setPositionFromIndex(index>0?index-1:0,3,2,1,-1)"
 
-                 width="2"
+                 :animation__position="'property: position; to:'+setPositionFromIndex(index,3,2,1,-1)+'; dur: 1000; easing: linear;loop:false;startEvents:change'"
+
+
 
                  @focus="onItemHover(index)"
                  @interaction-pick.stop="onItemSelected(index)"
@@ -26,12 +28,23 @@
                  :selected="isSelected(index)?true:null"
         >
 
-            <img v-if="item.value.url" :id="item.value.id" :src="item.value.url">
 
-            <a-image v-if="item.value.url"  scale=".9 .9 .9" position="0 0 0" :src="'#' + item.value.id"></a-image>
 
-            <a-text  :value="item.key" align='center' opacity="0.3" width="1.8" transparent="true"
+            <a-image v-if="item.value.url"
+                     material="depthTest:false"
+                     :animation__rotation="isSelected(index)?'property: rotation; from:0 0 0; to: 0 360 0; dur: 2000; easing: linear;loop:true':null"
+                     :animation__rotation_stop="!isSelected(index)?'property: rotation; to: 0 0 0; dur: 1000; easing: easeOutElastic;loop:false':null"
+
+                     position="0 0 0"
+                     :src="item.value.url"
+
+                     @interaction-pick.stop="onItemSelected(index)"
+            ></a-image>
+
+            <a-text  :value="item.value.name" align='center' opacity="0.3" width="1.8" transparent="true"
                      position="0 .6 0"></a-text>
+
+
 
         </a-plane>
     </nk-list-view>

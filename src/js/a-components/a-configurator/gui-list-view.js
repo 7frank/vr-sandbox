@@ -367,6 +367,9 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
 
         var caption = that ? that.getAttribute('value') : '-1'; // TODO improve usability of list view
 
+        // notify first order children manually
+        this.$refs.listView.childNodes.forEach(v => v.dispatchEvent(new CustomEvent(evtName, { bubbles: false})));
+
         if (this.$data.selectedIndex > -1) {
           if (evtName != 'none') {
             this.$el.emit(evtName, data);
@@ -449,7 +452,7 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
 
         // set selectedOffset to show correct selected item
         this.$data.selectedOffset = lower;
-        console.log(mIndex, lower, upper + 1);
+
         return this.$data.items.slice(lower, upper + 1);
       },
       setPosition: function (x = 0, y = 0, z = 0) {
