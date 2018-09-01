@@ -202,10 +202,10 @@ AFRAME.registerComponent('gui-list-view', {
 
     // TODO scaling of arrows is wrong
     /*  let scaleArrow =  this.data.orientation != 'column' ? max.y - min.y : max.x - min.x;
-                                            this.minArrow.object3D.scale.x = scaleArrow;
-                                            this.maxArrow.object3D.scale.x = scaleArrow;
+                                                                this.minArrow.object3D.scale.x = scaleArrow;
+                                                                this.maxArrow.object3D.scale.x = scaleArrow;
 
-                                            */
+                                                                */
 
     this.vm.$el.append(this.minArrow);
     this.vm.$el.append(this.maxArrow);
@@ -215,7 +215,7 @@ AFRAME.registerComponent('gui-list-view', {
   },
   init: function () {
     // read <template> tag and interpret it as less strict json data
-    console.log('datasource', this.data.datasource);
+
     if (this.data.datasource == 'template') {
       this.initDefaultTemplateDatasource();
     } else {
@@ -234,6 +234,7 @@ AFRAME.registerComponent('gui-list-view', {
       };
 
       if (isInstance) {
+        // Test if the datasource is a HTMLElement instance of some sort.
         var datasourceEl = this.el.sceneEl.querySelector(this.data.datasource);
 
         if (datasourceEl) {
@@ -244,6 +245,8 @@ AFRAME.registerComponent('gui-list-view', {
           console.error('datasource instance not found ');
         }
       } else {
+        // Otherwise the datasource might be a static component,
+        // in which case an instance of it will be generated at the list-view itself.
         listenToDatasource(this.el);
         this.el.setAttribute(this.data.datasource, {});
       }
@@ -336,13 +339,35 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
 
   // vue -------------------------------------
 
-  var app = new Vue({
+  var app;
+  app = new Vue({
     el: el,
 
     data: {
       items: items,
       hoveredIndex: -1,
-      selectedIndex: -1,
+      _selectedIndex: -1,
+      get selectedIndex () {
+        return this._selectedIndex;
+      },
+      set selectedIndex (newVal) {
+        // instead of using a watcher
+        // (which results in triggering the events twice when cthe property itself is mutated from within the handler),
+        // we ass setters manually to be able to restrict the selectedIndex
+
+        let oldVal = this._selectedIndex;
+        var len = app.$data.items.length - 1;
+        if (newVal > len) newVal = overflow ? 0 : len;
+        if (newVal < 0) newVal = overflow ? len : 0;
+
+        if (newVal == oldVal) return;
+
+        // ---------------------------------
+        this._selectedIndex = newVal;
+
+        app.updateSelection(newVal, oldVal);
+      },
+
       selectedOffset: 0 // the offset for the visible items
     },
 
@@ -379,7 +404,7 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
         var caption = that ? that.getAttribute('value') : '-1'; // TODO improve usability of list view
 
         // notify first order children manually
-        this.$refs.listView.childNodes.forEach(v => v.dispatchEvent(new CustomEvent(evtName, { bubbles: false})));
+        this.$refs.listView.childNodes.forEach(v => v.dispatchEvent(new CustomEvent(evtName, {bubbles: false})));
 
         if (this.$data.selectedIndex > -1) {
           if (evtName != 'none') {
@@ -431,7 +456,7 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
       /**
              * returns the items that should be visible relative to the selectedIndex
              * @param lowerDelta - the last n items before the index
-             * @param upperdelta - the next n items after the index
+             * @param upperDelta - the next n items after the index
              */
       getVisibleItems: function (lowerDelta = -2, upperDelta = 2) {
         // validate that it has the selectedIndex visible or else it does not make sense
@@ -459,8 +484,6 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
 
         if (upper < mCount - 1) upper = lower + mCount - 1;
 
-        //  console.log('lowerupper', 'index', mIndex, 'mCount', mCount, 'len', len, lower, upper);
-
         // set selectedOffset to show correct selected item
         this.$data.selectedOffset = lower;
 
@@ -468,43 +491,22 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
       },
       setPosition: function (x = 0, y = 0, z = 0) {
         return '' + x + ' ' + y + ' ' + z;
-      }
-    },
-    watch: {
-      /* items: {
-                                                                                                                          handler: function (val, oldVal) {
-                                                                                                                            // TODO not watching all the time
-                                                                                                                            // console.log('watch.items', val, oldVal);
+      },
+      updateSelection: function (newVal, oldVal) {
+        var _old = app.$refs.listView.childNodes[oldVal];
+        var _new = app.$refs.listView.childNodes[newVal];
 
-                                                                                                                            //  debouncedUpdate(this);
-                                                                                                                          },
-                                                                                                                          deep: false // TODO might interfere with recursive objects
-                                                                                                                        }, */
-      selectedIndex: {
-        handler: function (val, oldVal) {
-          // console.log('watch', arguments);
+        if (_old) _old.emit('mouseleave');
+        if (_new) _new.emit('mouseenter');
 
-          var len = app.$data.items.length - 1;
-          if (val > len) app.$data.selectedIndex = overflow ? 0 : len;
-          if (val < 0) app.$data.selectedIndex = overflow ? len : 0;
-
-          var _old = this.$refs.listView.childNodes[oldVal];
-          var _new = this.$refs.listView.childNodes[val];
-
-          if (_old) _old.emit('mouseleave');
-          if (_new) _new.emit('mouseenter');
-
-          if (val > -1) {
-            this.onItemClicked();
-          }
+        if (newVal > -1) {
+          app.onItemClicked();
         }
-
       }
-
     }
   });
 
-    // -----------------------------------------
+  // -----------------------------------------
 
   var decreaseAction = direction == 'row' ? invertControls ? 'player-move-forward' : 'player-move-backward' : invertControls ? 'player-strafe-right' : 'player-strafe-left';
   var increaseAction = direction == 'row' ? invertControls ? 'player-move-backward' : 'player-move-forward' : invertControls ? 'player-strafe-left' : 'player-strafe-right';
