@@ -56,24 +56,51 @@
     </nk-list-view>
 
 
-    <a-entity  gui-list-selected="src:#region-select-list"  >
-        <a-text
-                position="1.0 .45 0"
-                scale=".45 .45 .45"
-                width="1.5"
-                height="2"
-                geometry="primitive: plane; width: auto; height: auto"
-                material="color: black"
-                :value="value.thumbnail.name"
-                align='center' opacity="0.6"
+    <a-entity gui-list-selected="src:#region-select-list"   position=".9 0 0">
+        <a-entity
 
-                transparent="true"
-                position="0 0 0"
-        ></a-text>
+                geometry="primitive: plane; width: 1.1; height: 1.1"
+                material="color: grey;transparent:true;opacity:0.5"
+                scale=".4 .4 .4"
+        >
+            <a-text
+                    position="0 .45 0"
+
+                    width="1"
+                    height="1"
+                    geometry="primitive: plane; width: auto; height: auto"
+                    material="color: black"
+                    :value="'Name: '+value.name?value.name:''"
+                    align='left' opacity="0.9"
+
+                    transparent="true"
+
+            ></a-text>
+
+            <a-text
+                    position="0 .35 0"
+
+                    width="1"
+                    height="1"
+                    geometry="primitive: plane; width: auto; height: auto"
+                    material="color: black"
+                    :value="'Author: '+(value.owner&&value.owner.username)?value.owner.username:''"
+                    align='left' opacity="0.9"
+
+                    transparent="true"
+
+            ></a-text>
+
+            <a-entity
+                    position="0 0 .1"
+                    :textarea="'text:'+value.description+';rows:8'"
+                    transparent="true"
+
+            ></a-entity>
+
+
+        </a-entity>
     </a-entity>
-
-
-
 
 
 </a-entity>

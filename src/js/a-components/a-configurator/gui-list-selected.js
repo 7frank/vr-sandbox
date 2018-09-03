@@ -4,7 +4,12 @@ import Vue from 'vue/dist/vue.esm';
 import waitUntil from 'wait-until';
 
 /**
- * creates a recursive proxy object that will return a default text if a key does not exist
+ * creates a recursive proxy object that will return a default text if a key does not exist.
+ *
+ * TODO a gui-list-view and a gui-list-select should both have a src and a datasource attribute
+ * - a source should be any other list or element that uses a data-array of some sort
+ * - a datasource is an instance of a data-array component or any descendant of it.
+ *
  * @param obj
  * @returns {Object}
  */
@@ -13,9 +18,11 @@ function getDefaultsProxy (obj = {}) {
   var handler = {
     get: function (target, name) {
       if (name in target) {
+        // TODO potential error (typeof target[name] != 'symbol') => (typeof name != 'symbol'
         if (_.isObject(target[name]) && (typeof target[name] != 'symbol')) {
           return getDefaultsProxy(target[name]);
         } else {
+          global.test = {target, name};
           return target[name];
         }
       } else {
@@ -56,7 +63,7 @@ AFRAME.registerComponent('gui-list-selected', {
       })
       .done((result) => {
         // (1) init vue  container
-        let data = {};
+        var data = {};
         let dataProxy = getDefaultsProxy(data);
 
         let tpl = this.el.querySelector(':first-child');
@@ -76,7 +83,10 @@ AFRAME.registerComponent('gui-list-selected', {
           target.addEventListener(evt, ({detail}) => {
             this.vm.$data.key = detail.key;
             // FIXME object assign?
+            global.selected = detail.value;
+
             this.vm.$data.value = detail.value;
+            // Object.assign(data, detail.value);
           })
         );
       });
