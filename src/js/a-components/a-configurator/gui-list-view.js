@@ -233,6 +233,10 @@ AFRAME.registerComponent('gui-list-view', {
         });
       };
 
+        /**
+         * TODO add the possibility to reference other listviews like #lw1:selected
+         */
+
       if (isInstance) {
         // Test if the datasource is a HTMLElement instance of some sort.
         var datasourceEl = this.el.sceneEl.querySelector(this.data.datasource);
@@ -498,6 +502,10 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
 
         if (_old) _old.emit('mouseleave');
         if (_new) _new.emit('mouseenter');
+
+        // emit events to hint
+        if (newVal < oldVal) { this.onThat(newVal, 'change-dec'); }
+        if (newVal > oldVal) { this.onThat(newVal, 'change-inc'); }
 
         if (newVal > -1) {
           app.onItemClicked();

@@ -1,4 +1,5 @@
 import './gui-list-view';
+import './gui-list-selected';
 import './gui-color-list';
 import './gui-material-list';
 import './gui-mesh-list';

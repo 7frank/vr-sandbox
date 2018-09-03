@@ -1,6 +1,7 @@
-<a-entity id="region-select-menu"  visible="false" >
+<a-entity id="region-select-menu" visible="false">
 
-    <nk-list-view position="-.5 .25 0"
+    <nk-list-view id="region-select-list"
+                  position="-.5 .25 0"
                   order-as="grid: 2 5 .5 .25"
                   scale=".45 .45 .45"
                   orientation="column"
@@ -9,27 +10,27 @@
 
     >
 
-<!-- FIXME when setPositionFromIndex(index,5,2,2,1)"  the current selected element is not as intended, also selecting elements does not work wheen visible min <0-->
+
+        <!-- TODO refactor guilistview to work with animations -->
+        <!-- FIXME when setPositionFromIndex(index,5,2,2,1)"  the current selected element is not as intended, also selecting elements does not work wheen visible min <0-->
         <a-plane
 
-                 v-for="(item, index) in getVisibleItems(0,5)"
-                 opacity="0.3"
-                 :color="isSelected(index)?'blue':isHovered(index)?'slateblue':'grey'"
-                 :position="setPositionFromIndex(index>0?index-1:0,3,2,1,-1)"
+                v-for="(item, index) in getVisibleItems(0,5)"
+                opacity="0.3"
+                :color="isSelected(index)?'blue':isHovered(index)?'slateblue':'grey'"
+                :position="setPositionFromIndex(index,3,2,1,-1)"
 
-                 :animation__position="'property: position; to:'+setPositionFromIndex(index,3,2,1,-1)+'; dur: 1000; easing: linear;loop:false;startEvents:change'"
+                _animation__position_dec="'property: position;from:'+setPositionFromIndex(index-1,3,2,1,-1)+' ;to:'+setPositionFromIndex(index,3,2,1,-1)+'; dur: 1000; easing: linear;loop:false;startEvents:change-dec'"
+                _animation__position_inc="'property: position;from:'+setPositionFromIndex(index+1,3,2,1,-1)+' ; to:'+setPositionFromIndex(index,3,2,1,-1)+'; dur: 1000; easing: linear;loop:false;startEvents:change-inc'"
 
+                @click="emit('sandbox.loadRegion',item.value)"
 
+                @focus="onItemHover(index)"
+                @interaction-pick.stop="onItemSelected(index)"
+                @interaction-talk.stop="onItemClicked(index)"
 
-                 @click="emit('sandbox.loadRegion',item.value)"
-
-                 @focus="onItemHover(index)"
-                 @interaction-pick.stop="onItemSelected(index)"
-                 @interaction-talk.stop="onItemClicked(index)"
-
-                 :selected="isSelected(index)?true:null"
+                :selected="isSelected(index)?true:null"
         >
-
 
 
             <a-image v-if="item.value.thumbnail&&item.value.thumbnail.url"
@@ -43,13 +44,36 @@
                      @interaction-pick.stop="onItemSelected(index)"
             ></a-image>
 
-            <a-text  v-if="item.value.thumbnail" :value="item.value.thumbnail.name" align='center' opacity="0.3" width="1.8" transparent="true"
-                     position="0 .6 0"></a-text>
-
+            <a-text v-if="item.value.thumbnail"
+                    geometry="primitive: plane; width: 1; height: auto"
+                    material="color: black"
+                    :value="item.value.thumbnail.name" align='center' opacity="0.6" width="1.8" transparent="true"
+                    position="0 -.45 0.2"
+            ></a-text>
 
 
         </a-plane>
     </nk-list-view>
+
+
+    <a-entity  gui-list-selected="src:#region-select-list"  >
+        <a-text
+                position="1.0 .45 0"
+                scale=".45 .45 .45"
+                width="1.5"
+                height="2"
+                geometry="primitive: plane; width: auto; height: auto"
+                material="color: black"
+                :value="value.thumbnail.name"
+                align='center' opacity="0.6"
+
+                transparent="true"
+                position="0 0 0"
+        ></a-text>
+    </a-entity>
+
+
+
 
 
 </a-entity>

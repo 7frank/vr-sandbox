@@ -21,21 +21,6 @@ export function renderRegionFromDatabase (region) {
   console.log('renderRegionFromDatabase', region);
 
   let content = region.data;
-  /* let thumb = region.thumbnail;
-
-  if (!thumb) thumb = {id: ''};
-
-  if (!thumb.url) thumb.url = '#';
-  else { thumb.url = baseURL + thumb.url; }
-
-  let assetsTemplate = `<a-assets>
-            <img id="${thumb.id}" src="${thumb.url}">
-        </a-assets>
-    `;
-  getPlayer().sceneEl.appendChild(createHTML(assetsTemplate));
-
-    <a-image position="0 1 0" src="${'#' + thumb.id}"></a-image>
-*/
 
   let template = `
     <a-entity position="0 1 0" class="db-region">  
