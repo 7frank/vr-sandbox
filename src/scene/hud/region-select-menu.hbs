@@ -70,7 +70,7 @@
                     height="1"
                     geometry="primitive: plane; width: auto; height: auto"
                     material="color: black"
-                    :value="'Name: '+value.name?value.name:''"
+                    :value="'Name: '+value.name"
                     align='left' opacity="0.9"
 
                     transparent="true"
@@ -84,7 +84,7 @@
                     height="1"
                     geometry="primitive: plane; width: auto; height: auto"
                     material="color: black"
-                    :value="'Author: '+(value.owner&&value.owner.username)?value.owner.username:''"
+                    :value="'Author: '+value.owner.username"
                     align='left' opacity="0.9"
 
                     transparent="true"
@@ -93,9 +93,7 @@
 
             <a-entity
                     position="0 0 .1"
-                    :textarea="'text:'+value.description+';rows:8'"
-                    transparent="true"
-
+                    :textarea="{text:value.description,rows:8}"
             ></a-entity>
 
 

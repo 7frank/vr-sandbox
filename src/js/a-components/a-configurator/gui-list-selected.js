@@ -27,7 +27,8 @@ function getDefaultsProxy (obj = {}) {
         }
       } else {
         // FIXME render result if missing or throw error
-        return '!' + name.toString();
+
+        //  return '!' + name.toString();
       }
     }
   };
@@ -79,6 +80,9 @@ AFRAME.registerComponent('gui-list-selected', {
 
         // (2) add event listeners to list
         // (3) update this.vm.$data.value when listview selection changes
+
+        // TODO receive and render initial data
+
         this.data.events.forEach(evt =>
           target.addEventListener(evt, ({detail}) => {
             this.vm.$data.key = detail.key;
