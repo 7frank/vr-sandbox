@@ -53,10 +53,10 @@ export function renderRegionFromDatabase (region) {
 
   loadAssets(region.assets);
 
-  let content = region.data2; // TODO
+  let content = region.data;
 
   let template = `
-    <a-entity position="0 1 0" class="db-region">  
+    <a-entity dotted-cube="dimensions:${region.dimensions}" position="0 1 0" class="db-region">  
         ${content}
     </a-entity>
     `;
