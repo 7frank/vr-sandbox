@@ -34,6 +34,9 @@ AFRAME.registerComponent('dotted-cube', {
 
     let cubemesh = new THREE.Mesh(cubeGeometry, material1);
 
+    cubemesh.raycast = function () {};
+    edges.raycast = function () {};
+
     this.el.setObject3D('dotted-cube-mesh-faces', cubemesh);
 
     this.el.setObject3D('dotted-cube-mesh-edges', edges);

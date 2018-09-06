@@ -2,7 +2,7 @@ import {createHTML} from '../utils/dom-utils';
 import Vue from 'vue/dist/vue.esm';
 import template from './main-menu.hbs';
 import listTemplate from './main-menu-list.hbs';
-import {showMenu} from '../utils/debug-gui';
+import {MainMenuStack} from '../types/MenuStack';
 
 AFRAME.registerComponent('hud-main-menu', {
   schema: {},
@@ -32,11 +32,11 @@ AFRAME.registerComponent('hud-main-menu', {
       var hud = document.querySelector('[hud-hud]');
 
       switch (detail.value) {
-        case 'Start':showMenu(hud, 'player-hud'); break;
-        case 'Load':showMenu(hud, 'region-select-menu'); break;
-        case 'Config':showMenu(hud, 'sample-config-menu'); break;
-        case 'About':showMenu(hud, 'about-menu'); break;
-        case 'ToS':showMenu(hud, 'flow-test-menu'); break;
+        case 'Start':MainMenuStack.push('player-hud'); break;
+        case 'Load':MainMenuStack.push('region-select-menu'); break;
+        case 'Config':MainMenuStack.push('sample-config-menu'); break;
+        case 'About':MainMenuStack.push('about-menu'); break;
+        case 'ToS':MainMenuStack.push('flow-test-menu'); break;
       }
 
       console.error('list picked', arguments);

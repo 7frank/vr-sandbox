@@ -1,10 +1,7 @@
 import {createHTML} from './dom-utils';
-
-import {getWorldPosition, toast} from './aframe-utils';
-import {getCursor, getPlayer} from '../game-utils';
 import * as _ from 'lodash';
-import $ from 'jquery';
-import {openOptionsDialog} from '../gameOptionsDialog';
+import {getWorldPosition, toast} from './aframe-utils';
+import {getPlayer} from '../game-utils';
 
 function getMeaningfulnameFromRegionEl (el) {
   var id = el.getAttribute('id');
@@ -46,6 +43,26 @@ function createTeleportLocationButtons () {
     return btn;
   });
   return btns;
+}
+
+function createMenuSelect () {
+  var container = createDroplet('Menu Select');
+
+  let menus = document.querySelector('[hud-hud]').childNodes.toArray().filter(n => n.nodeType != 3);
+
+  _.each(menus, function (node, k) {
+    let btn = createButton(node.getAttribute('id') || '<no-id>');
+    btn.addEventListener('click', function () {
+      _.each(menus, (el) => el.setAttribute('visible', false));
+
+      node.setAttribute('visible', true);
+
+      node.flushToDOM();
+    });
+    container.append(btn);
+  });
+
+  return container;
 }
 
 function createDroplet (caption) {
@@ -102,83 +119,6 @@ function createHotkeysDebugLog () {
   });
 
   return hotkeyLog;
-}
-
-class MenuStack extends Array {
-  // set available menus
-  // push menus onto stack that will be visible until a pop event was triggered
-
-}
-
-var simpleMenuStack = [];
-let menustackinit = false;
-/**
- *
- * @param {HTMLElement} parent - the oarent container that contains one or more child elements with with the id parameter
- * @param {string} ids - comma separated list of id
- */
-export
-function showMenu (parent, ids) {
-  if (simpleMenuStack.length > 0) { setVisiblilityOfMenu(parent, _.last(simpleMenuStack).ids, false); }
-  simpleMenuStack.push({parent, ids});
-
-  if (!menustackinit) {
-    createEscHotkey();
-    menustackinit = true;
-  }
-
-  ids = ids.split(', ').map(n => n.trim());
-
-  let menus = parent.childNodes.toArray().filter(n => n.nodeType != 3);
-  _.each(menus, function (node, k) {
-    node.setAttribute('visible', ids.indexOf(node.getAttribute('id')) >= 0);
-    node.flushToDOM();
-  });
-}
-
-function setVisiblilityOfMenu (parent, ids, visible) {
-  if (!ids) return;
-
-  ids = ids.split(', ').map(n => n.trim());
-
-  let menus = parent.childNodes.toArray().filter(n => n.nodeType != 3);
-  _.each(menus, function (node, k) {
-    if (ids.indexOf(node.getAttribute('id')) >= 0) { node.setAttribute('visible', visible); }
-    node.flushToDOM();
-  });
-}
-
-function createEscHotkey () {
-  let Hotkeys = AFRAME.nk.Hotkeys;
-  Hotkeys.register('return to previous menu', 'esc');
-  Hotkeys().on('return to previous menu', function () {
-    if (simpleMenuStack.length <= 1) return;
-
-    let lastLayer = simpleMenuStack.pop();
-    setVisiblilityOfMenu(lastLayer.parent, lastLayer.ids, false);
-
-    setVisiblilityOfMenu(lastLayer.parent, _.last(simpleMenuStack).ids, true);
-  });
-}
-
-function createMenuSelect () {
-  var container = createDroplet('Menu Select');
-
-  let menus = document.querySelector('[hud-hud]').childNodes.toArray().filter(n => n.nodeType != 3);
-
-  _.each(menus, function (node, k) {
-    let btn = createButton(node.getAttribute('id') || '<no-id>');
-    btn.addEventListener('click', function () {
-      _.each(menus, (el) => el.setAttribute('visible', false));
-
-      node.setAttribute('visible', true);
-
-      node.flushToDOM();
-    });
-    container.append(btn);
-  });
-
-  return container;
 }
 
 // TODO

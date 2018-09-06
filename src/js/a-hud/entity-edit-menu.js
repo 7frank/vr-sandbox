@@ -1,7 +1,7 @@
 import {createHTML} from '../utils/dom-utils';
 import Vue from 'vue/dist/vue.esm';
 import template from './entity-edit-menu.hbs';
-import {showMenu} from '../utils/debug-gui';
+
 import * as _ from 'lodash';
 
 import {getMapOfElementsBySelectorAttrValue, getMesh, moveObjectToPosition} from './entity-edit-core';

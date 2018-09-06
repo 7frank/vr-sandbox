@@ -9,6 +9,8 @@ import {
   toast
 } from './utils/aframe-utils';
 
+import {MainMenuStack} from './types/MenuStack';
+
 import {getTextEditorInstance} from './a-editable/utils';
 import {startEditingTextarea} from './a-editable/editable-actor';
 import {ImpactGUI} from './utils/performance-utils';
@@ -25,7 +27,7 @@ import {exportElementUnderCursor} from './export/GLTF-exporter-utils';
 import {UndoMgr} from './utils/undo-utils';
 import {streamIn} from './utils/stream-utils';
 import {connectToServer, queryAPI, renderRegionFromDatabase} from './database-utils';
-import {createSidebarMenu, createSidebarToggleIcon, showMenu} from './utils/debug-gui';
+import {createSidebarMenu, createSidebarToggleIcon} from './utils/debug-gui';
 import * as _ from 'lodash';
 
 // import {Hotkeys} from '@nk/core-components/dist/bundle';
@@ -121,9 +123,9 @@ function addHotkeys () {
 
     var hud = document.querySelector('[hud-hud]');
     if (visible) {
-      showMenu(hud, 'm-main-menu');
+      MainMenuStack.push('m-main-menu');
     } else {
-      showMenu(hud, 'player-hud');
+      MainMenuStack.push('player-hud');
     }
 
     let state = visible ? 'mouse' : 'entity';
