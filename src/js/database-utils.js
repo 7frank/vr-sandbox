@@ -5,15 +5,32 @@ import {_setPosition, toast} from './utils/aframe-utils';
 
 import {ErrorTexture} from '@nk11/animation-lib/src/js/fbo/ErrorTexture';
 
+import fetchQL from 'graphql-fetch';
+import * as _ from 'lodash';
+
 // const baseURL = 'http://localhost:1337';
-export const config = {url: '/strapi'};
+export const config = {
+  url: '/strapi',
+  login: '/auth/local',
+  db: '/graphql'
+
+};
 const baseURL = config.url;
 
+/**
+ * test if server connection could be established
+ * @returns {Promise<void>}
+ */
 export async function connectToServer () {
   await streamIn(baseURL)
     .then(response => response.text());
 }
 
+/**
+ * query REST-API
+ * @param route
+ * @returns {*}
+ */
 export function queryAPI (route) {
   return streamIn(baseURL + route).then(response => response.json());
 }
@@ -74,3 +91,89 @@ export function renderRegionFromDatabase (region) {
 
 // FIXME at least use events for global elements like this one
 global.sandbox = {loadRegion: renderRegionFromDatabase};
+
+/*
+TODO login gui
+assets load
+qraphql query for region assets */
+export class User {
+  constructor () {
+    this.auth = false;
+  }
+
+  login (user, password) {
+    return fetch(config.url + config.login,
+      {
+        method: 'post',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          identifier: user,
+          password: password
+        })
+      })
+      .then(function (response) {
+        return response.json();
+      })
+      .then((auth) => {
+        //  console.log('Well done!');
+        // console.log('User profile', auth.user);
+        //  console.log('User token', auth.jwt);
+        this.auth = auth;
+      })
+      .catch(function (error) {
+        console.log('An error occurred:', error);
+      });
+  }
+}
+
+export class DB {
+  setUser (user) {
+    this.mUser = user;
+    return this;
+  }
+
+  /**
+     * @param  {Query} query graphql query without the query {} wrapper
+     * @param  {Object} [vars]  graphql query args, optional
+     * @param  {Object} [opts]  fetch options, optional
+     */
+  query (query, queryVars, opts) {
+    let fetch = fetchQL(config.url + config.db);
+
+    // TODO add default user auth bearer
+    queryVars = _.assignIn({}, queryVars);
+
+    return fetch(`query {  ${query}    }`, queryVars, opts).then(function (results) {
+      if (results.errors) {
+        console.error('Errors:', results.errors);
+        throw new Error(results.errors);
+      }
+      return results.data;
+    });
+  }
+
+  mutate () {
+    throw new Error('missing implementation');
+  }
+}
+
+export let QLQueries = {
+  regions: `
+         regions {
+            name
+            data
+            owner{
+              username
+            }
+            assets{ 
+              src{
+                name
+                url
+              }
+            }
+          }
+`
+};

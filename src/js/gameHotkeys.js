@@ -1,13 +1,5 @@
 import $ from 'jquery';
-import {
-  _setPosition,
-  findClosestEntity, getClosestEditableRegion,
-  getDirectionForEntity,
-  getPosition, getWorldPosition,
-  playSound, scaleEntity,
-  setPosition,
-  toast
-} from './utils/aframe-utils';
+import {_setPosition, getClosestEditableRegion, setPosition, toast} from './utils/aframe-utils';
 
 import {MainMenuStack} from './types/MenuStack';
 
@@ -15,20 +7,21 @@ import {getTextEditorInstance} from './a-editable/utils';
 import {startEditingTextarea} from './a-editable/editable-actor';
 import {ImpactGUI} from './utils/performance-utils';
 
-import {createHTML, setCenter} from './utils/dom-utils';
+import {createHTML} from './utils/dom-utils';
 import {openOptionsDialog} from './gameOptionsDialog';
-import {activateJetpack, getBall, getPlayer, getPositionInFrontOfEntity, playerKickBall} from './game-utils';
+import {activateJetpack, getPlayer, getPositionInFrontOfEntity, playerKickBall} from './game-utils';
 
 import {attachCodeEditor} from './reafactor.stuff';
 import {enterOrExitVehicle} from './car.refactor';
 import {createEditableNode} from './editing-utils';
-import {loadSketchfabBrowser, renderGLTFOrGlbURL} from './sketchfab/sketchfab-render';
+import {loadSketchfabBrowser} from './sketchfab/sketchfab-render';
 import {exportElementUnderCursor} from './export/GLTF-exporter-utils';
 import {UndoMgr} from './utils/undo-utils';
-import {streamIn} from './utils/stream-utils';
 import {connectToServer, queryAPI, renderRegionFromDatabase} from './database-utils';
-import {createSidebarMenu, createSidebarToggleIcon} from './utils/debug-gui';
+import {createSidebarToggleIcon} from './utils/debug-gui';
 import * as _ from 'lodash';
+
+import waitUntil from 'wait-until';
 
 // import {Hotkeys} from '@nk/core-components/dist/bundle';
 
@@ -60,11 +53,16 @@ window.addEventListener('load', function () {
   hideLocalPlayer();
 });
 
-function hideLocalPlayer (hideError) {
-  if (!hideError) { console.error('fix network local stuff'); }
-  getPlayer().querySelector('.avatar').setAttribute('visible', false);
-
-  // setTimeout(() => hideLocalPlayer(true));
+function hideLocalPlayer () {
+  waitUntil()
+    .interval(200)
+    .times(Infinity)
+    .condition(() => {
+      return !!getPlayer().querySelector('.avatar');
+    })
+    .done((result) => {
+      getPlayer().querySelector('.avatar').setAttribute('visible', false);
+    });
 }
 
 /**
@@ -163,10 +161,10 @@ function addHotkeys () {
 
   /* alert("we can 'R' but not move");
 
-            $('a-scene').setAttribute('cursor-focus', true);
-            sphere = document.activeElement;
-            sphere.addEventListener('keyup', (...args) => console.log('key', args, args[0].which));
-            */
+              $('a-scene').setAttribute('cursor-focus', true);
+              sphere = document.activeElement;
+              sphere.addEventListener('keyup', (...args) => console.log('key', args, args[0].which));
+              */
 
   // ----------------------------------------------
   // FIXME controls are overloaded and will work despite these wasd controls below not being active

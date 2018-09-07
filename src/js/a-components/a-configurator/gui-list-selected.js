@@ -22,7 +22,6 @@ function getDefaultsProxy (obj = {}) {
         if (_.isObject(target[name]) && (typeof target[name] != 'symbol')) {
           return getDefaultsProxy(target[name]);
         } else {
-          global.test = {target, name};
           return target[name];
         }
       } else {
@@ -86,9 +85,7 @@ AFRAME.registerComponent('gui-list-selected', {
         this.data.events.forEach(evt =>
           target.addEventListener(evt, ({detail}) => {
             this.vm.$data.key = detail.key;
-            // FIXME object assign?
-            global.selected = detail.value;
-
+            // FIXME use object assign?
             this.vm.$data.value = detail.value;
             // Object.assign(data, detail.value);
           })

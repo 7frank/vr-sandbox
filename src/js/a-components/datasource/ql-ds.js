@@ -1,21 +1,25 @@
 import * as _ from 'lodash';
-import {DB, queryAPI, User} from '../../database-utils';
+import {DB, User} from '../../database-utils';
 
 /**
- * A simple REST - based data source.
+ * A simple graphql - based data source.
  *
  * TODO have some more options
  *
  *
  */
 
-AFRAME.registerComponent('rest-ds', {
+AFRAME.registerComponent('ql-ds', {
   dependencies: ['data-array'],
   schema: {
 
     src: {
       type: 'string',
-      default: '/user'
+      default: 'user' // TODO keep in sync with rest ds maybe by using /region/assets as keys for data
+    },
+    query: {
+      type: 'string',
+      default: '' // 'regions {name data description dimensions owner { username   }   thumbnail {url name}   assets{    src{     name     url    }   }   }'
     }
 
   },
@@ -23,24 +27,28 @@ AFRAME.registerComponent('rest-ds', {
 
   },
   update: function () {
+    // TODO update query only if data has changed
+    // perform local operations only when src element changes
+
     this.query();
   },
   query: function () {
     let dataArrayData = this.el.components['data-array'].data;
     let observableDataArray = dataArrayData.items;
 
-    if (this.data.src) {
-      queryAPI(this.data.src).then(function (entries) {
+    let key = this.data.src;
+
+    // TODO have one global instance of the current user
+    new DB().setUser(new User()).query(this.data.query)
+      .then(function (entries) {
         // remove previous results
         observableDataArray.splice(0, observableDataArray.length);
 
-        if (!_.isArray(entries)) {
-          entries = [entries];
-        }
+        entries = _.get(entries, key);
 
         _.each(entries, (region, i) => {
           let mData = {key: i, value: region};
-          console.log('mData', mData);
+          // console.log('mData', mData);
           observableDataArray.push(mData);
         });
       }).catch((event) => {
@@ -52,7 +60,6 @@ AFRAME.registerComponent('rest-ds', {
           event
         });
       });
-    }
   }
 
 });
