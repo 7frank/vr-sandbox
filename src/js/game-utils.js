@@ -10,6 +10,10 @@ export function getPlayer () {
   return $('#player').get(0);
 }
 
+export function getAssets () {
+  return getPlayer().sceneEl.querySelector('a-assets');
+}
+
 /**
  *
  * all players that are connected to the network
