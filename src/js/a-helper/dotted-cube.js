@@ -1,3 +1,4 @@
+import {HexTexture} from '../utils/HexTexture';
 
 /**
  * A component for rendering a transparent cube when editing content. showcasing
@@ -25,17 +26,32 @@ AFRAME.registerComponent('dotted-cube', {
     var edges = new THREE.LineSegments(eGeometry, dashMaterial);
     edges.computeLineDistances();
 
+    let size = 1024;
+    let radius = 64;
+    let repeat = size / (radius);
+
+    // 'assets/images/grids/UV_Grid_Sm.jpg'
+
+    let url = (new HexTexture(size - radius, size - radius)).drawHexGrid(radius, repeat, repeat, -radius / 2, -radius / 2).getDataURL();
+    let texture = THREE.ImageUtils.loadTexture(url);
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    texture.magFilter = THREE.NearestFilter;
+
+    texture.repeat.set(1, 1);
+    global.texture = texture;
     var material1 = new THREE.MeshStandardMaterial({
-      opacity: 0.2,
+      opacity: 0.7,
       transparent: true,
       side: THREE.BackSide,
-      map: THREE.ImageUtils.loadTexture('assets/images/grids/UV_Grid_Sm.jpg')
+      map: texture
     });
 
     let cubemesh = new THREE.Mesh(cubeGeometry, material1);
 
-    cubemesh.raycast = function () {};
-    edges.raycast = function () {};
+    cubemesh.raycast = function () {
+    };
+    edges.raycast = function () {
+    };
 
     this.el.setObject3D('dotted-cube-mesh-faces', cubemesh);
 

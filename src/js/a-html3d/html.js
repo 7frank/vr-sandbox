@@ -10,7 +10,8 @@ import 'aframe-html-shader/dist/aframe-html-shader';
 
 // TODO change import to where it belongs
 import 'aframe-textarea-component';
-import 'aframe-material-snickell';
+import 'aframe-material-snickell';// TODO remove in future
+
 import 'aframe-daydream-controller-component';
 
 /**

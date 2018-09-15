@@ -3,6 +3,8 @@ import Vue from 'vue/dist/vue.esm';
 import template from './main-menu.hbs';
 import listTemplate from './main-menu-list.hbs';
 import {MainMenuStack} from '../types/MenuStack';
+import {getWorld} from '../game-utils';
+import {loadStaticRegionDemo} from '../region-utils';
 
 AFRAME.registerComponent('hud-main-menu', {
   schema: {},
@@ -32,11 +34,22 @@ AFRAME.registerComponent('hud-main-menu', {
       var hud = document.querySelector('[hud-hud]');
 
       switch (detail.value) {
-        case 'Start':MainMenuStack.push('player-hud'); break;
-        case 'Load':MainMenuStack.push('region-select-menu'); break;
-        case 'Config':MainMenuStack.push('sample-config-menu'); break;
-        case 'About':MainMenuStack.push('about-menu'); break;
-        case 'ToS':MainMenuStack.push('flow-test-menu'); break;
+        case 'Start':
+          MainMenuStack.push('player-hud');
+          loadStaticRegionDemo();
+          break;
+        case 'Load':
+          MainMenuStack.push('region-select-menu');
+          break;
+        case 'Config':
+          MainMenuStack.push('sample-config-menu');
+          break;
+        case 'About':
+          MainMenuStack.push('about-menu');
+          break;
+        case 'ToS':
+          MainMenuStack.push('flow-test-menu');
+          break;
       }
 
       console.error('list picked', arguments);

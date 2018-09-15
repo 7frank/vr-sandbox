@@ -14,6 +14,14 @@ export function getAssets () {
   return getPlayer().sceneEl.querySelector('a-assets');
 }
 
+export function getScene () {
+  return getPlayer().sceneEl;
+}
+
+export function getWorld () {
+  return getPlayer().sceneEl.querySelector('#regions-container');
+}
+
 /**
  *
  * all players that are connected to the network

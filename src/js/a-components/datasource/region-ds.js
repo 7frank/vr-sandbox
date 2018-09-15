@@ -34,8 +34,7 @@ var flatten = function (source, pathArray, result) {
 export function convertRegionInfo (region, i = 0) {
   let defaults = {
     thumbnail: {id: ''},
-    owner: {username: 'none'},
-    test: true
+    owner: {username: 'none'}
   };
 
   defaults = flatten(defaults);

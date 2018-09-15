@@ -100,6 +100,8 @@ export function playSound (assetSelector, duration = -1, instanceLimit = 1) {
 
   // currentlyPlaying[assetSelector]++;
 
+  console.log('playSound', assetSelector);
+
   $.each($(assetSelector), function () {
     this.components.sound.playSound();
 

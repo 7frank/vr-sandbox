@@ -17,11 +17,12 @@ import {createEditableNode} from './editing-utils';
 import {loadSketchfabBrowser} from './sketchfab/sketchfab-render';
 import {exportElementUnderCursor} from './export/GLTF-exporter-utils';
 import {UndoMgr} from './utils/undo-utils';
-import {connectToServer, queryAPI, renderRegionFromDatabase} from './database-utils';
+import {connectToServer, queryAPI} from './database-utils';
 import {createSidebarToggleIcon} from './utils/debug-gui';
 import * as _ from 'lodash';
 
 import waitUntil from 'wait-until';
+import {renderRegionFromDatabase} from './region-utils';
 
 // import {Hotkeys} from '@nk/core-components/dist/bundle';
 
@@ -51,7 +52,20 @@ window.addEventListener('load', function () {
   createSidebarToggleIcon();
 
   hideLocalPlayer();
+
+  connectServer();
 });
+
+var serverConnected = false;
+
+function connectServer () {
+  connectToServer().then(function () {
+    serverConnected = true;
+    // toast('connected to database');
+  }).catch(function (e) {
+    toast('no database connection: ' + e.statusText, 99999);
+  });
+}
 
 function hideLocalPlayer () {
   waitUntil()
@@ -375,18 +389,6 @@ function addHotkeys () {
   Hotkeys().on('show layers dialog', () => openOptionsDialog('layers'));
 
   // ------------------------------------
-  Hotkeys.register('test server connectivity', 'shift+1', {
-    category: 'debug'
-  });
-
-  Hotkeys().on('test server connectivity', function () {
-    connectToServer().then(function () {
-      toast('connected to database');
-    }).catch(function (e) {
-      console.error(e);
-      toast('no database connection');
-    });
-  });
 
   // FIXME no data in json
   Hotkeys.register('test load from server', 'shift+2', {
@@ -394,12 +396,14 @@ function addHotkeys () {
   });
 
   Hotkeys().on('test load from server', function () {
-    queryAPI('/region').then(function (regions) {
-      console.log('regions', regions);
-      _.each(regions, (region, i) => renderRegionFromDatabase(region, i));
-    }).catch(function (e) {
-      console.error(e);
-    });
+    if (!serverConnected) { toast('server offline'); } else {
+      queryAPI('/region').then(function (regions) {
+        console.log('regions', regions);
+        _.each(regions, (region, i) => renderRegionFromDatabase(region, i));
+      }).catch(function (e) {
+        console.error(e);
+      });
+    }
   });
 
   // ------------------------------------

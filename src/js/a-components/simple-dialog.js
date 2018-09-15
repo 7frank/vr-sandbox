@@ -35,7 +35,7 @@ AFRAME.registerComponent('simple-dialog', {
       `<a-rounded  material="opacity:.3;color:black;" width="4" height="3" radius="0.1" >
                 
                 
-                <a-text width="3.6" height="2" position="0.2 2.4 0.05" :value="caption"></a-text>
+                <a-text width="3.6" height="2" position="0.3 2.4 0.05" :value="caption"></a-text>
                         
                    <!-- <a-switch id="editableActorBtn" value="createEditableActor" position="0.2 2.7 0" enabled="true"></a-switch>
                     <a-radio position="0.2 2.4 0" width="3" name="food" label="Burger with fries and pizza" value="pizza"></a-radio>
@@ -44,9 +44,14 @@ AFRAME.registerComponent('simple-dialog', {
                     <a-checkbox position="0.2 1.5 0" width="3" name="stuff" label="I am a checkbox" checked="true"></a-checkbox>
                     <a-checkbox position="0.2 1.2 0" width="3" name="stuff" label="And I am another one" checked="true" disabled="true"></a-checkbox>
                     -->
-                    <a-button @interaction-pick.stop="onOkClick" @click.stop="onOkClick" position="0.2 0.6 0" name="stuff" :value="ok" type="raised"></a-button>
-                    <!--<a-button position="0.2 0.35 0" width="3" name="stuff" value="You cannot click me" disabled="true"></a-button> -->
-              
+                   
+                   <a-button @interaction-pick.stop="onOkClick" @click.stop="onOkClick" position="0.2 0.6 0" name="stuff" :value="ok" type="raised"></a-button>
+                  
+                   <!--  <a-ui-button text-value="ok" class="intersectable" position="0.2 0.6 0.01"
+                      @interaction-pick.stop="onOkClick" @click.stop="onOkClick"
+                     ></a-ui-button> -->  
+                   
+                  
             </a-rounded>`
     );
 

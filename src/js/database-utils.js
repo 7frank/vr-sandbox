@@ -1,10 +1,9 @@
 import {streamIn} from './utils/stream-utils';
-import {getAssets, getPlayer, getPositionInFrontOfEntity} from './game-utils';
-import {createHTML} from './utils/dom-utils';
-import {_setPosition} from './utils/aframe-utils';
+import {playSound} from './utils/aframe-utils';
 
 import fetchQL from 'graphql-fetch';
 import * as _ from 'lodash';
+import {renderRegionFromDatabase} from './region-utils';
 
 // const baseURL = 'http://localhost:1337';
 export const config = {
@@ -62,111 +61,6 @@ export async function connectToServer () {
 export function queryAPI (route) {
   return streamIn(baseURL + route).then(response => response.json());
 }
-
-function loadAssetItem (asset) {
-  if (!asset.Name || !_.has(asset, 'src.url')) {
-    console.error("can't load asset name or url missing", asset);
-    return;
-  }
-
-  let types = {
-    video: 'video',
-    audio: 'audio',
-    image: 'img',
-    mesh: 'a-asset-item'
-  };
-
-  let mType = types[asset.Type];
-
-  if (!mType) {
-    console.error('unsupported asset Type', asset);
-    return;
-  }
-
-  let el = AFRAME.nk.parseHTML(`<${mType} id=${asset.Name} src=${asset.src.url}></${mType}>`);
-
-  getAssets().append(el);
-}
-
-/**
- * loads assets from database
- * TODO have a db-assets component that can be dropped in the vue template to load assets without rewriting paths at different places in code
- * TODO reenable error fallback mechanisms like error textures and load via fetch
- * @param asset
- */
-function loadAssetImage (asset) {
-  if (!asset.Name || !_.has(asset, 'src.url')) {
-    console.error("can't load asset name or url missing");
-  }
-
-  let img = AFRAME.nk.parseHTML(`<img id=${asset.Name} src=${asset.src.url}  />  `);
-
-  // document.body;
-  getAssets().append(img);
-  /*
-            //FIXME
-          let img = AFRAME.nk.parseHTML(`<img id=${asset.Name}  />  `);
-          document.body.append(img);
-
-         fetch(asset.src)
-            .then(function (response) {
-              if (!response.ok) {
-                throw Error(response.statusText);
-              }
-              return response;
-            })
-            .then(response => response.blob())
-            .then(images => {
-              // Then create a local URL for that image and print it
-              let dataURL = URL.createObjectURL(images);
-              img.src = dataURL;
-            }).catch(e => {
-              let errorTexture = new ErrorTexture().setErrorMessage(asset.Name + ' not found', 512, 512);
-              let dataURL = errorTexture.getDataURL();
-
-              // img.src = dataURL;
-              img.src = '/assets/images/Octocat.png';
-              toast('Asset:' + asset.Name + ' not loaded');
-            });
-
-            */
-}
-
-function loadAssets (assets) {
-  /*
-       assets.filter(asset => asset.Type == 'image').forEach(loadAssetImage);
-
-       assets.filter(asset => asset.Type != 'image').forEach(loadAssetItem);
-     */
-  assets.forEach(loadAssetItem);
-}
-
-export function renderRegionFromDatabase (region) {
-  console.log('renderRegionFromDatabase', region);
-
-  loadAssets(region.assets);
-
-  let content = region.data;
-
-  let template = `
-    <a-entity  dotted-cube="dimensions:${region.dimensions}" class="db-region">  
-        ${content}
-    </a-entity>
-    `;
-
-  let regionInstance = createHTML(template);
-
-  let position = getPositionInFrontOfEntity(getPlayer(), 5);
-
-  position.y += Object.assign({x: 0, y: 0, z: 0}, AFRAME.utils.coordinates.parse(region.position)).y;
-
-  _setPosition(regionInstance, position);
-
-  getPlayer().sceneEl.appendChild(regionInstance);
-}
-
-// FIXME at least use events for global elements like this one
-global.sandbox = {loadRegion: renderRegionFromDatabase};
 
 /*
 TODO login gui

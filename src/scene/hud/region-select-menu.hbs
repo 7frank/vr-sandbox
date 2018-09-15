@@ -13,6 +13,8 @@
 
         <!-- TODO refactor guilistview to work with animations -->
         <!-- FIXME when setPositionFromIndex(index,5,2,2,1)"  the current selected element is not as intended, also selecting elements does not work wheen visible min <0-->
+
+       <!--   @click="emit('sandbox.loadRegion',item.value)" -->
         <a-plane
 
                 v-for="(item, index) in getVisibleItems(0,5)"
@@ -23,7 +25,9 @@
                 _animation__position_dec="'property: position;from:'+setPositionFromIndex(index-1,3,2,1,-1)+' ;to:'+setPositionFromIndex(index,3,2,1,-1)+'; dur: 1000; easing: linear;loop:false;startEvents:change-dec'"
                 _animation__position_inc="'property: position;from:'+setPositionFromIndex(index+1,3,2,1,-1)+' ; to:'+setPositionFromIndex(index,3,2,1,-1)+'; dur: 1000; easing: linear;loop:false;startEvents:change-inc'"
 
-                @click="emit('sandbox.loadRegion',item.value)"
+
+                @focus="emit('sandbox.playSound','.sound-ball-bounce')"
+
 
                 @focus="onItemHover(index)"
                 @interaction-pick.stop="onItemSelected(index)"
@@ -47,7 +51,7 @@
             <a-text v-if="item.value.thumbnail"
                     geometry="primitive: plane; width: 1; height: auto"
                     material="color: black"
-                    :value="item.value.thumbnail.name" align='center' opacity="0.6" width="1.8" transparent="true"
+                    :value="item.value.name" align='center' opacity="0.6" width="1.8" transparent="true"
                     position="0 -.45 0.2"
             ></a-text>
 
@@ -91,10 +95,22 @@
 
             ></a-text>
 
-            <a-entity
+            <a-entity v-if="value.description"
                     position="0 0 .1"
-                    :textarea="{text:value.description,rows:8}"
+                    :textarea="{text:value.description,rows:8,readonly:true}"
             ></a-entity>
+
+            <a-text
+                    position="0 -.35 0"
+                    width="1"
+                    height="1"
+                    geometry="primitive: plane; width: auto; height: auto"
+                    material="color: black"
+                    value="Load Region"
+                    align='left' opacity="0.9"
+                    transparent="true"
+                    @click="emit('sandbox.loadRegion',value)"
+            ></a-text>
 
 
         </a-entity>

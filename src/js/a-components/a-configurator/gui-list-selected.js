@@ -2,6 +2,7 @@
 import * as _ from 'lodash';
 import Vue from 'vue/dist/vue.esm';
 import waitUntil from 'wait-until';
+import {emit} from './gui-list-view';
 
 /**
  * creates a recursive proxy object that will return a default text if a key does not exist.
@@ -74,7 +75,9 @@ AFRAME.registerComponent('gui-list-selected', {
         this.vm = new Vue({
           el: tpl,
           data: {key: -1, value: dataProxy},
-          methods: {}
+          methods: {
+            emit: emit
+          }
         });
 
         // (2) add event listeners to list

@@ -9,6 +9,24 @@ import {jsonic} from 'jsonic';
 import {Box3Ext} from '../../three/Box3Ext';
 
 /**
+ * util for vue that triggers a global function if it exists
+ * @param path
+ * @param args
+ */
+export
+function emit (path, ...args) {
+  let fn = _.get(window, path, function () {
+    console.error(path + ' not found');
+  });
+
+  this.$el.emit(path, args);
+
+  // TODO remove as soon as events are final for sandbox
+  if (typeof fn != 'function') console.error(path + ' must be a function');
+  else fn(...args);
+}
+
+/**
  *  TODO helper components order-items-as
  * - grid animate current positions to grid positions
  * - horizontal-list
@@ -376,17 +394,7 @@ export function createListView (items, {itemFactory, containerFactory, arrowFact
     },
 
     methods: {
-      emit: function (path, ...args) {
-        let fn = _.get(window, path, function () {
-          console.error(path + ' not found');
-        });
-
-        this.$el.emit(path, args);
-
-        // TODO remove as soon as events are final for sandbox
-        if (typeof fn != 'function') console.error(path + ' must be a function');
-        else fn(...args);
-      },
+      emit: emit,
       setItems: function (items) {
         this.$data.items = items;
       },
