@@ -103,7 +103,10 @@ SketchfabOAuth2.prototype.connect = function (pendingCallback) {
             pendingCallback({state: 'pending'});
           }
         } else {
+          // browser window does block popups or other
+          // TODO ahve diffreent status codes
           console.error('Login failed:', e);
+          reject(new Error('Login failed (popup)'));
         }
       }
     }.bind(this), 500);

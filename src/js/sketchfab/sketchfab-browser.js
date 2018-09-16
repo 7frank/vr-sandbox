@@ -218,6 +218,14 @@ export function rewritePathsOfSceneGLTF (sceneFileContent, fileUrls) {
 // ------------------------------
 // ------------------------------
 
+function checkLocalhost () {
+  // FIXME do we have more gracefully options?
+  if (window.location.host.indexOf('localhost') > -1) {
+    alert('you are acessing remote from localhost make sure to use 127.0.0.1 as sketchfab is registered to this url with thhe token');
+    throw new Error('reload page: localhost >> 127.0.0.1');
+  }
+}
+
 /**
  *
  * @typedef SketchfabUserAuth
@@ -234,11 +242,13 @@ export function rewritePathsOfSceneGLTF (sceneFileContent, fileUrls) {
 export
 async function openUserLogin (pendingCallback) {
   console.log('openUserLogin');
+  checkLocalhost();
+
   var config = {
     hostname: 'sketchfab.com',
     client_id: 'L3MirrReWDeKytcjKCTNX2pS4ci6hkSoNPWx8yaC',
     useDefaultURI: true
-    // redirect_uri: '127.0.0.1:9000'
+    // redirect_uri: 'localhost:9000'
   };
 
   var client = new SketchfabOAuth2(config);

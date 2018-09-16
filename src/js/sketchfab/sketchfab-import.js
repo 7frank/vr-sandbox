@@ -20,7 +20,7 @@ export function importOrLoadFromCache (dataURL) {
 
   $('a-scene').append(el);
 
-  setTimeout(() => el.find('.content').get(0).setAttribute('networked-imported-model', 'src:' + dataURL), 10);
+  el.get(0).setAttribute('networked-imported-model', 'src:' + dataURL);
 
   window.mLoadingbar.hide();
 
@@ -39,7 +39,7 @@ export function createNetworkedGLTFEntity (url) {
 
   var el = $(tpl);
 
-  setTimeout(() => el.find('.content').get(0).setAttribute('networked-imported-model', 'src:' + url), 10);
+  el.get(0).setAttribute('networked-imported-model', 'src:' + url);
 
   return el.get(0);
 }
