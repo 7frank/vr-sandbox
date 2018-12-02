@@ -46,7 +46,7 @@ const dialog = `
     </a-entity>
 </a-ui-renderer>
 
-<a-plane id="uiPanelTwo" ui-curved-plane width="6" height="3" position="0 0 -2" side="double" shader="flat" class="intersect"></a-plane>
+<a-plane id="uiPanelTwo" ui-curved-plane width="6" height="3" position="0 2 -2" side="double" shader="flat" class="intersect"></a-plane>
 <a-ui-renderer id="mainRenderer" ui-panel="#uiPanelTwo">
 
     <a-entity position="0 0 -0.69" id="uiPanel" >

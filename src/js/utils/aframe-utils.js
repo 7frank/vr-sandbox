@@ -198,6 +198,8 @@ export function findClosestEntity (targetSelector, selector = '#player', minDist
 export function toast (msg, duration = 2000, action = 'Ok') {
   var el = getPlayer();
 
+  const msgEscaped = escape(msg);
+
   if (typeof duration !== 'number') throw new Error('type mismatch: must be number');
 
   function checkToastForDeletion (el) {
@@ -211,14 +213,15 @@ export function toast (msg, duration = 2000, action = 'Ok') {
 
     // ---------------------------
     // check if a toast with the same message is already visible in which case do nothing
-    if (el.querySelector(`a-toast[message='${msg}']`)) return;
+    // fixme use map of <msg,autoID> using msg as key is to broad and will fail for certain cases
+    if (el.querySelector(`a-toast[msgEscaped='${msgEscaped}']`)) return;
   }
   const renderToast = () => {
     var actionParam = '';
     if (action) {
       actionParam = `action="${action}"`;
     }
-    var t = `<a-entity class="toast-wrapper" ><a-toast  material="depthTest:false" message="${msg}" ${actionParam} duration="${duration}"></a-toast></a-entity>`;
+    var t = `<a-entity class="toast-wrapper" ><a-toast  material="depthTest:false" msgEscaped="${msgEscaped}"  message="${msg}" ${actionParam} duration="${duration}"></a-toast></a-entity>`;
     el.insertAdjacentHTML('beforeend', t);
 
     var wrappers = [...el.querySelectorAll('.toast-wrapper')];

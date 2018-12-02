@@ -18,6 +18,10 @@ export function getScene () {
   return getPlayer().sceneEl;
 }
 
+export function getHUD () {
+  return getPlayer().querySelector('#mainHUD');
+}
+
 export function getWorld () {
   return getPlayer().sceneEl.querySelector('#regions-container');
 }

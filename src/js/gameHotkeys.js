@@ -23,6 +23,7 @@ import * as _ from 'lodash';
 
 import waitUntil from 'wait-until';
 import {renderRegionFromDatabase} from './region-utils';
+import {showAssetDialog} from './asset-menu/assets-ds';
 
 // import {Hotkeys} from '@nk/core-components/dist/bundle';
 
@@ -97,7 +98,8 @@ function hideLocalPlayer () {
 function addHotkeys () {
   var ACTIONS = {
     undo: 'undo',
-    redo: 'redo'
+    redo: 'redo',
+    openAssetDialog: 'Open asset dialog.'
   };
 
   Hotkeys.setDebug(false);
@@ -333,6 +335,16 @@ function addHotkeys () {
     category: 'editing'
   });
   Hotkeys().on('export element you look at', exportElementUnderCursor);
+
+  Hotkeys.register(ACTIONS.openAssetDialog, 'ctrl+f', {
+    category: 'editing'
+  });
+  Hotkeys().on(ACTIONS.openAssetDialog, function () {
+    // asset dialog will be a list of text. a selected element is loaded in the preview window if a default loader exists
+    // toggleAssetDialog()
+
+    showAssetDialog();
+  });
 
   Hotkeys.register(ACTIONS.undo, 'ctrl+z', {
     category: 'editing'

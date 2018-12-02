@@ -74,6 +74,8 @@ import {toast} from './utils/aframe-utils';
 
 import {addNetworkListeners} from './network-game-logic';
 
+import './asset-menu/assets-ds';
+
 /**
  index.js?d30a:7 Uncaught TypeError: Invalid attempt to destructure non-iterable instance
  at eval (index.js?d30a:7)

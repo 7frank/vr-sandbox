@@ -4,8 +4,8 @@ import {
   addControlsToModel, appendImageToDOM, renderGLTFOrGlbURL,
   renderZipFile
 } from '../sketchfab/sketchfab-render';
-import {renderImage, renderVideo} from './aframe-utils';
-import {getCursor, getCursorComponent} from '../game-utils';
+import {renderImage, renderVideo, toast} from './aframe-utils';
+import {getCursor, getCursorComponent, getScene} from '../game-utils';
 
 // helper that keeps track of the shift key to dass functionality for dropping files
 var bShift = false;
@@ -32,6 +32,8 @@ export function onDropZoneDrop (data) {
   }
 
   var url = window.URL.createObjectURL(blob);
+  // data.file.url=url
+  getScene().emit('file-dropped', data.file);
 
   switch (format) {
     case 'glb':
@@ -67,6 +69,7 @@ export function onDropZoneDrop (data) {
       break;
 
     default:
-      alert('unsupported file format. either use "*.glb" or a "*.zip" containing a file named "scene.gltf" as entry point or image or video assets');
+      // alert('unsupported file format. either use "*.glb" or a "*.zip" containing a file named "scene.gltf" as entry point or image or video assets');
+      toast("unknown file format press 'ctrl+f'");
   }
 }

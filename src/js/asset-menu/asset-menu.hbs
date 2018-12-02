@@ -1,0 +1,107 @@
+<a-entity id="asset-select-menu" visible="false">
+
+    <nk-list-view id="asset-select-list"
+                  position="-.5 .25 0"
+                  order-as="grid: 2 5 .5 .25"
+                  scale=".45 .45 .45"
+                  orientation="column"
+                  arrows="false"
+                  datasource="assets-ds"
+
+    >
+
+
+        <!-- TODO refactor guilistview to work with animations -->
+        <!-- FIXME when setPositionFromIndex(index,5,2,2,1)"  the current selected element is not as intended, also selecting elements does not work wheen visible min <0-->
+
+       <!--   @click="emit('sandbox.loadRegion',item.value)" -->
+        <a-plane
+
+                v-for="(item, index) in getVisibleItems(0,5)"
+                opacity="0.3"
+                :color="isSelected(index)?'blue':isHovered(index)?'slateblue':'grey'"
+                :position="setPositionFromIndex(index,3,2,1,-1)"
+
+                _animation__position_dec="'property: position;from:'+setPositionFromIndex(index-1,3,2,1,-1)+' ;to:'+setPositionFromIndex(index,3,2,1,-1)+'; dur: 1000; easing: linear;loop:false;startEvents:change-dec'"
+                _animation__position_inc="'property: position;from:'+setPositionFromIndex(index+1,3,2,1,-1)+' ; to:'+setPositionFromIndex(index,3,2,1,-1)+'; dur: 1000; easing: linear;loop:false;startEvents:change-inc'"
+
+
+                @focus="emit('sandbox.playSound','.sound-ball-bounce')"
+
+
+                @focus="onItemHover(index)"
+                @interaction-pick.stop="onItemSelected(index)"
+                @interaction-talk.stop="onItemClicked(index)"
+
+                :selected="isSelected(index)?true:null"
+        >
+
+
+            <a-image v-if="item.value.thumbnail&&item.value.thumbnail.url"
+                     material="depthTest:false"
+                     :animation__rotation="isSelected(index)?'property: rotation; from:0 0 0; to: 0 360 0; dur: 2000; easing: linear;loop:true':null"
+                     :animation__rotation_stop="!isSelected(index)?'property: rotation; to: 0 0 0; dur: 1000; easing: easeOutElastic;loop:false':null"
+
+                     position="0 0 0"
+                     :src="item.value.thumbnail.url"
+
+                     @interaction-pick.stop="onItemSelected(index)"
+            ></a-image>
+
+            <a-text v-if="item.value.name"
+                    geometry="primitive: plane; width: 1; height: auto"
+                    material="color: black"
+                    :value="item.value.name" align='center' opacity="0.6" width="1.8" transparent="true"
+                    position="0 -.45 0.2"
+            ></a-text>
+
+
+        </a-plane>
+    </nk-list-view>
+
+
+    <a-entity gui-list-selected="src:#asset-select-list"   position=".9 0 0">
+        <a-entity
+
+                geometry="primitive: plane; width: 1.1; height: 1.1"
+                material="color: grey;transparent:true;opacity:0.5"
+                scale=".4 .4 .4"
+        >
+            <a-text
+                    position="0 .45 0"
+
+                    width="1"
+                    height="1"
+                    geometry="primitive: plane; width: auto; height: auto"
+                    material="color: black"
+                    :value="'Name: '+value.name"
+                    align='left' opacity="0.9"
+
+                    transparent="true"
+
+            ></a-text>
+
+
+            <a-entity v-if="value.description"
+                    position="0 0 .1"
+                    :textarea="{text:value.description,rows:8,readonly:true}"
+            ></a-entity>
+
+            <a-text
+                    position="0 -.35 0"
+                    width="1"
+                    height="1"
+                    geometry="primitive: plane; width: auto; height: auto"
+                    material="color: black"
+                    value="Load File"
+                    align='left' opacity="0.9"
+                    transparent="true"
+                    @click="emit('sandbox.loadFileFromPath',value)"
+            ></a-text>
+
+
+        </a-entity>
+    </a-entity>
+
+
+</a-entity>
