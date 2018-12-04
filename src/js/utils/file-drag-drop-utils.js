@@ -32,7 +32,8 @@ export function onDropZoneDrop (data) {
   }
 
   var url = window.URL.createObjectURL(blob);
-  // data.file.url=url
+  // TODO
+  data.file.url = url;
   getScene().emit('file-dropped', data.file);
 
   switch (format) {
@@ -54,8 +55,7 @@ export function onDropZoneDrop (data) {
         var id = appendImageToDOM(url).id;
 
         console.log('intersects', intersects);
-
-        intersects.setAttribute('material', {src: '#' + id});
+        if (intersects) { intersects.setAttribute('material', {src: '#' + id}); }
       } else {
         var el = renderImage(url);
         addControlsToModel(el);
