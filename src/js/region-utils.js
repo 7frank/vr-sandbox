@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import {getAssets, getPlayer, getPositionInFrontOfEntity, getWorld} from './game-utils';
 import {createHTML} from './utils/dom-utils';
 import {_setPosition, playSound, toast} from './utils/aframe-utils';
+import {loadFile} from './utils/file-drag-drop-utils';
 
 function loadAssetItem (asset) {
   if (!asset.Name || !_.has(asset, 'src.url')) {
@@ -154,8 +155,10 @@ export function renderRegionFromDatabase (region, unloadPrevious = false) {
  * load a file/url from cache or url e.g.
  */
 
-function loadFileFromPath () {
+function loadFileFromPath (file) {
   toast('TODO load file');
+
+  loadFile(file.format, file.url, file);
 }
 
 // FIXME at least use events for global elements like this one

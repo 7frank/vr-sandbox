@@ -7,6 +7,8 @@ import {
 import {renderImage, renderVideo, toast} from './aframe-utils';
 import {getCursor, getCursorComponent, getScene} from '../game-utils';
 
+import {assetDialogIsVisible} from '../asset-menu/assets-ds.js';
+
 // helper that keeps track of the shift key to dass functionality for dropping files
 var bShift = false;
 $(function () {
@@ -32,17 +34,38 @@ export function onDropZoneDrop (data) {
   }
 
   var url = window.URL.createObjectURL(blob);
-  // TODO
-  data.file.url = url;
-  getScene().emit('file-dropped', data.file);
 
+  // TODO create interface or similar
+
+  data.file.url = url;
+  data.file.format = format;
+
+  // if asset dialog is not visible then have default behaviour and load images into dialog in the background
+  // otherwise do not use default behaviour
+
+  if (!assetDialogIsVisible) {
+    loadFile(format, url, data.file);
+  }
+
+  getScene().emit('file-dropped', data.file);
+}
+
+/**
+ * Loads the file from into the scene
+ * @param format
+ * @param url
+ * @param file
+ */
+
+export
+function loadFile (format, url, file) {
   switch (format) {
     case 'glb':
       var modelEl = renderGLTFOrGlbURL(url);
       addControlsToModel(modelEl);
       break;
     case 'zip':
-      var el = renderZipFile(url, data.file);// TODO render zip
+      var el = renderZipFile(url, file);// TODO render zip
 
       break;
     case 'image':

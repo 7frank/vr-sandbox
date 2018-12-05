@@ -1,9 +1,17 @@
 <a-entity id="asset-select-menu" visible="false">
 
+
+    <a-text geometry="primitive: plane; width: 1; height: auto"
+            material="color: black"
+            value="File Dialog" align='center' opacity="0.6" width="1.2" transparent="true"
+            position="0 .45 0"
+    ></a-text>
+
+
     <nk-list-view id="asset-select-list"
                   position="-.5 .25 0"
                   order-as="grid: 2 5 .5 .25"
-                  scale=".45 .45 .45"
+                  scale=".15 .15 .15"
                   orientation="column"
                   arrows="false"
                   datasource="assets-ds"
@@ -17,10 +25,10 @@
        <!--   @click="emit('sandbox.loadRegion',item.value)" -->
         <a-plane
 
-                v-for="(item, index) in getVisibleItems(0,5)"
+                v-for="(item, index) in getVisibleItems(0,11)"
                 opacity="0.3"
                 :color="isSelected(index)?'blue':isHovered(index)?'slateblue':'grey'"
-                :position="setPositionFromIndex(index,3,2,1,-1)"
+                :position="setPositionFromIndex(index,6,2,1,-1)"
 
 
                 @focus="emit('sandbox.playSound','.sound-ball-bounce')"
@@ -55,7 +63,7 @@
     </nk-list-view>
 
 
-    <a-entity gui-list-selected="src:#asset-select-list"   position=".9 0 0">
+    <a-entity gui-list-selected="src:#asset-select-list"   position=".7 0.2 0">
         <a-entity
 
                 geometry="primitive: plane; width: 1.1; height: 1.1"
