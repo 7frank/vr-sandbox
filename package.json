@@ -51,11 +51,14 @@
     "####heroku-prebuild": "export NPM_CONFIG_PRODUCTION=false; export NODE_ENV=; NPM_CONFIG_PRODUCTION=false NODE_ENV=development npm install --only=dev --dev",
     "####heroku-postbuild": "export NPM_CONFIG_PRODUCTION=true; export NODE_ENV=production;",
     "docker-build": "docker build -t frank1147/vrsandbox .",
-    "docker-run": "docker run -p 80:9000 frank1147/vrsandbox",
+    "docker-run": "docker run -p 9000:9000 -p 1337:1337 -p 27017:27017 frank1147/vrsandbox",
     "docker:runningProcesses": "docker ps",
     "heroku-login": "heroku login",
     "heroku-container-login": "heroku container:login",
-    "heroku-docker-build-push": "heroku container:push web --app mighty-everglades-60535",
+    "#heroku-docker-build-push": "heroku container:push web --app mighty-everglades-60535",
+
+    "heroku-image-push": "docker tag frank1147/vrsandbox registry.heroku.com/mighty-everglades-60535/web && docker push registry.heroku.com/mighty-everglades-60535/web",
+
     "heroku-docker-release": "heroku container:release web --app mighty-everglades-60535",
     "heroku-docker-open": "heroku open --app mighty-everglades-60535"
   },
