@@ -243,6 +243,7 @@ app.listen(port, host, (err) => {
   }
 });
 */
+console.log('starting server on http://localhost:' + port);
 //listen on port
 webServer.listen(port, function () {
     console.log('listening on http://localhost:' + port);

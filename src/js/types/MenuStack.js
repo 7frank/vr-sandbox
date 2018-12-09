@@ -73,7 +73,7 @@ export class MenuStack {
     this.mStack.push({ids});
 
     if (!menustackinit) {
-      createEscHotkey(() => this.onMenuBack());
+      createEscHotkey(() => this.pop());
       menustackinit = true;
     }
 
@@ -84,6 +84,10 @@ export class MenuStack {
       node.setAttribute('visible', ids.indexOf(node.getAttribute('id')) >= 0);
       node.flushToDOM();
     });
+  }
+
+  pop () {
+    this.onMenuBack();
   }
 
   setVisiblilityByIds (ids, visible) {

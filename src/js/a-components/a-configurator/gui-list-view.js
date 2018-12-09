@@ -86,7 +86,7 @@ AFRAME.registerPrimitive('nk-list-view', {
  * TODO set container size to wrap around buttons to be able to grab events
  *
  * TODO have some default emitters for change and selected events .. on the other hands this might interfere with the customization
- *
+ * TODO empty list view does? have one visible item .. fix that
  */
 
 const listViewItemFactory = `<a-button  

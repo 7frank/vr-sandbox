@@ -1,6 +1,7 @@
 * create region 
     * add material white plane
     * (different local skybox)
+    
 
 * use bicycle model for showcase
 * place bicycle in world 
@@ -28,3 +29,7 @@
         * detailed menus that would be great in 3d
     * https://www.helmade.com/de/helmdesign-arai-sk-6-crown-2337.html
         * motorcycle helmet 
+        
+* built toolbox for configurators
+    * templates/patches for ground
+        * grass/crates/garage         

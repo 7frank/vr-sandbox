@@ -75,7 +75,7 @@
             <a-image v-if="value.thumbnail&&value.thumbnail.url"
                      material="depthTest:false"
                      position="0 0 0"
-                     scale=".8 .8 .8"
+                     scale=".6 .6 .6"
                      :src="value.thumbnail.url"
 
                      @interaction-pick.stop="onItemSelected(index)"
@@ -104,15 +104,16 @@
 
             <a-text
                     position="0 -.35 0"
-                    width="1"
-                    height="1"
-                    geometry="primitive: plane; width: auto; height: auto"
+                    width="2"
+                    height="2"
+                    geometry="primitive: plane; width: 1; height: auto"
                     material="color: black"
                     value="Load File"
                     align='left' opacity="0.9"
                     transparent="true"
                     @click="emit('sandbox.loadFileFromPath',value)"
             ></a-text>
+
 
 
         </a-entity>

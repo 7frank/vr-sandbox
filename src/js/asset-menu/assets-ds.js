@@ -2,25 +2,36 @@ import template from './asset-menu.hbs';
 import {getHUD, getScene} from '../game-utils';
 import {MainMenuStack} from '../types/MenuStack';
 import {createHTML} from '../utils/dom-utils';
-import {loadFile} from '../utils/file-drag-drop-utils';
-import {toast} from '../utils/aframe-utils';
 
-// FIXME add hide dialog behaviour as this is currently ignored
-export
-let assetDialogIsVisible = false;
-let dialogInstance;
+export let MainOpenFileDialogInstance;
+
 export function showAssetDialog () {
-  if (!dialogInstance) {
-    let tpl = template();
-    let menu = createHTML(tpl);
-    getHUD().append(menu);
-    MainMenuStack.push('asset-select-menu');
-    dialogInstance = menu;
+  if (!MainOpenFileDialogInstance) {
+    MainOpenFileDialogInstance = new AssetDialog();
+    MainOpenFileDialogInstance.toggle();
+  } else {
+    MainOpenFileDialogInstance.toggle();
+  }
+}
 
-    assetDialogIsVisible = true;
+class AssetDialog {
+  constructor () {
+    let tpl = template();
+    this.menu = createHTML(tpl);
+    getHUD().append(this.menu);
   }
 
-  // TODO toggle dialog
+  isVisible () {
+    return this.menu.getAttribute('visible');
+  }
+
+  toggle () {
+    if (this.isVisible()) {
+      MainMenuStack.pop();
+    } else {
+      MainMenuStack.push('asset-select-menu');
+    }
+  }
 }
 
 /*
@@ -42,11 +53,11 @@ AFRAME.registerComponent('assets-ds', {
     let observableDataArray = dataArrayData.items;
 
     /**
-       * data urls are for whatever reason not working
-       * to circumvent that we create our own images for now
-       * @param dataurl
-       * @returns {string}
-       */
+         * data urls are for whatever reason not working
+         * to circumvent that we create our own images for now
+         * @param dataurl
+         * @returns {string}
+         */
 
     function createImage (dataurl) {
       const uuid = 'asset-dialog-image-' + counter++;

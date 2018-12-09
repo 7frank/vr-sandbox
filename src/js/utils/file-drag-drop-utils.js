@@ -7,7 +7,7 @@ import {
 import {renderImage, renderVideo, toast} from './aframe-utils';
 import {getCursor, getCursorComponent, getScene} from '../game-utils';
 
-import {assetDialogIsVisible} from '../asset-menu/assets-ds.js';
+import { MainOpenFileDialogInstance} from '../asset-menu/assets-ds.js';
 
 // helper that keeps track of the shift key to dass functionality for dropping files
 var bShift = false;
@@ -43,7 +43,9 @@ export function onDropZoneDrop (data) {
   // if asset dialog is not visible then have default behaviour and load images into dialog in the background
   // otherwise do not use default behaviour
 
-  if (!assetDialogIsVisible) {
+  // TODO have one distinct handler active as fallback if no other
+
+  if (!MainOpenFileDialogInstance.isVisible()) {
     loadFile(format, url, data.file);
   }
 
