@@ -408,7 +408,9 @@ module.exports = {
             {from: '../node_modules/aframe-material-snickell/assets', to: 'assets'},
             {from: '../node_modules/beta-dev-zip/lib', to: 'lib/zip'},
             {from: '../node_modules/@nk11/core-components/dist/assets', to: 'assets'},
-            {from: '../node_modules/easyrtc/api/easyrtc.js', to: 'lib'}
+            {from: '../node_modules/easyrtc/api/easyrtc.js', to: 'lib'},
+            {from: '../src/js/dragonbones/dragonBones-three-lib.js', to: 'lib'}
+
         ]),
 
         new Webpack.NamedModulesPlugin(),

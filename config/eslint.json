@@ -2,7 +2,8 @@
   "globals": {
     "AFRAME": true,
     "THREE": true,
-    "CANNON": true
+    "CANNON": true,
+    "dragonBones": true
   },
   "extends": "standard",
   "env": {

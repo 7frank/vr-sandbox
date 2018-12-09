@@ -76,6 +76,7 @@ import {addNetworkListeners} from './network-game-logic';
 
 import './asset-menu/assets-ds';
 
+import './dragonbones/dragon-bones';
 /**
  index.js?d30a:7 Uncaught TypeError: Invalid attempt to destructure non-iterable instance
  at eval (index.js?d30a:7)
