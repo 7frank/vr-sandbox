@@ -8,10 +8,17 @@
     ></a-text>
 
 
+    <a-plane class="asset-dialog-background"
+            material="color: white;transparent:true; opacity:0.2"
+            position="0 0 -1"
+             scale="1.4 .98 .1"
+    ></a-plane>
+
+
     <nk-list-view id="asset-select-list"
-                  position="-.5 .25 0"
+                  position="-.5 .3 0"
                   order-as="grid: 2 5 .5 .25"
-                  scale=".15 .15 .15"
+                  scale=".20 .20 .20"
                   orientation="column"
                   arrows="false"
                   datasource="assets-ds"
@@ -25,15 +32,11 @@
        <!--   @click="emit('sandbox.loadRegion',item.value)" -->
         <a-plane
 
-                v-for="(item, index) in getVisibleItems(0,11)"
+                v-for="(item, index) in getVisibleItems(0,15)"
                 opacity="0.3"
                 :color="isSelected(index)?'blue':isHovered(index)?'slateblue':'grey'"
-                :position="setPositionFromIndex(index,6,2,1,-1)"
-
-
+                :position="setPositionFromIndex(index,4,4,1,-1)"
                 @focus="emit('sandbox.playSound','.sound-ball-bounce')"
-
-
                 @focus="onItemHover(index)"
                 @interaction-pick.stop="onItemSelected(index)"
                 @interaction-talk.stop="onItemClicked(index)"
@@ -43,9 +46,9 @@
 
 
             <a-image v-if="item.value.thumbnail&&item.value.thumbnail.url"
-                     material="depthTest:false"
+
                      position="0 0 0"
-                     scale=".8 .8 .8"
+                     scale=".9 .9 .9"
                      :src="item.value.thumbnail.url"
 
                      @interaction-pick.stop="onItemSelected(index)"
@@ -54,8 +57,8 @@
             <a-text v-if="item.value.name"
                     geometry="primitive: plane; width: 1; height: auto"
                     material="color: black"
-                    :value="item.value.name" align='center' opacity="0.6" width="1.8" transparent="true"
-                    position="0 -.45 0.2"
+                    :value="item.value.name.substr(0,12)" align='center' opacity="1" width="1.8" transparent="true"
+                    position="0 -.45 0.5"
             ></a-text>
 
 
@@ -63,7 +66,7 @@
     </nk-list-view>
 
 
-    <a-entity gui-list-selected="src:#asset-select-list"   position=".7 0.2 0">
+    <a-entity gui-list-selected="src:#asset-select-list"   position=".45 0.15 0">
         <a-entity
 
                 geometry="primitive: plane; width: 1.1; height: 1.1"
@@ -75,41 +78,33 @@
             <a-image v-if="value.thumbnail&&value.thumbnail.url"
                      material="depthTest:false"
                      position="0 0 0"
-                     scale=".6 .6 .6"
+                     scale=".8 .8 .8"
                      :src="value.thumbnail.url"
 
                      @interaction-pick.stop="onItemSelected(index)"
             ></a-image>
-
 
             <a-text
                     position="0 .45 0"
 
                     width="1"
                     height="1"
-                    geometry="primitive: plane; width: auto; height: auto"
                     material="color: black"
-                    :value="'Name: '+value.name"
-                    align='left' opacity="0.9"
+                    :value="value.name"
+                    align='center' opacity="0.9"
 
                     transparent="true"
 
             ></a-text>
 
-
-            <a-entity v-if="value.description"
-                    position="0 0 .1"
-                    :textarea="{text:value.description,rows:8,readonly:true}"
-            ></a-entity>
-
             <a-text
-                    position="0 -.35 0"
+                    position="0 -.5 0"
                     width="2"
                     height="2"
                     geometry="primitive: plane; width: 1; height: auto"
                     material="color: black"
                     value="Load File"
-                    align='left' opacity="0.9"
+                    align='center' opacity="0.9"
                     transparent="true"
                     @click="emit('sandbox.loadFileFromPath',value)"
             ></a-text>

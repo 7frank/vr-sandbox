@@ -508,11 +508,13 @@ export function renderVideo (url) {
 export function renderAtPlayer (el, target = document.querySelector('a-scene')) {
   var playerPos = getWorldPosition(getPlayer().object3D);
   var playerDir = getWorldDirection(getPlayer().object3D).normalize().multiplyScalar(3);
+  playerDir.y = 0;
 
-  el.setAttribute('position', AFRAME.utils.coordinates.stringify(playerPos.sub(playerDir)));
+  let position = AFRAME.utils.coordinates.stringify(playerPos.sub(playerDir));
+  // el.setAttribute('position',position);
 
   // target.appendChild(el);
-  UndoMgr.addHTMLElementToTarget(el, target);
+  UndoMgr.addHTMLElementToTarget(el, target, position);
 
   scaleEntity(el, 1);
 }

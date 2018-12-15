@@ -45,40 +45,40 @@ function loadAssetImage (asset) {
   // document.body;
   getAssets().append(img);
   /*
-              //FIXME
-            let img = AFRAME.nk.parseHTML(`<img id=${asset.Name}  />  `);
-            document.body.append(img);
+                //FIXME
+              let img = AFRAME.nk.parseHTML(`<img id=${asset.Name}  />  `);
+              document.body.append(img);
 
-           fetch(asset.src)
-              .then(function (response) {
-                if (!response.ok) {
-                  throw Error(response.statusText);
-                }
-                return response;
-              })
-              .then(response => response.blob())
-              .then(images => {
-                // Then create a local URL for that image and print it
-                let dataURL = URL.createObjectURL(images);
-                img.src = dataURL;
-              }).catch(e => {
-                let errorTexture = new ErrorTexture().setErrorMessage(asset.Name + ' not found', 512, 512);
-                let dataURL = errorTexture.getDataURL();
+             fetch(asset.src)
+                .then(function (response) {
+                  if (!response.ok) {
+                    throw Error(response.statusText);
+                  }
+                  return response;
+                })
+                .then(response => response.blob())
+                .then(images => {
+                  // Then create a local URL for that image and print it
+                  let dataURL = URL.createObjectURL(images);
+                  img.src = dataURL;
+                }).catch(e => {
+                  let errorTexture = new ErrorTexture().setErrorMessage(asset.Name + ' not found', 512, 512);
+                  let dataURL = errorTexture.getDataURL();
 
-                // img.src = dataURL;
-                img.src = '/assets/images/Octocat.png';
-                toast('Asset:' + asset.Name + ' not loaded');
-              });
+                  // img.src = dataURL;
+                  img.src = '/assets/images/Octocat.png';
+                  toast('Asset:' + asset.Name + ' not loaded');
+                });
 
-              */
+                */
 }
 
 function loadAssets (assets) {
   /*
-         assets.filter(asset => asset.Type == 'image').forEach(loadAssetImage);
+           assets.filter(asset => asset.Type == 'image').forEach(loadAssetImage);
 
-         assets.filter(asset => asset.Type != 'image').forEach(loadAssetItem);
-       */
+           assets.filter(asset => asset.Type != 'image').forEach(loadAssetItem);
+         */
   assets.forEach(loadAssetItem);
 }
 
@@ -153,10 +153,19 @@ export function renderRegionFromDatabase (region, unloadPrevious = false) {
 
 /**
  * load a file/url from cache or url e.g.
+ * Note atm only used in context of dialog selections
+ *
  */
 
 function loadFileFromPath (file) {
-  toast('TODO load file');
+  if (!(file instanceof File)) {
+    toast('select file first');
+    return;
+  }
+
+  if (file.format == 'image' || file.url.indexOf('blob:') >= 0) {
+    console.warn("can't load images from blob currently");
+  }
 
   loadFile(file.format, file.url, file);
 }
