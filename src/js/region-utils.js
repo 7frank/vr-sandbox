@@ -158,7 +158,7 @@ export function renderRegionFromDatabase (region, unloadPrevious = false) {
  */
 
 function loadFileFromPath (file) {
-  if (!(file instanceof File)) {
+  if (!file.url) {
     toast('select file first');
     return;
   }
@@ -167,7 +167,7 @@ function loadFileFromPath (file) {
     console.warn("can't load images from blob currently");
   }
 
-  loadFile(file.format, file.url, file);
+  loadFile(file.type, file.url, file);
 }
 
 // FIXME at least use events for global elements like this one
