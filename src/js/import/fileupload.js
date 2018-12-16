@@ -2,6 +2,9 @@ import dragDrop from 'drag-drop';
 import {createHTML} from '../utils/dom-utils';
 import {Logger} from '../utils/Logger';
 
+import {strapiSDK} from '../database-utils';
+import {toast} from '../utils/aframe-utils';
+
 var console = Logger.getLogger('fileupload');
 
 var styleTpl = `
@@ -93,24 +96,19 @@ document.addEventListener('DOMContentLoaded', function (event) {
 
 // This will upload the file after having read it
 export
-const uploadFile = (file, url = window.location.origin + '/strapi/upload') => {
-  console.log('file', file);
+async function uploadFile (file, url = window.location.origin + '/strapi/upload') {
+  // FIXME have dedicated login
 
-  var data = new FormData();
-  data.append('file', file);
-  data.append('user', 'hubot');
+  const form = new FormData();
 
-  return fetch(url, { // Your POST endpoint
-    method: 'POST',
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    },
-    body: data // This is your file object
-  }).then(
-    response => response.json() // if the response is a JSON object
-  ).then(
-    success => console.log(success) // Handle the success response object
-  ).catch(
-    error => console.log(error) // Handle the error response object
-  );
-};
+  form.append('files', file, file.name);
+  const files = await strapiSDK.upload(form);
+  const fileID = files[0].id;
+  toast('uploaded ' + file.name);
+
+  const result = await strapiSDK.createEntry('asset', {Name: 'Asset-' + file.name, Type: 'other', src: fileID});
+
+  toast('uploaded ' + file.name);
+
+  console.log('uploadFile result', result);
+}

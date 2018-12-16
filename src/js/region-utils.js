@@ -4,6 +4,7 @@ import {createHTML} from './utils/dom-utils';
 import {_setPosition, playSound, toast} from './utils/aframe-utils';
 import {loadFile} from './utils/file-drag-drop-utils';
 import {uploadFile} from './import/fileupload';
+import {strapiSDK} from './database-utils';
 
 function loadAssetItem (asset) {
   if (!asset.Name || !_.has(asset, 'src.url')) {

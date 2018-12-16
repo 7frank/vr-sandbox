@@ -8,6 +8,8 @@ import {DB, User} from '../../database-utils';
  *
  *
  */
+export
+const defaultUser = new User();
 
 AFRAME.registerComponent('ql-ds', {
   dependencies: ['data-array'],
@@ -39,7 +41,7 @@ AFRAME.registerComponent('ql-ds', {
     let key = this.data.src;
 
     // TODO have one global instance of the current user
-    new DB().setUser(new User()).query(this.data.query)
+    new DB().setUser(defaultUser).query(this.data.query)
       .then(function (entries) {
         // remove previous results
         observableDataArray.splice(0, observableDataArray.length);

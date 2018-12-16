@@ -5,6 +5,8 @@ import fetchQL from 'graphql-fetch';
 import * as _ from 'lodash';
 import {renderRegionFromDatabase} from './region-utils';
 
+import Strapi from 'strapi-sdk-javascript/build/main';
+
 // const baseURL = 'http://localhost:1337';
 export const config = {
   url: '/strapi',
@@ -13,6 +15,13 @@ export const config = {
 
 };
 const baseURL = config.url;
+
+// FIXME 500 stream upload not working with redirect
+export
+// const strapiSDK = new Strapi(window.location.origin + config.url);
+const strapiSDK = new Strapi('http://localhost:1337');
+
+global['strapiSDK'] = strapiSDK;
 
 /**
  *
@@ -62,6 +71,12 @@ export function queryAPI (route) {
   return streamIn(baseURL + route).then(response => response.json());
 }
 
+async function TODOLOGIN () {
+  let name = prompt('name');
+  let pw = prompt('password');
+  return strapiSDK.login(name, pw);
+}
+
 /*
 TODO login gui
 assets load
@@ -72,6 +87,8 @@ export class User {
   }
 
   login (user, password) {
+    return TODOLOGIN()
+    /*
     return fetch(config.url + config.login,
       {
         method: 'post',
@@ -87,6 +104,7 @@ export class User {
       .then(function (response) {
         return response.json();
       })
+        */
       .then((auth) => {
         //  console.log('Well done!');
         // console.log('User profile', auth.user);

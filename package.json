@@ -56,9 +56,7 @@
     "heroku-login": "heroku login",
     "heroku-container-login": "heroku container:login",
     "#heroku-docker-build-push": "heroku container:push web --app mighty-everglades-60535",
-
     "heroku-image-push": "docker tag frank1147/vrsandbox registry.heroku.com/mighty-everglades-60535/web && docker push registry.heroku.com/mighty-everglades-60535/web",
-
     "heroku-docker-release": "heroku container:release web --app mighty-everglades-60535",
     "heroku-docker-open": "heroku open --app mighty-everglades-60535"
   },
@@ -77,6 +75,7 @@
     "pretty": "^2.0.0",
     "proctree": "^0.1.1",
     "socket.io": "^2.1.1",
+    "strapi-sdk-javascript": "^0.3.1",
     "three-codeeditor": "^0.1.4",
     "three-to-cannon": "^1.4.1",
     "tween": "^0.9.0",
