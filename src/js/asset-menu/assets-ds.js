@@ -1,43 +1,20 @@
-import template from './asset-menu.hbs';
-import {getHUD, getScene} from '../game-utils';
-import {MainMenuStack} from '../types/MenuStack';
-import {createHTML} from '../utils/dom-utils';
+import {getScene} from '../game-utils';
+import * as _ from 'lodash';
+import {convertRegionInfo} from '../a-components/datasource/region-ds';
 
-export let MainOpenFileDialogInstance;
-
-export function showAssetDialog () {
-  if (!MainOpenFileDialogInstance) {
-    MainOpenFileDialogInstance = new AssetDialog();
-    MainOpenFileDialogInstance.toggle();
-  } else {
-    MainOpenFileDialogInstance.toggle();
-  }
-}
-
-class AssetDialog {
-  constructor () {
-    let tpl = template();
-    this.menu = createHTML(tpl);
-    getHUD().append(this.menu);
-  }
-
-  isVisible () {
-    return this.menu.getAttribute('visible');
-  }
-
-  toggle () {
-    if (this.isVisible()) {
-      MainMenuStack.pop();
-    } else {
-      MainMenuStack.push('asset-select-menu');
-    }
-  }
-}
-
+/**
+ * Note: don't use blob urls, only those with actual file name and extension
+ * @param url
+ * @param type
+ * @returns {*}
+ */
 function addFileFromURL (url, type = 'image') {
+  const name = url.split('/').pop();
+
   let obj = {
     url,
-    type
+    format: type,
+    name
   };
   let validated = validateFileOrURL(obj);
   console.log('validated', validated);
@@ -62,15 +39,15 @@ function createImage (dataurl) {
 
 function validateFileOrURL (detail) {
   let thumbnail;
-  if (detail.type.indexOf('text') >= 0) {
+  if (detail.format.indexOf('text') >= 0) {
     thumbnail = {url: 'assets/images/fa/file-text-o.png'};
-  } else if (detail.type.indexOf('video') >= 0) {
+  } else if (detail.format.indexOf('video') >= 0) {
     thumbnail = {url: 'assets/images/fa/file-video-o.png'};
-  } else if (detail.type.indexOf('audio') >= 0) {
+  } else if (detail.format.indexOf('audio') >= 0) {
     thumbnail = {url: 'assets/images/fa/file-sound-o.png'};
-  } else if (detail.type.indexOf('zip') >= 0) {
+  } else if (detail.format.indexOf('zip') >= 0) {
     thumbnail = {url: 'assets/images/fa/file-zip-o.png'};
-  } else if (detail.type.indexOf('image') >= 0) {
+  } else if (detail.format.indexOf('image') >= 0) {
     if (detail.url.indexOf('blob:') == 0) {
       const id = '#' + createImage(detail.url);
       thumbnail = {url: id};
@@ -114,6 +91,49 @@ AFRAME.registerComponent('assets-ds', {
 
       let obj = validateFileOrURL(detail);
       observableDataArray.push({key: -1, value: obj});
+    });
+  }
+});
+
+const assetsQuery =
+`
+ assets{
+    Type
+    src{
+      name
+      
+      
+    }
+    Name
+    
+  }
+`;
+
+AFRAME.registerComponent('assets-ds-x', {
+  // dependencies: ['ql-ds'],
+  schema: {
+
+    src: {
+      type: 'string',
+      default: 'assets' //  "/region" //for rest-ds
+    },
+    query: {
+      type: 'string',
+      default: assetsQuery
+    }
+  },
+  init: function () {
+    this.el.setAttribute('ql-ds', this.data); // rest-ds
+
+    // TODO make it easier to change underlying data
+    // this.el.addEventListener('data-entry-change',
+
+    this.el.addEventListener('data-change', (event) => {
+      _.each(event.detail.items, (entry, i) => {
+        event.detail.items[i] = {key: i, value: entry.value};
+
+        global.resultAssets = event.detail.items;
+      });
     });
   }
 });

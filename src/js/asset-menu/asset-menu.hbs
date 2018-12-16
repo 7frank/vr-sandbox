@@ -3,7 +3,7 @@
 
     <a-text geometry="primitive: plane; width: 1; height: auto"
             material="color: black"
-            value="File Dialog" align='center' opacity="0.6" width="1.2" transparent="true"
+            value="{{title}}" align='center' opacity="0.6" width="1.2" transparent="true"
             position="0 .45 0"
     ></a-text>
 
@@ -21,7 +21,7 @@
                   scale=".20 .20 .20"
                   orientation="column"
                   arrows="false"
-                  datasource="assets-ds"
+                  datasource="{{datasource}}"
 
     >
 

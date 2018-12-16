@@ -167,7 +167,7 @@ function loadFileFromPath (file) {
     console.warn("can't load images from blob currently");
   }
 
-  loadFile(file.type, file.url, file);
+  loadFile(file.format, file.url, file);
 }
 
 // FIXME at least use events for global elements like this one

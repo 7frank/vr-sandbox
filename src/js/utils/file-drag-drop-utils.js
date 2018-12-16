@@ -7,7 +7,7 @@ import {
 import {renderImage, renderVideo, toast} from './aframe-utils';
 import {getCursor, getCursorComponent, getScene} from '../game-utils';
 
-import { MainOpenFileDialogInstance} from '../asset-menu/assets-ds.js';
+import { MainOpenFileDialogInstance} from '../asset-menu/AssetsDialog.js';
 
 // helper that keeps track of the shift key to dass functionality for dropping files
 var bShift = false;
@@ -61,6 +61,8 @@ export function onDropZoneDrop (data) {
 
 export
 function loadFile (format, url, file) {
+  console.log('loadFile', format, url, file);
+
   switch (format) {
     case 'glb':
       var modelEl = renderGLTFOrGlbURL(url);

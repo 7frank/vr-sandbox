@@ -23,7 +23,7 @@ import * as _ from 'lodash';
 
 import waitUntil from 'wait-until';
 import {renderRegionFromDatabase} from './region-utils';
-import {showAssetDialog} from './asset-menu/assets-ds';
+import {showAssetDialog} from './asset-menu/AssetsDialog';
 
 // import {Hotkeys} from '@nk/core-components/dist/bundle';
 
