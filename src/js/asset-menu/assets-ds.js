@@ -1,6 +1,5 @@
 import {getScene} from '../game-utils';
 import * as _ from 'lodash';
-import {convertRegionInfo} from '../a-components/datasource/region-ds';
 
 /**
  * Note: don't use blob urls, only those with actual file name and extension
@@ -37,7 +36,11 @@ function createImage (dataurl) {
   return uuid;
 }
 
-function validateFileOrURL (detail) {
+function validateFileOrURL (detail, prefixURL) {
+  if (prefixURL) {
+    detail.url = prefixURL + detail.url;
+  }
+
   let thumbnail;
   if (detail.format.indexOf('text') >= 0) {
     thumbnail = {url: 'assets/images/fa/file-text-o.png'};
@@ -73,7 +76,7 @@ function validateFileOrURL (detail) {
 
 */
 let counter = 0;
-AFRAME.registerComponent('assets-ds', {
+AFRAME.registerComponent('assets-ds-temp', {
   dependencies: ['data-array'],
   schema: {},
   init: function () {
@@ -86,28 +89,54 @@ AFRAME.registerComponent('assets-ds', {
       'https://i.imgur.com/D4YsQrL.jpg'
     ].forEach((url, k) => observableDataArray.push({key: -1, value: addFileFromURL(url, 'image')}));
 
+    // drag and drop listener
     getScene().addEventListener('file-dropped', ({detail}) => {
-      console.log('droppend in asset-ds', detail);
-
       let obj = validateFileOrURL(detail);
+
+      // indicates that the file is not stored
+      obj.isBlob = true;
+
       observableDataArray.push({key: -1, value: obj});
     });
   }
 });
 
 const assetsQuery =
-`
+    `
  assets{
     Type
     src{
       name
-      
-      
+      url
+      size 
     }
     Name
-    
   }
 `;
+
+/**
+ * Creates a copy of an object like _.pick but with renaming the keys as well
+ * Note :Extend by type check ..
+ * TODO this should be done on dialog instead of datasource
+ * @param obj
+ * @param _interface
+ */
+export function transformObjectViaInterfaceMap (obj, _interface) {
+  const result = {};
+  _.each(_interface, (data, key) => {
+    let [newKeyName, defaultValue] = data.split(':');
+    const val = _.get(obj, key, defaultValue);
+    _.set(result, newKeyName, val);
+  });
+  return result;
+}
+
+// TODO "oldKey" : "newkeyType: newKeyName = newKeyDefault"
+let assetsDSInterface = {
+  Name: 'name',
+  'src.url': 'url',
+  Type: 'format'
+};
 
 AFRAME.registerComponent('assets-ds-x', {
   // dependencies: ['ql-ds'],
@@ -130,10 +159,24 @@ AFRAME.registerComponent('assets-ds-x', {
 
     this.el.addEventListener('data-change', (event) => {
       _.each(event.detail.items, (entry, i) => {
-        event.detail.items[i] = {key: i, value: entry.value};
+        // if the file is a blob we don't do anything as it was added via d&d
+        if (entry.value.isBlob) return;
 
+        let transformedData = transformObjectViaInterfaceMap(entry.value, assetsDSInterface);
+        transformedData = validateFileOrURL(transformedData, window.location.origin + '/strapi');
+        event.detail.items[i] = {key: i, value: transformedData};
         global.resultAssets = event.detail.items;
       });
+    });
+
+    // drag and drop listener
+    let dataArrayData = this.el.components['data-array'].data;
+    let observableDataArray = dataArrayData.items;
+    getScene().addEventListener('file-dropped', ({detail}) => {
+      let obj = validateFileOrURL(detail);
+      // indicates that the file is not stored
+      obj.isBlob = true;
+      observableDataArray.push({key: -1, value: obj});
     });
   }
 });

@@ -56,7 +56,7 @@
 
             <a-text v-if="item.value.name"
                     geometry="primitive: plane; width: 1; height: auto"
-                    material="color: black"
+                    :material="item.value.isBlob?'color: red':'color: black'"
                     :value="item.value.name.substr(0,12)" align='center' opacity="1" width="1.8" transparent="true"
                     position="0 -.45 0.5"
             ></a-text>
@@ -107,6 +107,19 @@
                     align='center' opacity="0.9"
                     transparent="true"
                     @click="emit('sandbox.loadFileFromPath',value)"
+            ></a-text>
+
+
+            <a-text v-if="value.isBlob"
+                    position="0 -.6 0"
+                    width="2"
+                    height="2"
+                    geometry="primitive: plane; width: 1; height: auto"
+                    material="color: red"
+                    value="Upload to Server"
+                    align='center' opacity="0.9"
+                    transparent="true"
+                    @click="emit('sandbox.uploadFileToServer',value)"
             ></a-text>
 
 

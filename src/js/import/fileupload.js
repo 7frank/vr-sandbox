@@ -90,3 +90,27 @@ export function createDropZone (el, onBlobCreated) {
 document.addEventListener('DOMContentLoaded', function (event) {
   createDropZone(document.body);
 }); */
+
+// This will upload the file after having read it
+export
+const uploadFile = (file, url = window.location.origin + '/strapi/upload') => {
+  console.log('file', file);
+
+  var data = new FormData();
+  data.append('file', file);
+  data.append('user', 'hubot');
+
+  return fetch(url, { // Your POST endpoint
+    method: 'POST',
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    },
+    body: data // This is your file object
+  }).then(
+    response => response.json() // if the response is a JSON object
+  ).then(
+    success => console.log(success) // Handle the success response object
+  ).catch(
+    error => console.log(error) // Handle the error response object
+  );
+};

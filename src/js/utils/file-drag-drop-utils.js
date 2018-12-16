@@ -54,6 +54,7 @@ export function onDropZoneDrop (data) {
 
 /**
  * Loads the file from into the scene
+ * TODO format mesh and glb might interfere. currently used for local d&drop and assets from strapi
  * @param format
  * @param url
  * @param file
@@ -64,6 +65,10 @@ function loadFile (format, url, file) {
   console.log('loadFile', format, url, file);
 
   switch (format) {
+    case 'mesh':
+      var modelEl = renderGLTFOrGlbURL(url);
+      addControlsToModel(modelEl);
+      break;
     case 'glb':
       var modelEl = renderGLTFOrGlbURL(url);
       addControlsToModel(modelEl);

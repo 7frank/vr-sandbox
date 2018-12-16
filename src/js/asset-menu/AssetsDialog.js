@@ -18,7 +18,7 @@ class AssetDialog {
   constructor () {
     let tpl = template({
       title: 'File Dialog!',
-      datasource: 'assets-ds-x' //  'assets-ds'
+      datasource: 'assets-ds-x' //  'assets-ds-temp'
     });
     this.menu = createHTML(tpl);
     getHUD().append(this.menu);

@@ -3,6 +3,7 @@ import {getAssets, getPlayer, getPositionInFrontOfEntity, getWorld} from './game
 import {createHTML} from './utils/dom-utils';
 import {_setPosition, playSound, toast} from './utils/aframe-utils';
 import {loadFile} from './utils/file-drag-drop-utils';
+import {uploadFile} from './import/fileupload';
 
 function loadAssetItem (asset) {
   if (!asset.Name || !_.has(asset, 'src.url')) {
@@ -170,5 +171,16 @@ function loadFileFromPath (file) {
   loadFile(file.format, file.url, file);
 }
 
+/**
+ * Note: Only files or blobs should be used
+ * @param file
+ */
+
+function uploadFileToServer (file) {
+  toast('TODO upoad to strapi server');
+
+  uploadFile(file);
+}
+
 // FIXME at least use events for global elements like this one
-global.sandbox = {loadRegion: renderRegionFromDatabase, playSound, loadFileFromPath};
+global.sandbox = {loadRegion: renderRegionFromDatabase, playSound, loadFileFromPath, uploadFileToServer};
