@@ -1,11 +1,11 @@
 import {streamIn} from './utils/stream-utils';
-import {playSound} from './utils/aframe-utils';
+import {toast} from './utils/aframe-utils';
 
 import fetchQL from 'graphql-fetch';
 import * as _ from 'lodash';
-import {renderRegionFromDatabase} from './region-utils';
 
 import Strapi from 'strapi-sdk-javascript/build/main';
+import {createLoginDialog} from './database/LoginDialog';
 
 // const baseURL = 'http://localhost:1337';
 export const config = {
@@ -71,51 +71,57 @@ export function queryAPI (route) {
   return streamIn(baseURL + route).then(response => response.json());
 }
 
-async function TODOLOGIN () {
-  let name = prompt('name');
-  let pw = prompt('password');
-  return strapiSDK.login(name, pw);
-}
+/**
+ *
+ * TODO improve loggin handling, log in once keep auth available in "Single Point of Truth"
+ * assets load
+ * qraphql query for region assets
+ *
+ */
 
-/*
-TODO login gui
-assets load
-qraphql query for region assets */
 export class User {
   constructor () {
     this.auth = false;
   }
 
   login (user, password) {
-    return TODOLOGIN()
-    /*
-    return fetch(config.url + config.login,
-      {
-        method: 'post',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          identifier: user,
-          password: password
-        })
-      })
-      .then(function (response) {
-        return response.json();
-      })
-        */
+    // wait for current login process
+    if (this.loginPromise) return this.loginPromise;
+
+    // already logged in return auth
+    if (this.auth) {
+      toast('already logged in:' + this.auth.user.username);
+      return Promise.resolve(this.auth);
+    }
+
+    const onCancel = () => {
+      this.loginPromise = undefined;
+    };
+
+    this.loginPromise = createLoginDialog(onCancel);
+
+    return this.loginPromise
       .then((auth) => {
-        //  console.log('Well done!');
-        // console.log('User profile', auth.user);
-        //  console.log('User token', auth.jwt);
+        console.log('Well done!');
+        console.log('User profile', auth.user);
+        console.log('User token', auth.jwt);
         this.auth = auth;
-      })
-      .catch(function (error) {
-        console.log('An error occurred:', error);
+
+        toast('Login Success');
+
+        return auth;
       });
   }
 }
+
+/**
+ * A simple graphql - based data source.
+ *
+ * TODO have some more options
+ *
+ *
+ */
+export const DefaultUser = new User();
 
 export class DB {
   setUser (user) {
@@ -154,21 +160,21 @@ export let QLQueries = {
   region: function () {
     /*  return region(id:"234234wqwrwer") + QLQueries.regChunk
 
-              */
+                                                              */
     /*
-                  {name
-               data
-               description
-               dimensions
-               position
-               owner  { username   }
-               thumbnail {url name}
-               assets{
-                 Type
-                 Name
-                 src{     name     url
-                 }
-               }   */
+                                                                  {name
+                                                               data
+                                                               description
+                                                               dimensions
+                                                               position
+                                                               owner  { username   }
+                                                               thumbnail {url name}
+                                                               assets{
+                                                                 Type
+                                                                 Name
+                                                                 src{     name     url
+                                                                 }
+                                                               }   */
   },
   regions: `
  regions 

@@ -10,7 +10,10 @@ import {emit} from './gui-list-view';
  * TODO a gui-list-view and a gui-list-select should both have a src and a datasource attribute
  * - a source should be any other list or element that uses a data-array of some sort
  * - a datasource is an instance of a data-array component or any descendant of it.
- *
+
+ * TODO the concept of the proxy seems to be flawed here 'type != function' if ersolved for example
+ * TODO instead vue should work like loadash.get
+
  * @param obj
  * @returns {Object}
  */
@@ -20,13 +23,17 @@ function getDefaultsProxy (obj = {}) {
     get: function (target, name) {
       if (name in target) {
         // TODO potential error (typeof target[name] != 'symbol') => (typeof name != 'symbol'
-        if (_.isObject(target[name]) && (typeof target[name] != 'symbol')) {
+        if (_.isObject(target[name]) && (typeof target[name] != 'symbol') && !target[name].__isProxy) {
           return getDefaultsProxy(target[name]);
         } else {
           return target[name];
         }
       } else {
-        // FIXME render result if missing or throw error
+      /*  // TODO test rendering with no selection
+       //FIXME using this will break accessing functions
+        const obj = {__isProxy: true};
+        obj.toString = () => '';
+        return getDefaultsProxy(obj); */
 
         //  return '!' + name.toString();
       }
@@ -60,6 +67,7 @@ AFRAME.registerComponent('gui-list-selected', {
         if (!this.data.src) return false;
 
         target = document.querySelector(this.data.src);
+
         return !!target;
       })
       .done((result) => {

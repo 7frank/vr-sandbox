@@ -1,15 +1,5 @@
 import * as _ from 'lodash';
-import {DB, User} from '../../database-utils';
-
-/**
- * A simple graphql - based data source.
- *
- * TODO have some more options
- *
- *
- */
-export
-const defaultUser = new User();
+import {DB, User, DefaultUser} from '../../database-utils';
 
 AFRAME.registerComponent('ql-ds', {
   dependencies: ['data-array'],
@@ -41,7 +31,7 @@ AFRAME.registerComponent('ql-ds', {
     let key = this.data.src;
 
     // TODO have one global instance of the current user
-    new DB().setUser(defaultUser).query(this.data.query)
+    new DB().setUser(DefaultUser).query(this.data.query)
       .then(function (entries) {
         // remove previous results
         observableDataArray.splice(0, observableDataArray.length);

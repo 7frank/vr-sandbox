@@ -78,14 +78,12 @@ AFRAME.registerComponent('html-3d', {
     // TODO
     var viewport = $('body').get(0);// scene;// .querySelector('canvas');
 
-    window['oo'] = this;
-
     var test = $('a-html-3d').get(0);
 
     // FIXME something is wrong here
 
     var box = createHtmlMixer(null, /* test.querySelector(':first-child') */ viewport, scene.object3D, scene.camera, scene.renderer, this.model);
-    window['box'] = box;
+
     /* setInterval(function () {
       $(viewport).append(box);
     }, 1000);

@@ -75,7 +75,7 @@
                     geometry="primitive: plane; width: auto; height: auto"
                     material="color: black"
                     :value="'Name: '+value.name"
-                    align='left' opacity="0.9"
+                    align='center' opacity="0.9"
 
                     transparent="true"
 
@@ -89,7 +89,7 @@
                     geometry="primitive: plane; width: auto; height: auto"
                     material="color: black"
                     :value="'Author: '+value.owner.username"
-                    align='left' opacity="0.9"
+                    align='center' opacity="0.9"
 
                     transparent="true"
 
@@ -107,7 +107,7 @@
                     geometry="primitive: plane; width: auto; height: auto"
                     material="color: black"
                     value="Load Region"
-                    align='left' opacity="0.9"
+                    align='center' opacity="0.9"
                     transparent="true"
                     @click="emit('sandbox.loadRegion',value)"
             ></a-text>

@@ -5,14 +5,13 @@ import listTemplate from './main-menu-list.hbs';
 import {MainMenuStack} from '../types/MenuStack';
 import {getWorld} from '../game-utils';
 import {loadStaticRegionDemo} from '../region-utils';
-import {User as defaultUser} from '../database-utils';
+import {DefaultUser} from '../database-utils';
 
 AFRAME.registerComponent('hud-main-menu', {
   schema: {},
   init: function () {
     this.createDialog();
   },
-
   createDialog: function () {
     if (this.vm) this.vm.$el.parentElement.removeChild(this.vm.$el);
 
@@ -43,7 +42,7 @@ AFRAME.registerComponent('hud-main-menu', {
           MainMenuStack.push('region-select-menu');
           break;
         case 'Login':
-          defaultUser.login();
+          DefaultUser.login();
           break;
         case 'Config':
           MainMenuStack.push('sample-config-menu');
